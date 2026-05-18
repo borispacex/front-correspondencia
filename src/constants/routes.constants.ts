@@ -1,29 +1,35 @@
 export const ROUTES = {
   HOME: "/",
-  SIGN_IN: "/signin",
-  SIGN_UP: "/signup",
+  SIGN_IN: "/iniciar-sesion",
+  SIGN_UP: "/registrarse",
+  RESET_PASSWORD: "/restrablecer",
   PROFILE: "/perfil",
   // Admin
   ROLES: {
-    LIST: "/roles",
-    CREATE: "/roles/create",
-    EDIT: (id: number | string) => `/roles/${id}/edit`,
+    LIST: "/admin/roles",
+    CREATE: "/admin/roles/crear",
+    EDIT: (id: number | string) => `/admin/roles/${id}/editar`,
   },
   PERMISSIONS: {
-    LIST: "/permissions",
+    LIST: "/admin/permisos",
   },
   MENU_ITEMS: {
-    LIST: "/menu-items",
+    LIST: "/admin/menu-items",
   },
   USERS: {
-    LIST: "/users",
-    CREATE: "/users/create",
-    EDIT: (id: number | string) => `/users/${id}/edit`,
+    LIST: "/admin/usuarios",
+    CREATE: "/admin/usuarios/crear",
+    EDIT: (id: number | string) => `/admin/usuarios/${id}/editar`,
   },
   // Posgrado
   POSGRADO: {
     CURSOS: "/posgrado/cursos",
   },
   // Correspondencia
+  CORRESPONDENCE: {
+    ROUTE_SHEET: "/correspondencia/hoja-ruta",
+    DOCUMENTS: "/correspondencia/documentos",
+    APPROVE_SIGN: "/correspondencia/aprobar-firmar",
 
+  },
 } as const;

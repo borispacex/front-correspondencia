@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
-import { PencilIcon, TrashBinIcon, AngleUpIcon, AngleDownIcon } from "../../icons";
+import { PencilIcon, AngleUpIcon, AngleDownIcon } from "../../icons";
 import type { MenuItem } from "../../types/menu-items/menu-item.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
+import {ToggleSwitch} from "../form/switch/ToggleSwitch.tsx";
+import Button from "../ui/button/Button.tsx";
 
 interface MenuItemTableProps {
   menuItems: MenuItem[];
@@ -118,9 +120,6 @@ export default function MenuItemTable({
               <th onClick={() => handleSort('order')} className="w-16 px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200">
                 <span className="flex items-center gap-1">Orden {renderSortIcon('order')}</span>
               </th>
-              <th onClick={() => handleSort('active')} className="w-24 px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200">
-                <span className="flex items-center gap-1">Estado {renderSortIcon('active')}</span>
-              </th>
               {showActions && <th className="w-28 px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Acciones</th>}
             </tr>
             <tr className="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-white/[0.02]">
@@ -153,13 +152,12 @@ export default function MenuItemTable({
                 />
               </td>
               <td className="px-5 py-2" />
-              <td className="px-5 py-2" />
               {showActions && <td className="px-5 py-2" />}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
           {isLoading && paged.length === 0 ? (
-                  <TableSkeleton rows={8} cols={showActions ? 7 : 6} />
+                  <TableSkeleton rows={8} cols={showActions ? 6 : 5} />
           ) : paged.length === 0 ? (
               <tr>
                 <td colSpan={showActions ? 7 : 6} className="px-5 py-10 text-center text-sm text-gray-400">
@@ -177,34 +175,25 @@ export default function MenuItemTable({
                   <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">{item.url ?? "—"}</td>
                   <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">{item.icon ?? "—"}</td>
                   <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">{item.order}</td>
-                  <td className="px-5 py-4">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      item.active
-                        ? "bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400"
-                        : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-                    }`}>
-                      {item.active ? "Activo" : "Inactivo"}
-                    </span>
-                  </td>
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      {can('menu_items.edit') && (
-                        <button
-                          onClick={() => onEdit(item)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400"
-                          title="Editar"
-                        >
-                          <PencilIcon className="size-4" />
-                        </button>
-                      )}
                       {can('menu_items.delete') && (
-                        <button
-                          onClick={() => onDelete(item.id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:border-error-500 hover:text-error-500 dark:border-gray-700 dark:text-gray-400"
-                          title="Eliminar"
-                        >
-                          <TrashBinIcon className="size-4" />
-                        </button>
+                          <ToggleSwitch
+                              checked={item.active}
+                              onChange={() => { onDelete(item.id) }}
+                              showIcon
+                              label=""
+                              size="xs"
+                          />
+                      )}
+                      {can('menu_items.edit') && (
+                          <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => onEdit(item)}
+                              className="w-8 h-8 p-0"
+                              startIcon={<PencilIcon className="size-4"/>}
+                          />
                       )}
                     </div>
                   </td>}

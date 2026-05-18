@@ -4,6 +4,7 @@ import type { Role, RoleFilters } from "../../types/roles/role.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import type { Pagination } from "../../types/common/api.types";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
+import Button from "../ui/button/Button.tsx";
 
 interface RoleTableProps {
   roles: Role[];
@@ -177,22 +178,22 @@ export default function RoleTable({
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {can('roles.edit') && (
-                        <button
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => onEdit(role)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400"
-                          title="Editar"
-                        >
-                          <PencilIcon className="size-4" />
-                        </button>
+                          className="w-8 h-8 p-0"
+                          startIcon={<PencilIcon className="size-4"/>}
+                        />
                       )}
                       {can('roles.delete') && (
-                        <button
-                          onClick={() => onDelete(role.id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:border-error-500 hover:text-error-500 dark:border-gray-700 dark:text-gray-400"
-                          title="Eliminar"
-                        >
-                          <TrashBinIcon className="size-4" />
-                        </button>
+                          <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => onDelete(role.id)}
+                              className="w-8 h-8 p-0"
+                              startIcon={<TrashBinIcon className="size-4" />}
+                          />
                       )}
                     </div>
                   </td>}

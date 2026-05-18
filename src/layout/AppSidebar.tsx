@@ -19,6 +19,7 @@ import { useSidebar } from "../context/SidebarContext";
 import type { MenuItem } from "../types/menu-items/menu-item.types";
 import { useMenu } from "../hooks/useMenu";
 import { useAuth } from "../hooks/auth/useAuth";
+import {ROUTES} from "../constants/routes.constants.ts";
 
 type NavItem = {
   name: string;
@@ -110,15 +111,15 @@ function transformToNavItems(items: MenuItem[]): NavItem[] {
 
 // Principal section
 const principalItems: NavItem[] = [
-  { icon: <HouseIcon />, name: "Inicio", path: "/" },
-  { icon: <UserIcon />, name: "Perfil", path: "/perfil" },
+  { icon: <HouseIcon />, name: "Inicio", path: ROUTES.HOME },
+  { icon: <UserIcon />, name: "Perfil", path: ROUTES.PROFILE },
 ];
 
 // Correspondencia section
 const CORRESPONDENCIA_ITEMS: (NavItem)[] = [
-  { icon: <FolderIcon />, name: "Hoja de Ruta", path: "/correspondencia/hoja-ruta", permission: "correspondencia_hojaruta.index" },
-  { icon: <FileTextIcon />, name: "Documentos", path: "/correspondencia/documentos", permission: "correspondencia_documentos.index" },
-  { icon: <FingerprintPatternIcon />, name: "Aprobar y firmar", path: "/correspondencia/aprobar-firmar", permission: "correspondencia_aprobarfirmar.index" },
+  { icon: <FolderIcon />, name: "Hoja de Ruta", path: ROUTES.CORRESPONDENCE.ROUTE_SHEET, permission: "correspondencia_hojaruta.index" },
+  { icon: <FileTextIcon />, name: "Documentos", path: ROUTES.CORRESPONDENCE.DOCUMENTS, permission: "correspondencia_documentos.index" },
+  { icon: <FingerprintPatternIcon />, name: "Aprobar y firmar", path: ROUTES.CORRESPONDENCE.APPROVE_SIGN, permission: "correspondencia_aprobarfirmar.index" },
 ];
 
 // Static admin section items (permission key → path)
@@ -130,12 +131,12 @@ const ALL_ADMIN_ITEMS: (NavItem)[] = [
     icon: <LockOpenIcon />,
     name: "Accesos",
     subItems: [
-      { name: "Permisos", path: "/admin/permisos", pro: false, permission: "permissions.index" },
-      { name: "Roles", path: "/admin/roles", pro: false, permission: "roles.index" },
-      { name: "Ítems de Menú", path: "/admin/menu", pro: false, permission: "menu_items.index" },
+      { name: "Permisos", path: ROUTES.PERMISSIONS.LIST, pro: false, permission: "permissions.index" },
+      { name: "Roles", path: ROUTES.ROLES.LIST, pro: false, permission: "roles.index" },
+      { name: "Ítems de Menú", path: ROUTES.MENU_ITEMS.LIST, pro: false, permission: "menu_items.index" },
     ],
   },
-  { icon: <UserCogIcon />, name: "Usuarios", path: "/admin/usuarios", permission: "users.index" },
+  { icon: <UserCogIcon />, name: "Usuarios", path: ROUTES.USERS.LIST, permission: "users.index" },
 ];
 
 type MenuType = "dynamic" | "principal" | "admin" | "correspondencia";

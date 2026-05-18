@@ -24,6 +24,7 @@ import SignUp from "./pages/AuthPages/SignUp.tsx";
 import NotFound from "./pages/OtherPage/NotFound.tsx";
 import {correspondenciaRoutes} from "./components/correspondencia/correspondencia.route.tsx";
 import ResetPassword from "./pages/AuthPages/ResetPassword.tsx";
+import {ROUTES} from "./constants/routes.constants.ts";
 
 
 export const appRouter = createBrowserRouter([
@@ -36,13 +37,13 @@ export const appRouter = createBrowserRouter([
                     { index: true, element: <Home /> },
 
                     // Modules
-                    { path: "/admin/roles", element: <RolesListPage /> },
-                    { path: "/admin/permisos", element: <PermissionsListPage /> },
-                    { path: "/admin/menu", element: <MenuItemsListPage /> },
-                    { path: "/admin/usuarios", element: <UsersListPage /> },
+                    { path: ROUTES.ROLES.LIST, element: <RolesListPage /> },
+                    { path: ROUTES.PERMISSIONS.LIST, element: <PermissionsListPage /> },
+                    { path: ROUTES.MENU_ITEMS.LIST, element: <MenuItemsListPage /> },
+                    { path: ROUTES.USERS.LIST, element: <UsersListPage /> },
+                    { path: ROUTES.PROFILE, element: <UserProfiles /> },
 
                     // Others
-                    { path: "perfil", element: <UserProfiles /> },
                     { path: "calendar", element: <Calendar /> },
                     { path: "blank", element: <Blank /> },
 
@@ -72,9 +73,9 @@ export const appRouter = createBrowserRouter([
     },
 
     // Auth
-    { path: "/iniciar-sesion", element: <SignIn /> },
-    { path: "/signup", element: <SignUp /> },
-    { path: "/restablecer", element: <ResetPassword /> },
+    { path: ROUTES.SIGN_IN, element: <SignIn /> },
+    { path: ROUTES.SIGN_UP, element: <SignUp /> },
+    { path: ROUTES.RESET_PASSWORD , element: <ResetPassword /> },
 
 
     // Fallback

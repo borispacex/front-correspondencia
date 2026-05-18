@@ -9,23 +9,23 @@ export const API_ENDPOINTS = {
   },
   // Roles
   ROLES: {
-    BASE: "/roles",
-    BY_ID: (id: number) => `/roles/${id}`,
+    BASE: "/admin/roles",
+    BY_ID: (id: number) => `/admin/roles/${id}`,
   },
   // Permissions
   PERMISSIONS: {
-    BASE: "/permissions",
-    BY_ID: (id: number) => `/permissions/${id}`,
+    BASE: "/admin/permissions",
+    BY_ID: (id: number) => `/admin/permissions/${id}`,
   },
   // Menu Items
   MENU_ITEMS: {
-    BASE: "/menu-items",
-    BY_ID: (id: number) => `/menu-items/${id}`,
+    BASE: "/admin/menu-items",
+    BY_ID: (id: number) => `/admin/menu-items/${id}`,
   },
   // Users
   USERS: {
-    BASE: "/users",
-    BY_ID: (id: number) => `/users/${id}`,
+    BASE: "/admin/users",
+    BY_ID: (id: number) => `/admin/users/${id}`,
   },
   // SAGA
   SAGA: {

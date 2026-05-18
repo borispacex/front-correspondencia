@@ -14,6 +14,8 @@ import {
 import type { Role, CreateRoleRequest, RoleFilters } from "../../types/roles/role.types";
 import type { Pagination } from "../../types/common/api.types";
 import { usePermissions } from "../../hooks/usePermissions";
+import Button from "../../components/ui/button/Button.tsx";
+import ModalDelete from "../../components/modal/ModalDelete.tsx";
 
 export default function RolesListPage() {
   const { can } = usePermissions();
@@ -117,13 +119,13 @@ export default function RolesListPage() {
             Lista de Roles
           </h2>
           {can('roles.create') && (
-            <button
-              onClick={handleCreate}
-              className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600"
-            >
-              <PlusIcon className="size-4" />
-              Nuevo Rol
-            </button>
+              <Button
+                  size={"sm"}
+                  onClick={handleCreate}
+                  startIcon={<PlusIcon className="size-4 text-white" />}
+              >
+                Nuevo Rol
+              </Button>
           )}
         </div>
 
@@ -155,39 +157,13 @@ export default function RolesListPage() {
         />
       </Modal>
 
-      <Modal
-        isOpen={confirmId !== null}
-        onClose={() => setConfirmId(null)}
-        className="max-w-sm p-6"
-      >
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-error-50 dark:bg-error-500/10">
-            <svg className="size-6 text-error-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-          </div>
-          <h4 className="mb-2 text-base font-semibold text-gray-800 dark:text-white/90">
-            ¿Eliminar este rol?
-          </h4>
-          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
-            Esta acción no se puede deshacer.
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={() => setConfirmId(null)}
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03]"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleConfirmDelete}
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm bg-error-500 text-white hover:bg-error-600"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-      </Modal>
+      <ModalDelete
+          isOpen={confirmId !== null}
+          onClose={() => setConfirmId(null)}
+          onConfirm={handleConfirmDelete}
+          title="¿Eliminar este rol?"
+          message="Esta acción no se puede deshacer."
+      />
     </>
   );
 }
