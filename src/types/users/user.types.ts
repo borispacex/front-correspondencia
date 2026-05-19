@@ -15,18 +15,28 @@ export interface User {
 }
 
 export interface CreateUserRequest {
+  ci: string;
   name: string;
+  last_name: string;
+  mother_last_name: string;
   email: string;
+  phone: string;
   password: string;
   password_confirmation: string;
   roles?: number[];
+  active?: boolean;
 }
 
 export interface UpdateUserRequest {
   id: number;
+  ci: string;
   name?: string;
+  last_name?: string;
+  mother_last_name?: string;
   email?: string;
+  phone?: string;
   password?: string;
   password_confirmation?: string;
   roles?: number[];
+  active?: boolean;
 }

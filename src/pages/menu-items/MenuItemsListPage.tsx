@@ -9,7 +9,9 @@ import { PlusIcon } from "../../icons";
 import {
   createMenuItem,
   updateMenuItem,
-  getMenuItemsAll, deleteMenuItem, getMenuItemById,
+  getMenuItemsAll,
+  deleteMenuItem,
+  getMenuItemById,
 } from "../../services/menu-items.service";
 
 import type {
@@ -19,6 +21,7 @@ import type {
 
 import { useMenu } from "../../hooks/useMenu";
 import { usePermissions } from "../../hooks/usePermissions";
+import { useNotifications } from "../../hooks/useNotification";
 
 import Button from "../../components/ui/button/Button.tsx";
 import ModalStatus from "../../components/modal/ModalStatus.tsx";
@@ -48,21 +51,23 @@ function flattenMenuItems(items: MenuItem[]): MenuItem[] {
 export default function MenuItemsListPage() {
   const { refreshMenu } = useMenu();
   const { can } = usePermissions();
+  const { addNotification } = useNotifications();
 
   const [rawMenuItems, setRawMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [selected, setSelected] = useState<MenuItem | null>(null);
+
   const [openStatusModal, setOpenStatusModal] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [selectedStatusItem, setSelectedStatusItem] = useState<MenuItem | null>(null);
   const [nextStatus, setNextStatus] = useState(false);
+
   const menuItems = flattenMenuItems(rawMenuItems);
 
   async function loadAll() {
     setIsLoading(true);
-
     try {
       const data = await getMenuItemsAll();
       setRawMenuItems(data);
@@ -71,7 +76,9 @@ export default function MenuItemsListPage() {
     }
   }
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => {
+    loadAll();
+  }, []);
 
   function handleCreate() {
     setSelected(null);
@@ -97,15 +104,30 @@ export default function MenuItemsListPage() {
 
     try {
       await updateMenuItem(selectedStatusItem.id, {
-        ...selectedStatusItem,
         active: nextStatus,
       });
 
-      await refreshMenu();
-      await loadAll();
+      addNotification({
+        type: "success",
+        title: "Estado actualizado",
+        message: `El ítem fue ${
+            nextStatus ? "activado" : "desactivado"
+        } correctamente.`,
+      });
 
       setOpenStatusModal(false);
       setSelectedStatusItem(null);
+
+      await refreshMenu();
+      await loadAll();
+    } catch (err: any) {
+      addNotification({
+        type: "error",
+        title: "Error",
+        message:
+            err?.response?.data?.message ??
+            "Error al cambiar el estado del ítem",
+      });
     } finally {
       setLoadingStatus(false);
     }
@@ -117,26 +139,65 @@ export default function MenuItemsListPage() {
 
   async function handleConfirmDelete() {
     if (confirmId === null) return;
-    await deleteMenuItem(confirmId);
-    setConfirmId(null);
-    await refreshMenu();
-    await loadAll();
+
+    try {
+      await deleteMenuItem(confirmId);
+
+      addNotification({
+        type: "success",
+        title: "Ítem eliminado",
+        message: "El ítem de menú fue eliminado correctamente.",
+      });
+
+      setConfirmId(null);
+      await refreshMenu();
+      await loadAll();
+    } catch (err: any) {
+      addNotification({
+        type: "error",
+        title: "Error",
+        message:
+            err?.response?.data?.message ??
+            "Error al eliminar el ítem de menú",
+      });
+    }
   }
 
   async function handleSubmit(data: CreateMenuItemRequest) {
-    if (selected) {
-      await updateMenuItem(selected.id, {
-        id: selected.id,
-        ...data,
+    try {
+      if (selected) {
+        await updateMenuItem(selected.id, {
+          id: selected.id,
+          ...data,
+        });
+
+        addNotification({
+          type: "info",
+          title: "Ítem actualizado",
+          message: `El ítem "${data.label}" fue actualizado correctamente.`,
+        });
+      } else {
+        await createMenuItem(data);
+
+        addNotification({
+          type: "success",
+          title: "Ítem creado",
+          message: `El ítem "${data.label}" fue creado correctamente.`,
+        });
+      }
+
+      setIsModalOpen(false);
+      await refreshMenu();
+      await loadAll();
+    } catch (err: any) {
+      addNotification({
+        type: "error",
+        title: "Error",
+        message:
+            err?.response?.data?.message ??
+            "Error al guardar el ítem de menú",
       });
-    } else {
-      await createMenuItem(data);
     }
-
-    setIsModalOpen(false);
-
-    await refreshMenu();
-    await loadAll();
   }
 
   return (
@@ -209,7 +270,6 @@ export default function MenuItemsListPage() {
             title="¿Eliminar este ítem de menú?"
             message="Esta acción no se puede deshacer."
         />
-
       </>
   );
 }

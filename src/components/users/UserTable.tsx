@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { PencilIcon, AngleUpIcon, AngleDownIcon } from "../../icons";
+import {PencilIcon, AngleUpIcon, AngleDownIcon, TrashBinIcon} from "../../icons";
 import type { User } from "../../types/users/user.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
@@ -11,11 +11,12 @@ interface UserTableProps {
   isLoading?: boolean;
   onEdit: (user: User) => void;
   onDelete: (id: number) => void;
+  onToggleActive: (item: User, active: boolean) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
-export default function UserTable({ users, isLoading, onEdit, onDelete }: UserTableProps) {
+export default function UserTable({ users, isLoading, onEdit, onDelete, onToggleActive }: UserTableProps) {
   const { can } = usePermissions();
   const showActions = can('users.edit') || can('users.delete');
   const [filterCi, setFilterCi] = useState("");
@@ -221,10 +222,10 @@ export default function UserTable({ users, isLoading, onEdit, onDelete }: UserTa
                   </td>
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      {can('users.delete') && (
+                      {can('users.edit') && (
                           <ToggleSwitch
                               checked={user.active}
-                              onChange={() => { onDelete(user.id) }}
+                              onChange={(checked) => onToggleActive(user, checked)}
                               showIcon
                               label=""
                               size="xs"
@@ -239,7 +240,15 @@ export default function UserTable({ users, isLoading, onEdit, onDelete }: UserTa
                               startIcon={<PencilIcon className="size-4"/>}
                           />
                       )}
-
+                      {can('menu_items.delete') && (
+                          <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => onDelete(user.id)}
+                              className="w-8 h-8 p-0"
+                              startIcon={<TrashBinIcon className="size-4" />}
+                          />
+                      )}
                     </div>
                   </td>}
                 </tr>

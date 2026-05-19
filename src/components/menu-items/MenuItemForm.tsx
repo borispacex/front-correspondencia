@@ -66,7 +66,6 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
   }, []);
 
   useEffect(() => {
-    console.log("item", item);
     setLabel(item?.label ?? "");
     setUrl(item?.url ?? "");
     setIcon(item?.icon ?? "");

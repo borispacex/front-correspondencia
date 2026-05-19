@@ -15,9 +15,14 @@ interface UserFormProps {
 }
 
 export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
+  const [ci, setCi] = useState("");
   const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [motherLastname, setMotherLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [active, setActive] = useState(true);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
@@ -36,9 +41,14 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
   }, []);
 
   useEffect(() => {
+    setCi(user?.ci ?? "");
     setName(user?.name ?? "");
+    setLastName(user?.last_name ?? "");
+    setMotherLastName(user?.mother_last_name ?? "");
     setEmail(user?.email ?? "");
+    setPhone(user?.phone ?? "");
     setPassword("");
+    setActive(user?.active ?? true);
     setPasswordConfirmation("");
     setError(null);
     if (user?.roles && allRoles.length > 0) {
@@ -57,8 +67,16 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      setError("Nombre y correo son requeridos");
+    if (!ci.trim()) {
+      setError("Ci es requerido");
+      return;
+    }
+    if (!name.trim() || !lastName.trim() || !motherLastname.trim()) {
+      setError("Nombre, Apellido paterno y materno son requeridos");
+      return;
+    }
+    if (!email.trim() || !phone.trim()) {
+      setError("Nombre y correo y telefono son requeridos");
       return;
     }
     if (!user && !password) {
@@ -73,7 +91,17 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
     setError(null);
     try {
       if (user) {
-        const payload: UpdateUserRequest = { id: user.id, name: name.trim(), email: email.trim(), roles: selectedRoleIds };
+        const payload: UpdateUserRequest = {
+          id: user.id,
+          ci: user.ci.trim(),
+          name: name.trim(),
+          last_name: lastName.trim(),
+          mother_last_name: motherLastname.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          roles: selectedRoleIds,
+          active: active,
+        };
         if (password) {
           payload.password = password;
           payload.password_confirmation = passwordConfirmation;
@@ -81,8 +109,12 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
         await onSubmit(payload);
       } else {
         await onSubmit({
+          ci: ci.trim(),
           name: name.trim(),
+          last_name: lastName.trim(),
+          mother_last_name: motherLastname.trim(),
           email: email.trim(),
+          phone: phone.trim(),
           password,
           password_confirmation: passwordConfirmation,
           roles: selectedRoleIds,
@@ -98,24 +130,48 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label>Nombre <span className="text-error-500">*</span></Label>
-        <InputField value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre completo" />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Ci <span className="text-error-500">*</span></Label>
+          <InputField value={ci} onChange={(e) => setCi(e.target.value)} placeholder="9884972" />
+        </div>
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Nombre(s) <span className="text-error-500">*</span></Label>
+          <InputField value={name} onChange={(e) => setName(e.target.value)} placeholder="Juan" />
+        </div>
       </div>
-      <div>
-        <Label>Correo electrónico <span className="text-error-500">*</span></Label>
-        <InputField type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@ejemplo.com" />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Apellido paterno <span className="text-error-500">*</span></Label>
+          <InputField value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Perez" />
+        </div>
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Apellido materno <span className="text-error-500">*</span></Label>
+          <InputField value={motherLastname} onChange={(e) => setMotherLastName(e.target.value)} placeholder="Lopez" />
+        </div>
       </div>
-      <div>
-        <Label>
-          Contraseña{!user && <span className="text-error-500"> *</span>}
-          {user && <span className="text-xs text-gray-400 ml-1">(dejar en blanco para no cambiar)</span>}
-        </Label>
-        <InputField type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Correo electrónico <span className="text-error-500">*</span></Label>
+          <InputField type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@adm.emi.edu.bo" />
+        </div>
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Telefono <span className="text-error-500">*</span></Label>
+          <InputField value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="60514138" />
+        </div>
       </div>
-      <div>
-        <Label>Confirmar contraseña</Label>
-        <InputField type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} placeholder="••••••••" />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div className="col-span-2 lg:col-span-1">
+          <Label>
+            Contraseña{!user && <span className="text-error-500"> *</span>}
+            {user && <span className="text-xs text-gray-400 ml-1">(dejar en blanco para no cambiar)</span>}
+          </Label>
+          <InputField type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+        </div>
+        <div className="col-span-2 lg:col-span-1">
+          <Label>Confirmar contraseña</Label>
+          <InputField type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} placeholder="••••••••" />
+        </div>
       </div>
 
           <div>
@@ -143,7 +199,14 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
               )}
             </div>
           </div>
-
+      <div className="flex items-center gap-3">
+        <Checkbox
+            label="Activo"
+            checked={active}
+            onChange={(checked) => setActive(checked)}
+            size="md"
+        />
+      </div>
       {error && <p className="text-sm text-error-500">{error}</p>}
       <div className="flex items-center justify-end gap-3 pt-2">
         <Button
