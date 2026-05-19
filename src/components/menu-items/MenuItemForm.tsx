@@ -18,6 +18,7 @@ import {
 import Checkbox from "../form/input/Checkbox.tsx";
 import Select from "../form/Select.tsx";
 import CheckboxSkeleton from "../animation/CheckboxSkeleton.tsx";
+import Button from "../ui/button/Button.tsx";
 
 const ICON_OPTIONS: { value: string; label: string; Icon: React.FC<{ className?: string }> }[] = [
   { value: "dashboard", label: "Dashboard", Icon: GridIcon },
@@ -65,6 +66,7 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
   }, []);
 
   useEffect(() => {
+    console.log("item", item);
     setLabel(item?.label ?? "");
     setUrl(item?.url ?? "");
     setIcon(item?.icon ?? "");
@@ -202,34 +204,35 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
 
 
       <div className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          id="active"
-          checked={active}
-          onChange={(e) => setActive(e.target.checked)}
-          className="rounded border-gray-300"
+        <Checkbox
+            label="Activo"
+            checked={active}
+            onChange={(checked) => setActive(checked)}
+            size="md"
         />
-        <label htmlFor="active" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-          Activo
-        </label>
       </div>
       {error && <p className="text-sm text-error-500">{error}</p>}
       <div className="flex items-center justify-end gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={isSubmitting}
-          className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03] disabled:cursor-not-allowed disabled:opacity-50"
+        <Button
+            variant="outline"
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
         >
           Cancelar
-        </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed disabled:opacity-50"
+        </Button>
+
+        <Button
+            variant="primary"
+            type="submit"
+            disabled={isSubmitting}
         >
-          {isSubmitting ? "Guardando..." : item ? "Actualizar" : "Crear"}
-        </button>
+          {isSubmitting
+              ? "Guardando..."
+              : item
+                  ? "Actualizar"
+                  : "Crear"}
+        </Button>
       </div>
     </form>
   );

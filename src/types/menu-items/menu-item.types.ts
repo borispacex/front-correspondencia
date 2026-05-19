@@ -1,3 +1,5 @@
+import {Role} from "../roles/role.types.ts";
+
 export interface MenuItem {
   id: number;
   label: string;
@@ -7,7 +9,7 @@ export interface MenuItem {
   active: boolean;
   parent_id: number | null;
   children: MenuItem[];
-  roles?: Array<{ id: number; name: string }>;
+  roles?: Role[];
 }
 
 export interface CreateMenuItemRequest {

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { PencilIcon, AngleUpIcon, AngleDownIcon } from "../../icons";
+import {PencilIcon, AngleUpIcon, AngleDownIcon, TrashBinIcon} from "../../icons";
 import type { MenuItem } from "../../types/menu-items/menu-item.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
@@ -11,6 +11,7 @@ interface MenuItemTableProps {
   isLoading?: boolean;
   onEdit: (item: MenuItem) => void;
   onDelete: (id: number) => void;
+  onToggleActive: (item: MenuItem, active: boolean) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -20,6 +21,7 @@ export default function MenuItemTable({
   isLoading,
   onEdit,
   onDelete,
+  onToggleActive,
 }: MenuItemTableProps) {
   const { can } = usePermissions();
   const showActions = can('menu_items.edit') || can('menu_items.delete');
@@ -177,10 +179,10 @@ export default function MenuItemTable({
                   <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">{item.order}</td>
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      {can('menu_items.delete') && (
+                      {can('menu_items.edit') && (
                           <ToggleSwitch
                               checked={item.active}
-                              onChange={() => { onDelete(item.id) }}
+                              onChange={(checked) => onToggleActive(item, checked)}
                               showIcon
                               label=""
                               size="xs"
@@ -193,6 +195,15 @@ export default function MenuItemTable({
                               onClick={() => onEdit(item)}
                               className="w-8 h-8 p-0"
                               startIcon={<PencilIcon className="size-4"/>}
+                          />
+                      )}
+                      {can('menu_items.delete') && (
+                          <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => onDelete(item.id)}
+                              className="w-8 h-8 p-0"
+                              startIcon={<TrashBinIcon className="size-4" />}
                           />
                       )}
                     </div>
