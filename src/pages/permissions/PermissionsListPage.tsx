@@ -17,17 +17,18 @@ import { usePermissions } from "../../hooks/usePermissions";
 
 import Button from "../../components/ui/button/Button.tsx";
 import ModalDelete from "../../components/modal/ModalDelete.tsx";
+import {useNotifications} from "../../hooks/useNotification.tsx";
 
 export default function PermissionsListPage() {
   const { can } = usePermissions();
+  const { addNotification } = useNotifications();
 
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [confirmId, setConfirmId] = useState<number | null>(null);
-
   const [selected, setSelected] = useState<Permission | null>(null);
 
   const fetchPermissions = useCallback(async () => {
@@ -60,13 +61,30 @@ export default function PermissionsListPage() {
   }
 
   async function handleConfirmDelete() {
-    if (confirmId === null) return;
+        if (confirmId === null) return;
 
-    await deletePermission(confirmId);
+        try {
+            setIsDeleting(true);
 
-    setConfirmId(null);
+            await deletePermission(confirmId);
 
-    fetchPermissions();
+            addNotification({
+                type: "success",
+                title: "Permiso eliminado",
+                message: "El permiso fue eliminado correctamente.",
+            });
+
+            fetchPermissions();
+        } catch {
+            addNotification({
+                type: "error",
+                title: "Error al eliminar",
+                message: "No se pudo eliminar el permiso.",
+            });
+        } finally {
+            setIsDeleting(false);
+            setConfirmId(null);
+        }
   }
 
   return (
@@ -124,6 +142,7 @@ export default function PermissionsListPage() {
 
         <ModalDelete
             isOpen={confirmId !== null}
+            loading={isDeleting}
             onClose={() => setConfirmId(null)}
             onConfirm={handleConfirmDelete}
             title="¿Eliminar este permiso?"

@@ -6,12 +6,14 @@ interface ModalDeleteProps {
     message?: string;
     onClose: () => void;
     onConfirm: () => void;
+    loading?: boolean;
 }
 
 export default function ModalDelete({
   isOpen,
   title = "¿Eliminar registro?",
   message = "Esta acción no se puede deshacer.",
+  loading = false,
   onClose,
   onConfirm,
   }: ModalDeleteProps) {
@@ -58,7 +60,7 @@ export default function ModalDelete({
                         onClick={onConfirm}
                         className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm bg-error-500 text-white hover:bg-error-600"
                     >
-                        Eliminar
+                        {loading ? "Eliminando..." : "Eliminar"}
                     </button>
                 </div>
             </div>

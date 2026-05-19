@@ -10,9 +10,13 @@ import {
 
 import type { Permission } from "../../types/permissions/permission.types";
 
+import Button from "../ui/button/Button.tsx";
+import {useNotifications} from "../../hooks/useNotification.tsx";
+import Select, {Option} from "../form/Select.tsx";
+
+
 interface Props {
     permission?: Permission | null;
-
     onSuccess: () => void;
     onCancel: () => void;
 }
@@ -23,18 +27,32 @@ export default function PermissionForm({
                                            onCancel,
                                        }: Props) {
     const [formName, setFormName] = useState("");
+    const [formGuardName, setFormGuardName] = useState<"web" | "api" | "">("");
     const [formGroup, setFormGroup] = useState("");
 
     const [formError, setFormError] = useState<string | null>(null);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const GUARD_OPTIONS: Option[] = [
+        {value: 'web', label: 'WEB'},
+        {value: 'api', label: 'API'}
+    ];
+
+    const { addNotification } = useNotifications();
+
     useEffect(() => {
         if (permission) {
-            setFormName(permission.name);
+            setFormName(permission.name ?? "");
+            setFormGuardName(
+                permission?.guard_name === "web"
+                    ? "web"
+                    : "api"
+            );
             setFormGroup(permission.group ?? "");
         } else {
             setFormName("");
+            setFormGuardName("");
             setFormGroup("");
         }
     }, [permission]);
@@ -44,6 +62,25 @@ export default function PermissionForm({
 
         if (!formName.trim()) {
             setFormError("El nombre es requerido");
+
+            addNotification({
+                type: "warning",
+                title: "Campo requerido",
+                message: "El nombre es obligatorio.",
+            });
+
+            return;
+        }
+
+        if (!formGuardName.trim()) {
+            setFormError("El guard es requerido");
+
+            addNotification({
+                type: "warning",
+                title: "Campo requerido",
+                message: "El guard es obligatorio.",
+            });
+
             return;
         }
 
@@ -54,13 +91,26 @@ export default function PermissionForm({
         try {
             const payload = {
                 name: formName.trim(),
+                guard_name: formGuardName.trim(),
                 group: formGroup.trim() || undefined,
             };
 
             if (permission) {
                 await updatePermission(permission.id, payload);
+
+                addNotification({
+                    type: "info",
+                    title: "Permiso actualizado",
+                    message: `El permiso ${formName} fue actualizado correctamente.`,
+                });
             } else {
                 await createPermission(payload);
+
+                addNotification({
+                    type: "success",
+                    title: "Permiso creado",
+                    message: `El permiso ${formName} fue creado correctamente.`,
+                });
             }
 
             onSuccess();
@@ -73,9 +123,17 @@ export default function PermissionForm({
                 };
             };
 
-            setFormError(
-                axiosErr?.response?.data?.message ?? "Error al guardar"
-            );
+            const errorMessage =
+                axiosErr?.response?.data?.message ??
+                "Error al guardar";
+
+            setFormError(errorMessage);
+
+            addNotification({
+                type: "error",
+                title: "Error",
+                message: errorMessage,
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -85,13 +143,38 @@ export default function PermissionForm({
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
                 <Label>
-                    Nombre <span className="text-error-500">*</span>
+                    Nombre
+                    <span className="text-error-500">
+                        {" "}
+                        *
+                    </span>
                 </Label>
 
                 <InputField
                     value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
+                    onChange={(e) =>
+                        setFormName(e.target.value)
+                    }
                     placeholder="Ej: roles.view"
+                />
+            </div>
+
+            <div>
+                <Label>
+                    Guard
+                    <span className="text-error-500">
+                        {" "}
+                        *
+                    </span>
+                </Label>
+
+                <Select
+                    options={GUARD_OPTIONS}
+                    defaultValue={formGuardName}
+                    onChange={(value) =>
+                        setFormGuardName(value)
+                    }
+                    placeholder="Seleccione un guard"
                 />
             </div>
 
@@ -100,7 +183,9 @@ export default function PermissionForm({
 
                 <InputField
                     value={formGroup}
-                    onChange={(e) => setFormGroup(e.target.value)}
+                    onChange={(e) =>
+                        setFormGroup(e.target.value)
+                    }
                     placeholder="Ej: Roles"
                 />
             </div>
@@ -112,26 +197,26 @@ export default function PermissionForm({
             )}
 
             <div className="flex items-center justify-end gap-3 pt-2">
-                <button
+                <Button
+                    variant="outline"
                     type="button"
                     onClick={onCancel}
                     disabled={isSubmitting}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Cancelar
-                </button>
+                </Button>
 
-                <button
+                <Button
+                    variant="primary"
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {isSubmitting
                         ? "Guardando..."
                         : permission
                             ? "Actualizar"
                             : "Crear"}
-                </button>
+                </Button>
             </div>
         </form>
     );

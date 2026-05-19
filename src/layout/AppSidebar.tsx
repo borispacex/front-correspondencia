@@ -408,24 +408,24 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
 
             {/* Dynamic menu from API */}
-            {dynamicNavItems.length > 0 && (
-              <div>
-                <h2
-                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                    !isExpanded && !isHovered
-                      ? "lg:justify-center"
-                      : "justify-start"
-                  }`}
-                >
-                  {isExpanded || isHovered || isMobileOpen ? (
-                    "Ítems de Menú"
-                  ) : (
-                    <HorizontaLDots className="size-6" />
-                  )}
-                </h2>
-                {renderMenuItems(dynamicNavItems, "dynamic")}
-              </div>
-            )}
+            {/*{dynamicNavItems.length > 0 && (*/}
+            {/*  <div>*/}
+            {/*    <h2*/}
+            {/*      className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${*/}
+            {/*        !isExpanded && !isHovered*/}
+            {/*          ? "lg:justify-center"*/}
+            {/*          : "justify-start"*/}
+            {/*      }`}*/}
+            {/*    >*/}
+            {/*      {isExpanded || isHovered || isMobileOpen ? (*/}
+            {/*        "Ítems de Menú"*/}
+            {/*      ) : (*/}
+            {/*        <HorizontaLDots className="size-6" />*/}
+            {/*      )}*/}
+            {/*    </h2>*/}
+            {/*    {renderMenuItems(dynamicNavItems, "dynamic")}*/}
+            {/*  </div>*/}
+            {/*)}*/}
 
             {/* Principal section */}
             <div>
