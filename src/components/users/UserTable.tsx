@@ -133,7 +133,7 @@ export default function UserTable({ users, isLoading, onEdit, onDelete, onToggle
                 <span className="flex items-center gap-1">Email {renderSortIcon('email')}</span>
               </th>
               <th onClick={() => handleSort('phone')} className="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200">
-                <span className="flex items-center gap-1">Telefono {renderSortIcon('phone')}</span>
+                <span className="flex items-center gap-1">Teléfono {renderSortIcon('phone')}</span>
               </th>
               <th className="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Roles</th>
               {showActions && <th className="w-28 px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Acciones</th>}

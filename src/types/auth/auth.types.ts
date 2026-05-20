@@ -30,4 +30,8 @@ export interface AuthUser {
   foto: string;
   roles?: Role[];
   permissions?: string[];
+
+  created_at?: string;
+  updated_at?: string | null;
+  UltimoCambioContrasenia?: string | null;
 }

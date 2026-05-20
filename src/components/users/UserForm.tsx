@@ -156,20 +156,25 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
           <InputField type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@adm.emi.edu.bo" />
         </div>
         <div className="col-span-2 lg:col-span-1">
-          <Label>Telefono <span className="text-error-500">*</span></Label>
+          <Label>Teléfono <span className="text-error-500">*</span></Label>
           <InputField value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="60514138" />
         </div>
       </div>
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
         <div className="col-span-2 lg:col-span-1">
           <Label>
-            Contraseña{!user && <span className="text-error-500"> *</span>}
-            {user && <span className="text-xs text-gray-400 ml-1">(dejar en blanco para no cambiar)</span>}
+            Contraseña
+            <br/>
+            <span className="text-xs text-gray-400 ml-1">{user ? '(Dejar en blanco para no cambiar)' : '(Recomendamos una contraseña segura)'}</span>
+            <span className="text-error-500"> *</span>
           </Label>
           <InputField type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </div>
         <div className="col-span-2 lg:col-span-1">
-          <Label>Confirmar contraseña</Label>
+          <Label>Confirmar contraseña
+            <br/>
+            <span className="text-xs text-gray-400 ml-1">{user ? '(Dejar en blanco para no cambiar)' : '(Las contraseñas deben coincidir)'}<span className="text-error-500"> *</span></span>
+          </Label>
           <InputField type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} placeholder="••••••••" />
         </div>
       </div>

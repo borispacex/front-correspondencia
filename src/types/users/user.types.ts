@@ -12,6 +12,9 @@ export interface User {
   created_at?: string;
   updated_at?: string;
   active: boolean;
+
+  // email_verified_at?: string;
+  // UltimoCambioContrasenia?: string;
 }
 
 export interface CreateUserRequest {
@@ -39,4 +42,18 @@ export interface UpdateUserRequest {
   password_confirmation?: string;
   roles?: number[];
   active?: boolean;
+}
+
+export interface ChangePasswordUserRequest {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface InfoUserRequest {
+  phone: string;
+}
+
+export interface PhotoUserRequest {
+  photo: string;
 }

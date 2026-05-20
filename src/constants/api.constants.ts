@@ -27,6 +27,12 @@ export const API_ENDPOINTS = {
     BASE: "/admin/users",
     BY_ID: (id: number) => `/admin/users/${id}`,
   },
+  // Profile
+  PROFILE: {
+    BASE: "/profile/users",
+    CHANGE_PASSWORD: `/profile/users/password`,
+    PHONE: `/profile/users/phone`,
+  },
   // SAGA
   SAGA: {
     ALUMNOS: {

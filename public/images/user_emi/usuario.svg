@@ -1,0 +1,69 @@
+<svg width="200" height="200" viewBox="0 0 200 200" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Usuario civil con traje azul marino</title>
+  <desc>Avatar de usuario civil con traje azul marino, corbata dorada, fondo institucional azul y dorado</desc>
+  <defs>
+    <clipPath id="cc1"><circle cx="100" cy="88" r="75"/></clipPath>
+    <mask id="imagine-text-gaps-czkxwu" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="200" height="200" fill="white"/><rect x="81" y="166" width="38" height="13" fill="black" rx="2"/></mask>
+  </defs>
+
+  <circle cx="100" cy="88" r="75" fill="#1A3A6B"/>
+  <clipPath id="dg1"><circle cx="100" cy="88" r="75"/></clipPath>
+  <polygon points="100,13 175,13 175,163" fill="#F0C020" clip-path="url(#dg1)"/>
+  <circle cx="100" cy="88" r="75" fill="none" stroke="#F0C020" stroke-width="3"/>
+
+  <g clip-path="url(#cc1)">
+    <!-- Cuerpo traje azul marino -->
+    <ellipse cx="100" cy="186" rx="65" ry="50" fill="#0D1F3C"/>
+    <!-- Camisa blanca -->
+    <rect x="93" y="142" width="14" height="38" fill="#F5F5F5"/>
+    <!-- Corbata dorada -->
+    <polygon points="100,146 97,183 100,188 103,183" fill="#F0C020"/>
+    <polygon points="97,146 103,146 101,153 99,153" fill="#D4A800"/>
+    <!-- Solapas traje -->
+    <polygon points="63,186 93,142 93,166 75,186" fill="#0D1F3C"/>
+    <polygon points="137,186 107,142 107,166 125,186" fill="#0D1F3C"/>
+    <line x1="100" y1="156" x2="100" y2="186" stroke="#091527" stroke-width="1" mask="url(#imagine-text-gaps-czkxwu)"/>
+    <!-- Botones dorados -->
+    <circle cx="100" cy="163" r="1.5" fill="#F0C020"/>
+    <circle cx="100" cy="173" r="1.5" fill="#F0C020"/>
+    <!-- Cuello camisa blanca -->
+    <polygon points="91,143 100,153 109,143 107,136 93,136" fill="#F5F5F5"/>
+    <polygon points="93,143 100,150 107,143" fill="#0D1F3C"/>
+    <!-- Pañuelo dorado bolsillo -->
+    <polygon points="75,154 85,153 84,160 74,159" fill="#F0C020"/>
+
+    <!-- Cuello piel -->
+    <rect x="90" y="126" width="20" height="16" rx="6" fill="#F2C18D"/>
+
+    <!-- Cabeza -->
+    <ellipse cx="100" cy="103" rx="34" ry="36" fill="#F2C18D"/>
+
+    <!-- Cabello -->
+    <ellipse cx="100" cy="72" rx="34" ry="15" fill="#3A2510"/>
+    <rect x="66" y="72" width="68" height="14" fill="#3A2510"/>
+    <ellipse cx="87" cy="80" rx="11" ry="6" fill="#3A2510"/>
+    <ellipse cx="97" cy="79" rx="8" ry="5" fill="#3A2510"/>
+
+    <!-- Orejas -->
+    <ellipse cx="66" cy="104" rx="5" ry="7" fill="#E8A87C"/>
+    <ellipse cx="134" cy="104" rx="5" ry="7" fill="#E8A87C"/>
+
+    <!-- Ojos -->
+    <ellipse cx="89" cy="101" rx="6" ry="5" fill="#fff"/>
+    <ellipse cx="111" cy="101" rx="6" ry="5" fill="#fff"/>
+    <circle cx="90" cy="102" r="3" fill="#3A2510"/>
+    <circle cx="112" cy="102" r="3" fill="#3A2510"/>
+    <circle cx="91" cy="101" r="1.2" fill="#fff"/>
+    <circle cx="113" cy="101" r="1.2" fill="#fff"/>
+
+    <!-- Cejas -->
+    <path d="M83 94 Q89 91 95 94" fill="none" stroke="#3A2510" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M105 94 Q111 91 117 94" fill="none" stroke="#3A2510" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Nariz -->
+    <ellipse cx="100" cy="109" rx="3" ry="3.5" fill="#E8A87C"/>
+
+    <!-- Sonrisa -->
+    <path d="M93 117 Q100 125 107 117" fill="none" stroke="#C47A50" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

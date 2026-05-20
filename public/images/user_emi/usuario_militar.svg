@@ -1,0 +1,76 @@
+<svg width="200" height="200" viewBox="0 0 200 200" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Usuario militar con uniforme camuflaje</title>
+  <desc>Avatar de usuario militar con uniforme camuflaje, casco y colores institucionales</desc>
+  <defs>
+    <clipPath id="cc2"><circle cx="100" cy="88" r="75"/></clipPath>
+  </defs>
+
+  <circle cx="100" cy="88" r="75" fill="#1A3A6B"/>
+  <clipPath id="dg2"><circle cx="100" cy="88" r="75"/></clipPath>
+  <polygon points="100,13 175,13 175,163" fill="#F0C020" clip-path="url(#dg2)"/>
+  <circle cx="100" cy="88" r="75" fill="none" stroke="#F0C020" stroke-width="3"/>
+
+  <g clip-path="url(#cc2)">
+    <!-- Cuerpo base camuflaje -->
+    <ellipse cx="100" cy="186" rx="65" ry="50" fill="#5A6B2A"/>
+    <!-- Manchas camuflaje -->
+    <ellipse cx="76" cy="159" rx="10" ry="7" fill="#3B4A18" opacity="0.85"/>
+    <ellipse cx="94" cy="172" rx="13" ry="8" fill="#7A6830" opacity="0.75"/>
+    <ellipse cx="115" cy="158" rx="12" ry="7.5" fill="#3B4A18" opacity="0.85"/>
+    <ellipse cx="126" cy="174" rx="9" ry="6" fill="#7A6830" opacity="0.75"/>
+    <ellipse cx="85" cy="183" rx="12" ry="7" fill="#3B4A18" opacity="0.7"/>
+    <ellipse cx="106" cy="182" rx="10" ry="6.5" fill="#4A3818" opacity="0.7"/>
+    <ellipse cx="122" cy="187" rx="8" ry="5" fill="#3B4A18" opacity="0.7"/>
+
+    <!-- Bolsillos pecho -->
+    <rect x="87" y="150" width="13" height="10" rx="2" fill="#4A5A20"/>
+    <rect x="104" y="150" width="13" height="10" rx="2" fill="#4A5A20"/>
+    <line x1="87" y1="155" x2="100" y2="155" stroke="#3B4A18" stroke-width="0.7"/>
+    <line x1="104" y1="155" x2="117" y2="155" stroke="#3B4A18" stroke-width="0.7"/>
+
+    <!-- Insignia dorada -->
+    <rect x="88" y="151" width="11" height="6.5" rx="1" fill="#F0C020"/>
+    <line x1="88" y1="154" x2="99" y2="154" stroke="#1A3A6B" stroke-width="0.8"/>
+
+    <!-- Cuello uniforme -->
+    <polygon points="87,146 100,153 113,146 109,136 91,136" fill="#4A5A20"/>
+
+    <!-- Cuello piel -->
+    <rect x="90" y="126" width="20" height="16" rx="6" fill="#F2C18D"/>
+
+    <!-- Cabeza -->
+    <ellipse cx="100" cy="103" rx="34" ry="36" fill="#F2C18D"/>
+
+    <!-- Casco camuflaje -->
+    <ellipse cx="100" cy="75" rx="38" ry="20" fill="#5A6B2A"/>
+    <ellipse cx="87" cy="72" rx="8" ry="5" fill="#3B4A18" opacity="0.8"/>
+    <ellipse cx="106" cy="69" rx="9" ry="5" fill="#7A6830" opacity="0.75"/>
+    <ellipse cx="120" cy="74" rx="7" ry="4" fill="#3B4A18" opacity="0.8"/>
+    <ellipse cx="93" cy="78" rx="6" ry="3.5" fill="#4A3818" opacity="0.7"/>
+    <!-- Visera -->
+    <rect x="62" y="82" width="76" height="8" rx="2" fill="#4A5A20"/>
+    <rect x="62" y="88" width="76" height="3" rx="1.5" fill="#F0C020"/>
+
+    <!-- Orejas -->
+    <ellipse cx="66" cy="105" rx="5" ry="7" fill="#E8A87C"/>
+    <ellipse cx="134" cy="105" rx="5" ry="7" fill="#E8A87C"/>
+
+    <!-- Ojos serios -->
+    <ellipse cx="89" cy="102" rx="6" ry="5" fill="#fff"/>
+    <ellipse cx="111" cy="102" rx="6" ry="5" fill="#fff"/>
+    <circle cx="90" cy="103" r="3" fill="#3A2510"/>
+    <circle cx="112" cy="103" r="3" fill="#3A2510"/>
+    <circle cx="91" cy="102" r="1.2" fill="#fff"/>
+    <circle cx="113" cy="102" r="1.2" fill="#fff"/>
+
+    <!-- Cejas rectas -->
+    <rect x="82" y="94" width="13" height="2.5" rx="1" fill="#3A2510"/>
+    <rect x="104" y="94" width="13" height="2.5" rx="1" fill="#3A2510"/>
+
+    <!-- Nariz -->
+    <ellipse cx="100" cy="110" rx="3" ry="3.5" fill="#E8A87C"/>
+
+    <!-- Boca seria -->
+    <line x1="93" y1="119" x2="107" y2="119" stroke="#C47A50" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

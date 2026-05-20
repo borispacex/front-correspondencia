@@ -16,10 +16,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = getToken();
     if (stored) {
       setIsLoading(true);
-      meService()
-        .then(setUser)
-        .catch(() => {})
-        .finally(() => setIsLoading(false));
+      refreshUser()
+          .finally(() => setIsLoading(false));
     }
   }, []);
 
@@ -55,6 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function refreshUser(): Promise<void> {
+    try {
+      const profile = await meService();
+      setUser(profile);
+    } catch {
+      setUser(null);
+    }
+  }
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -64,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        refreshUser
       }}
     >
       {children}
