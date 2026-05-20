@@ -1,4 +1,4 @@
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+export const BASE_URL = import.meta.env.VITE_API_PREFIX as string;
 
 export const API_ENDPOINTS = {
   // Auth
@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     BASE: "/profile/users",
     CHANGE_PASSWORD: `/profile/users/password`,
     PHONE: `/profile/users/phone`,
+    PHOTO: `/profile/users/photo`,
   },
   // SAGA
   SAGA: {

@@ -14,7 +14,17 @@ export async function infoUser(payload: InfoUserRequest): Promise<User> {
 }
 
 export async function photoUser(payload: PhotoUserRequest): Promise<User> {
-    const { data } = await http.patch<ApiResponse<User>>(API_ENDPOINTS.PROFILE.PHONE, payload);
+    const formData = new FormData();
+    formData.append("photo", payload.photo);
+    const { data } = await http.patch<ApiResponse<User>>(
+        API_ENDPOINTS.PROFILE.PHOTO,
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
     return data.data;
 }
 

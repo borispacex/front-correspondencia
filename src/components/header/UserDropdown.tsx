@@ -6,6 +6,8 @@ import { useAuth } from "../../hooks/auth/useAuth";
 import {ChevronDownIcon, LogOutIcon, UserIcon} from "../../icons";
 import {ROUTES} from "../../constants/routes.constants.ts";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
@@ -24,7 +26,11 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
+          <img
+              src={user?.foto
+                  ? `${API_URL}/storage/${user.foto}`
+                  : "/images/user_emi/usuario.jpg"}
+              alt="User" />
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">{user?.name?.split(" ")[0] ?? "Usuario"}</span>

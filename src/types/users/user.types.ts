@@ -55,5 +55,5 @@ export interface InfoUserRequest {
 }
 
 export interface PhotoUserRequest {
-  photo: string;
+  photo: File;
 }
