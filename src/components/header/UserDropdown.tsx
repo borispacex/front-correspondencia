@@ -33,7 +33,7 @@ export default function UserDropdown() {
               alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">{user?.name?.split(" ")[0] ?? "Usuario"}</span>
+        <span className="hidden sm:block mr-1 font-medium text-theme-sm">{`${user?.name ?? ""} ${user?.last_name ?? ""}`}</span>
         <ChevronDownIcon
             width="20"
             height="20"
@@ -49,7 +49,7 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.name ?? "—"}
+            {`${user?.name ?? ""} ${user?.last_name ?? ""}`}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
             {user?.email ?? "—"}

@@ -384,24 +384,21 @@ const AppSidebar: React.FC = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="py-8 flex justify-center">
-        <Link to="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <img
-              src="/images/logo_emi/logo_sidebar.png"
-              alt="Logo EMI"
-              width={150}
-              height={40}
-            />
-          ) : (
-            <img
-              src="/images/logo_emi/emi_icono.png"
-              alt="Logo EMI"
-              width={32}
-              height={32}
-            />
-          )}
-        </Link>
+      <div className={isMobileOpen ? "py-2" : "py-8 flex justify-center"}>
+        {!isMobileOpen && (
+            <Link to={ROUTES.HOME}>
+              <img
+                  src={
+                    isExpanded || isHovered
+                        ? "/images/logo_emi/logo_sidebar.png"
+                        : "/images/logo_emi/emi_icono.png"
+                  }
+                  alt="Logo EMI"
+                  width={isExpanded || isHovered ? 150 : 32}
+                  height={isExpanded || isHovered ? 40 : 32}
+              />
+            </Link>
+        )}
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">

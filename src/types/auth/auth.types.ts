@@ -35,3 +35,10 @@ export interface AuthUser {
   updated_at?: string | null;
   UltimoCambioContrasenia?: string | null;
 }
+
+export interface MicrosoftAuthResponse {
+  token_type: string;
+  access_token: string;
+  expires_at: string;
+  user: { id: number; name: string; email: string };
+}

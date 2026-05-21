@@ -3,7 +3,7 @@ import {PencilIcon} from "../../icons";
 import UserChangePasswordForm from "./UserChangePasswordForm.tsx";
 import type {ChangePasswordUserRequest} from "../../types/users/user.types.ts";
 import {useNotifications} from "../../hooks/useNotification.tsx";
-import {useCallback, useState} from "react";
+import {useState} from "react";
 import {changePasswordUser} from "../../services/users-profile.service.ts";
 import {useAuth} from "../../hooks/auth/useAuth.ts";
 import {formatDateBo} from "../../utils/format.utils.ts";

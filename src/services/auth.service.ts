@@ -1,6 +1,6 @@
 import http from "./http.service";
 import { API_ENDPOINTS } from "../constants/api.constants";
-import type { LoginRequest, LoginResponse, AuthUser } from "../types/auth/auth.types";
+import type {LoginRequest, LoginResponse, AuthUser} from "../types/auth/auth.types";
 import type { ApiResponse } from "../types/common/api.types";
 
 export async function login(credentials: LoginRequest): Promise<LoginResponse> {
@@ -22,3 +22,4 @@ export async function me(): Promise<AuthUser> {
   console.log(data);
   return data.data;
 }
+

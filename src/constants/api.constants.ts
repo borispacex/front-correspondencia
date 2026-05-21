@@ -7,6 +7,10 @@ export const API_ENDPOINTS = {
     LOGOUT: "/auth/logout",
     ME: "/auth/me",
   },
+  // Social Auth
+  SOCIAL_AUTH: {
+    MICROSOFT: "/auth/social/microsoft",
+  },
   // Roles
   ROLES: {
     BASE: "/admin/roles",
