@@ -19,7 +19,6 @@ export async function me(): Promise<AuthUser> {
   const { data } = await http.get<ApiResponse<AuthUser>>(
     API_ENDPOINTS.AUTH.ME
   );
-  console.log(data);
   return data.data;
 }
 

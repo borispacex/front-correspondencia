@@ -12,7 +12,7 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { login, isLoading } = useAuth();
+  const { login, loginWithMicrosoft, isLoading } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -26,6 +26,19 @@ export default function SignInForm() {
       setError(axiosErr?.response?.data?.message ?? "Credenciales incorrectas");
     }
   }
+
+  const handleClick = async () => {
+    setError(null);
+    try {
+      await loginWithMicrosoft();
+
+      navigate(ROUTES.HOME);
+    } catch (err: unknown) {
+      console.error('Error COMPLETO:', err);
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setError(axiosErr?.response?.data?.message ?? 'Error al iniciar sesión con Microsoft');
+    }
+  };
 
   return (
     <div className="flex flex-col flex-1">
@@ -106,7 +119,9 @@ export default function SignInForm() {
                 <div className="flex-1 border-t border-gray-200 dark:border-gray-800"></div>
               </div>
               <div className="flex flex-col gap-3 w-full ">
-                <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+                <button
+                    onClick={handleClick}
+                    className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
                   <MicrosoftIcon width="20" height="20" />
                   Ingresa con tu correo institucional
                 </button>

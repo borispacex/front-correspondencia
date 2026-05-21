@@ -25,6 +25,7 @@ import NotFound from "./pages/OtherPage/NotFound.tsx";
 import {correspondenciaRoutes} from "./components/correspondencia/correspondencia.route.tsx";
 import ResetPassword from "./pages/AuthPages/ResetPassword.tsx";
 import {ROUTES} from "./constants/routes.constants.ts";
+import MsalCallbackPage from "./pages/auth/MsalCallbackPage.tsx";
 
 
 export const appRouter = createBrowserRouter([
@@ -76,7 +77,7 @@ export const appRouter = createBrowserRouter([
     { path: ROUTES.SIGN_IN, element: <SignIn /> },
     { path: ROUTES.SIGN_UP, element: <SignUp /> },
     { path: ROUTES.RESET_PASSWORD , element: <ResetPassword /> },
-
+    { path: '/msal-callback', element: <MsalCallbackPage /> },
 
     // Fallback
     { path: "*", element: <NotFound /> },

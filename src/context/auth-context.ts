@@ -12,6 +12,7 @@ export interface AuthContextValue {
   resetPassword: (email: string ) => Promise<void>;
 
   refreshUser: () => Promise<void>;
+  loginWithMicrosoft: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined);

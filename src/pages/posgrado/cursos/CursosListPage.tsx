@@ -129,7 +129,6 @@ export default function CursosListPage() {
       });
 
       const { data, ...meta } = result;
-      console.log("Cursos", data);
       setCursos(data);
       setPagination(meta);
     } catch {

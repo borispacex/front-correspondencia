@@ -40,5 +40,9 @@ export interface MicrosoftAuthResponse {
   token_type: string;
   access_token: string;
   expires_at: string;
-  user: { id: number; name: string; email: string };
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
