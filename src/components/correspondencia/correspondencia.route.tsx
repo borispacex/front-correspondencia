@@ -1,8 +1,8 @@
 import {RouteObject} from "react-router";
 import {CorrespondenciaLayout} from "./layout/CorrespondenciaLayout.tsx";
-import {DocumentosCorrespondenciaPage} from "./pages/DocumentosCorrespondencia.tsx";
-import {HojaRutaCorrespondenciaPage} from "./pages/HojaRutaCorrespondenciaPage.tsx";
-import {AprobarFirmarCorrespondenciaPage} from "./pages/AprobarFirmarCorrespondencia.tsx";
+import {DocumentsPage} from "./pages/DocumentsPage.tsx";
+import {RoadmapPage} from "./pages/RoadmapPage.tsx";
+import {AprobarFirmarPage} from "./pages/AprobarFirmarPage.tsx";
 import {ROUTES} from "../../constants/routes.constants.ts";
 
 
@@ -10,9 +10,9 @@ export const correspondenciaRoutes: RouteObject[] = [
     {
         element: <CorrespondenciaLayout />,
         children: [
-            { path: ROUTES.CORRESPONDENCE.ROUTE_SHEET, element: <HojaRutaCorrespondenciaPage /> },
-            { path: ROUTES.CORRESPONDENCE.DOCUMENTS, element: <DocumentosCorrespondenciaPage /> },
-            { path: ROUTES.CORRESPONDENCE.APPROVE_SIGN, element: <AprobarFirmarCorrespondenciaPage /> },
+            { path: ROUTES.CORRESPONDENCE.ROUTE_SHEET, element: <RoadmapPage /> },
+            { path: ROUTES.CORRESPONDENCE.DOCUMENTS, element: <DocumentsPage /> },
+            { path: ROUTES.CORRESPONDENCE.APPROVE_SIGN, element: <AprobarFirmarPage /> },
         ],
     },
 ];

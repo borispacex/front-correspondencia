@@ -21,10 +21,6 @@ export const ROUTES = {
     CREATE: "/admin/usuarios/crear",
     EDIT: (id: number | string) => `/admin/usuarios/${id}/editar`,
   },
-  // Posgrado
-  POSGRADO: {
-    CURSOS: "/posgrado/cursos",
-  },
   // Correspondencia
   CORRESPONDENCE: {
     ROUTE_SHEET: "/correspondencia/hoja-ruta",

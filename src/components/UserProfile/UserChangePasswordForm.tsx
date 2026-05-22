@@ -7,6 +7,7 @@ import {AuthUser} from "../../types/auth/auth.types.ts";
 import {formatDateBo} from "../../utils/format.utils.ts";
 import {InfoIcon} from "../../icons";
 import Tooltip from "../form/Tooltip.tsx";
+import {InputFieldPassword} from "../form/input/InputFieldPassword.tsx";
 
 interface UserChangePasswordFormProps {
     user?: AuthUser | null;
@@ -15,7 +16,6 @@ interface UserChangePasswordFormProps {
 }
 
 export default function UserChangePasswordForm({ user, onSubmit, onCancel }: UserChangePasswordFormProps) {
-
     const [currentPassword, setCurrentPassword] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -77,7 +77,7 @@ export default function UserChangePasswordForm({ user, onSubmit, onCancel }: Use
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1">
                 <div className="col-span-2 lg:col-span-1">
                     <Label>Contraseña actual <span className="text-error-500">*</span></Label>
-                    <InputField type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="••••••••" />
+                    <InputFieldPassword value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="••••••••" />
                 </div>
             </div>
 
@@ -107,14 +107,20 @@ export default function UserChangePasswordForm({ user, onSubmit, onCancel }: Use
                         <br/>
                         <span className="text-xs text-gray-400 ml-1">(Recomendamos una contraseña segura)<span className="text-error-500"> *</span></span>
                     </Label>
-                    <InputField type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                    <InputFieldPassword
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="••••••••"
+                    />
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                     <Label>Confirmar contraseña
                         <br/>
                         <span className="text-xs text-gray-400 ml-1">(Las contraseñas deben coincidir)<span className="text-error-500"> *</span></span>
                     </Label>
-                    <InputField type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} placeholder="••••••••" />
+                    <InputFieldPassword
+                        value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} placeholder="••••••••" />
                 </div>
             </div>
 

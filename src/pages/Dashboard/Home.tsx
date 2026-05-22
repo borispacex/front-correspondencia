@@ -1,32 +1,25 @@
-import {CorrespondenciaDashboard} from "../../components/correspondencia/components/CorrespondenciaDashboard.tsx";
+import { CorrespondenciaDashboard } from "../../components/correspondencia/components/CorrespondenciaDashboard.tsx";
+import { useAuth } from "../../hooks/auth/useAuth.ts";
 
 export default function Home() {
-  return (
-    <>
-        <CorrespondenciaDashboard />
-      {/*<div className="grid grid-cols-12 gap-4 md:gap-6">*/}
-        {/*<div className="col-span-12 space-y-6 xl:col-span-7">*/}
-        {/*  <EcommerceMetrics />*/}
+    const { user } = useAuth();
 
-        {/*  <MonthlySalesChart />*/}
-        {/*</div>*/}
-
-        {/*<div className="col-span-12 xl:col-span-5">*/}
-        {/*  <MonthlyTarget />*/}
-        {/*</div>*/}
-
-        {/*<div className="col-span-12">*/}
-        {/*  <StatisticsChart />*/}
-        {/*</div>*/}
-
-        {/*<div className="col-span-12 xl:col-span-5">*/}
-        {/*  <DemographicCard />*/}
-        {/*</div>*/}
-
-        {/*<div className="col-span-12 xl:col-span-7">*/}
-        {/*  <RecentOrders />*/}
-        {/*</div>*/}
-      {/*</div>*/}
-    </>
-  );
+    return (
+        <>
+            <div className="mb-5 rounded-2xl border border-gray-200 bg-white py-1 dark:border-gray-800 dark:bg-white/[0.03] ">
+                <div className="mx-auto w-full max-w-[630px] text-center">
+                    <h3 className="text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
+                        {`Hola, `}
+                        <span className="font-semibold">
+                            {` ${user?.name} ${user?.last_name} ${user?.mother_last_name}`}
+                        </span>
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 sm:text-base">
+                        Bienvenido al Sistema de Correspondencia
+                    </p>
+                </div>
+            </div>
+            <CorrespondenciaDashboard />
+        </>
+    );
 }

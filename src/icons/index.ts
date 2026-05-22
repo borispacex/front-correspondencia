@@ -72,7 +72,7 @@ import { ReactComponent as MenuIcon } from "./menu.svg?react";
 import { ReactComponent as BellIcon } from "./bell.svg?react";
 import { ReactComponent as SunIcon } from "./sun.svg?react";
 import { ReactComponent as MoonIcon } from "./moon.svg?react";
-
+import { ReactComponent as SearchIcon } from "./search.svg?react";
 
 export {
   ErrorHexaIcon,
@@ -148,5 +148,6 @@ export {
   BellIcon,
   SunIcon,
   MoonIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  SearchIcon
 };

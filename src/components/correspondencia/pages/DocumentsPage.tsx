@@ -1,4 +1,4 @@
-export const DocumentosCorrespondenciaPage = () => {
+export const DocumentsPage = () => {
     return (
         <div>Documentos page</div>
     )
