@@ -1,10 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { PencilIcon, TrashBinIcon, AngleUpIcon, AngleDownIcon } from "../../icons";
+import {
+  PencilIcon,
+  TrashBinIcon,
+  AngleUpIcon,
+  AngleDownIcon,
+  ChevronsRightIcon,
+  ChevronRightIcon,
+  ChevronLeftIcon, ChevronsLeftIcon
+} from "../../icons";
 import type { Role, RoleFilters } from "../../types/roles/role.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import type { Pagination } from "../../types/common/api.types";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import Button from "../ui/button/Button.tsx";
+import Tooltip from "../form/Tooltip.tsx";
 
 interface RoleTableProps {
   roles: Role[];
@@ -178,22 +187,26 @@ export default function RoleTable({
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {can('roles.edit') && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => onEdit(role)}
-                          className="w-8 h-8 p-0"
-                          startIcon={<PencilIcon className="size-4"/>}
-                        />
-                      )}
-                      {can('roles.delete') && (
+                        <Tooltip content="Editar">
                           <Button
                               type="button"
-                              variant="outline"
-                              onClick={() => onDelete(role.id)}
+                              variant="ghost"
+                              onClick={() => onEdit(role)}
                               className="w-8 h-8 p-0"
-                              startIcon={<TrashBinIcon className="size-4" />}
+                              startIcon={<PencilIcon className="size-4"/>}
                           />
+                        </Tooltip>
+                      )}
+                      {can('roles.delete') && (
+                          <Tooltip content="Eliminar">
+                            <Button
+                                type="button"
+                                variant="danger"
+                                onClick={() => onDelete(role.id)}
+                                className="w-8 h-8 p-0"
+                                startIcon={<TrashBinIcon className="size-4" />}
+                            />
+                          </Tooltip>
                       )}
                     </div>
                   </td>}
@@ -232,7 +245,7 @@ export default function RoleTable({
               className={btnNormal}
               title="Primera página"
             >
-              «
+              <ChevronsLeftIcon />
             </button>
             <button
               onClick={() => onPageChange(currentPage - 1)}
@@ -240,7 +253,7 @@ export default function RoleTable({
               className={btnNormal}
               title="Página anterior"
             >
-              ‹
+              <ChevronLeftIcon />
             </button>
             {renderPageNumbers().map((p, i) =>
               p === "..." ? (
@@ -266,7 +279,7 @@ export default function RoleTable({
               className={btnNormal}
               title="Página siguiente"
             >
-              ›
+              <ChevronRightIcon />
             </button>
             <button
               onClick={() => onPageChange(totalPages)}
@@ -274,7 +287,7 @@ export default function RoleTable({
               className={btnNormal}
               title="Última página"
             >
-              »
+              <ChevronsRightIcon />
             </button>
           </div>
         </div>

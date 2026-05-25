@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import {SearchIcon} from "../../icons";
+
+import { SearchIcon } from "../../icons";
 
 interface SearchSelectProps<T> {
     options: T[];
@@ -24,7 +25,11 @@ interface SearchSelectProps<T> {
 
     getOptionLabel: (option: T) => string;
 
-    getOptionValue: (option: T) => string | number;
+    getOptionValue: (
+        option: T,
+    ) => string | number;
+
+    size?: "xs" | "sm" | "md";
 }
 
 export default function SearchSelect<T>({
@@ -40,12 +45,15 @@ export default function SearchSelect<T>({
                                             onSearch,
                                             getOptionLabel,
                                             getOptionValue,
+                                            size = "md",
                                         }: SearchSelectProps<T>) {
     const [query, setQuery] = useState("");
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] =
+        useState(false);
 
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef =
+        useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (value) {
@@ -54,19 +62,29 @@ export default function SearchSelect<T>({
     }, [value, getOptionLabel]);
 
     useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
+        function handleClickOutside(
+            event: MouseEvent,
+        ) {
             if (
                 containerRef.current &&
-                !containerRef.current.contains(event.target as Node)
+                !containerRef.current.contains(
+                    event.target as Node,
+                )
             ) {
                 setIsOpen(false);
             }
         }
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside,
+        );
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside,
+            );
         };
     }, []);
 
@@ -94,6 +112,27 @@ export default function SearchSelect<T>({
         onChange(option);
     }
 
+    // Sizes
+    const sizeClasses = {
+        xs: {
+            input: "h-9 px-3 py-2 pr-9 text-xs",
+            icon: "right-2.5",
+            dropdownItem: "px-3 py-2 text-xs",
+        },
+
+        sm: {
+            input: "h-10 px-3.5 py-2 pr-10 text-sm",
+            icon: "right-3",
+            dropdownItem: "px-3.5 py-2.5 text-sm",
+        },
+
+        md: {
+            input: "h-11 px-4 py-2.5 pr-11 text-sm",
+            icon: "right-3",
+            dropdownItem: "px-4 py-3 text-sm",
+        },
+    };
+
     return (
         <div
             ref={containerRef}
@@ -114,16 +153,18 @@ export default function SearchSelect<T>({
                         }
                     }}
                     onKeyDown={(e) => {
-                        if (searchOnEnter && e.key === "Enter") {
+                        if (
+                            searchOnEnter &&
+                            e.key === "Enter"
+                        ) {
                             e.preventDefault();
 
                             handleSearch();
                         }
                     }}
-                    className="
-            h-11 w-full rounded-lg border
+                    className={`
+            w-full rounded-lg border
             border-gray-300 bg-white
-            px-4 py-2 text-sm
             text-gray-900 outline-none
             transition
 
@@ -141,16 +182,16 @@ export default function SearchSelect<T>({
             dark:placeholder:text-gray-400
             dark:disabled:bg-gray-800
 
-            pr-12
-          "
+            ${sizeClasses[size].input}
+          `}
                 />
 
                 {showSearchButton && (
                     <button
                         type="button"
                         onClick={handleSearch}
-                        className="
-              absolute right-3 top-1/2
+                        className={`
+              absolute top-1/2
               -translate-y-1/2
 
               text-gray-400
@@ -159,9 +200,14 @@ export default function SearchSelect<T>({
               hover:text-brand-500
 
               dark:text-gray-500
-            "
+
+              ${sizeClasses[size].icon}
+            `}
                     >
-                        <SearchIcon width="18" height="18" />
+                        <SearchIcon
+                            width="18"
+                            height="18"
+                        />
                     </button>
                 )}
             </div>
@@ -178,33 +224,35 @@ export default function SearchSelect<T>({
             dark:bg-gray-900
           "
                 >
-                    {query.trim().length < minLength ? (
+                    {query.trim().length <
+                    minLength ? (
                         <div
-                            className="
-                px-4 py-3 text-sm
+                            className={`
                 text-gray-500
                 dark:text-gray-400
-              "
+                ${sizeClasses[size].dropdownItem}
+              `}
                         >
-                            Escriba al menos {minLength} caracteres
+                            Escriba al menos{" "}
+                            {minLength} caracteres
                         </div>
                     ) : loading ? (
                         <div
-                            className="
-                px-4 py-3 text-sm
+                            className={`
                 text-gray-500
                 dark:text-gray-400
-              "
+                ${sizeClasses[size].dropdownItem}
+              `}
                         >
                             Buscando...
                         </div>
                     ) : options.length === 0 ? (
                         <div
-                            className="
-                px-4 py-3 text-sm
+                            className={`
                 text-gray-500
                 dark:text-gray-400
-              "
+                ${sizeClasses[size].dropdownItem}
+              `}
                         >
                             Sin resultados
                         </div>
@@ -213,17 +261,20 @@ export default function SearchSelect<T>({
                             <button
                                 key={getOptionValue(option)}
                                 type="button"
-                                onClick={() => handleSelect(option)}
-                                className="
-                  w-full px-4 py-3
-                  text-left text-sm
+                                onClick={() =>
+                                    handleSelect(option)
+                                }
+                                className={`
+                  w-full text-left
                   text-gray-900 transition
 
                   hover:bg-gray-100
 
                   dark:text-white
                   dark:hover:bg-gray-800
-                "
+
+                  ${sizeClasses[size].dropdownItem}
+                `}
                             >
                                 {getOptionLabel(option)}
                             </button>

@@ -2,26 +2,40 @@ import { useState } from "react";
 import type React from "react";
 
 import InputField from "./InputField.tsx";
-import { EyeCloseIcon, EyeIcon } from "../../../icons";
+
+import {
+    EyeCloseIcon,
+    EyeIcon,
+} from "../../../icons";
 
 interface InputFieldPasswordProps {
     value?: string;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+
+    onChange?: (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => void;
 
     id?: string;
+
     name?: string;
+
     placeholder?: string;
 
     disabled?: boolean;
+
     required?: boolean;
 
     autoComplete?: string;
 
     error?: boolean;
+
     success?: boolean;
+
     hint?: string;
 
     className?: string;
+
+    size?: "xs" | "sm" | "md";
 }
 
 export const InputFieldPassword = ({
@@ -37,13 +51,39 @@ export const InputFieldPassword = ({
                                        success = false,
                                        hint,
                                        className = "",
+                                       size = "md",
                                    }: InputFieldPasswordProps) => {
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] =
+        useState(false);
+
+    const sizeClasses = {
+        xs: {
+            button: "right-3",
+            icon: "size-4",
+            padding: "pr-9",
+        },
+
+        sm: {
+            button: "right-3.5",
+            icon: "size-4.5",
+            padding: "pr-10",
+        },
+
+        md: {
+            button: "right-4",
+            icon: "size-5",
+            padding: "pr-11",
+        },
+    };
 
     return (
         <div className="relative">
             <InputField
-                type={showPassword ? "text" : "password"}
+                type={
+                    showPassword
+                        ? "text"
+                        : "password"
+                }
                 value={value}
                 onChange={onChange}
                 id={id}
@@ -55,19 +95,41 @@ export const InputFieldPassword = ({
                 error={error}
                 success={success}
                 hint={hint}
-                className={`pr-11 ${className}`}
+                size={size}
+                className={`
+          ${sizeClasses[size].padding}
+          ${className}
+        `}
             />
 
             {!disabled && (
                 <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 z-30 -translate-y-1/2"
+                    onClick={() =>
+                        setShowPassword(!showPassword)
+                    }
+                    className={`
+            absolute top-1/2 z-30
+            -translate-y-1/2
+            ${sizeClasses[size].button}
+          `}
                 >
                     {showPassword ? (
-                        <EyeIcon className="size-5 fill-gray-500 dark:fill-gray-400" />
+                        <EyeIcon
+                            className={`
+                fill-gray-500
+                dark:fill-gray-400
+                ${sizeClasses[size].icon}
+              `}
+                        />
                     ) : (
-                        <EyeCloseIcon className="size-5 fill-gray-500 dark:fill-gray-400" />
+                        <EyeCloseIcon
+                            className={`
+                fill-gray-500
+                dark:fill-gray-400
+                ${sizeClasses[size].icon}
+              `}
+                        />
                     )}
                 </button>
             )}

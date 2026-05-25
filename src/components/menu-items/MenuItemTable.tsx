@@ -1,10 +1,19 @@
 import { useState, useMemo } from "react";
-import {PencilIcon, AngleUpIcon, AngleDownIcon, TrashBinIcon} from "../../icons";
+import {
+  PencilIcon,
+  AngleUpIcon,
+  AngleDownIcon,
+  TrashBinIcon,
+  ChevronsRightIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon, ChevronLeftIcon
+} from "../../icons";
 import type { MenuItem } from "../../types/menu-items/menu-item.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import {ToggleSwitch} from "../form/switch/ToggleSwitch.tsx";
 import Button from "../ui/button/Button.tsx";
+import Tooltip from "../form/Tooltip.tsx";
 
 interface MenuItemTableProps {
   menuItems: MenuItem[];
@@ -180,31 +189,37 @@ export default function MenuItemTable({
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {can('menu_items.edit') && (
-                          <ToggleSwitch
-                              checked={item.active}
-                              onChange={(checked) => onToggleActive(item, checked)}
-                              showIcon
-                              label=""
-                              size="xs"
-                          />
+                          <Tooltip content="Cambiar estado">
+                            <ToggleSwitch
+                                checked={item.active}
+                                onChange={(checked) => onToggleActive(item, checked)}
+                                showIcon
+                                label=""
+                                size="xs"
+                            />
+                          </Tooltip>
                       )}
                       {can('menu_items.edit') && (
-                          <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => onEdit(item)}
-                              className="w-8 h-8 p-0"
-                              startIcon={<PencilIcon className="size-4"/>}
-                          />
+                          <Tooltip content="Editar">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => onEdit(item)}
+                                className="w-8 h-8 p-0"
+                                startIcon={<PencilIcon className="size-4"/>}
+                            />
+                          </Tooltip>
                       )}
                       {can('menu_items.delete') && (
-                          <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => onDelete(item.id)}
-                              className="w-8 h-8 p-0"
-                              startIcon={<TrashBinIcon className="size-4" />}
-                          />
+                          <Tooltip content="Eliminar">
+                            <Button
+                                type="button"
+                                variant="danger"
+                                onClick={() => onDelete(item.id)}
+                                className="w-8 h-8 p-0"
+                                startIcon={<TrashBinIcon className="size-4" />}
+                            />
+                          </Tooltip>
                       )}
                     </div>
                   </td>}
@@ -231,8 +246,12 @@ export default function MenuItemTable({
               <span>{from}–{to} de {total}</span>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">«</button>
-              <button onClick={() => setPage(safePage - 1)} disabled={safePage === 1} className={btnNormal} title="Anterior">‹</button>
+              <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">
+                <ChevronsLeftIcon />
+              </button>
+              <button onClick={() => setPage(safePage - 1)} disabled={safePage === 1} className={btnNormal} title="Anterior">
+                <ChevronLeftIcon />
+              </button>
               {renderPageNumbers().map((p, i) =>
                   p === "..." ? (
                       <span key={`e-${i}`} className="inline-flex h-8 w-8 items-center justify-center text-sm text-gray-400">…</span>
@@ -240,8 +259,12 @@ export default function MenuItemTable({
                       <button key={p} onClick={() => setPage(p as number)} className={p === safePage ? btnActive : btnNormal}>{p}</button>
                   )
               )}
-              <button onClick={() => setPage(safePage + 1)} disabled={safePage === totalPages} className={btnNormal} title="Siguiente">›</button>
-              <button onClick={() => setPage(totalPages)} disabled={safePage === totalPages} className={btnNormal} title="Última">»</button>
+              <button onClick={() => setPage(safePage + 1)} disabled={safePage === totalPages} className={btnNormal} title="Siguiente">
+                <ChevronRightIcon />
+              </button>
+              <button onClick={() => setPage(totalPages)} disabled={safePage === totalPages} className={btnNormal} title="Última">
+                <ChevronsRightIcon />
+              </button>
             </div>
           </div>
       )}

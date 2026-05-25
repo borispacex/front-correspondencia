@@ -73,6 +73,17 @@ import { ReactComponent as BellIcon } from "./bell.svg?react";
 import { ReactComponent as SunIcon } from "./sun.svg?react";
 import { ReactComponent as MoonIcon } from "./moon.svg?react";
 import { ReactComponent as SearchIcon } from "./search.svg?react";
+import { ReactComponent as ChevronsRightIcon } from "./chevrons-right.svg?react";
+import { ReactComponent as ChevronsLeftIcon } from "./chevrons-left.svg?react";
+import { ReactComponent as ArchiveRestoreIcon } from "./archive-restore.svg?react";
+import { ReactComponent as RouteIcon } from "./route.svg?react";
+import { ReactComponent as BookCopyIcon } from "./book-copy.svg?react";
+import { ReactComponent as SendHorizontalIcon } from "./send-horizontal.svg?react";
+import { ReactComponent as FileOutputIcon } from "./file-output.svg?react";
+import { ReactComponent as FileInputIcon } from "./file-input.svg?react";
+import { ReactComponent as BadgeIcon } from "./badge.svg?react";
+import { ReactComponent as BrushCleaningIcon } from "./brush-cleaning.svg?react";
+
 
 export {
   ErrorHexaIcon,
@@ -149,5 +160,15 @@ export {
   SunIcon,
   MoonIcon,
   ChevronRightIcon,
-  SearchIcon
+  SearchIcon,
+  ChevronsRightIcon,
+  ChevronsLeftIcon,
+  ArchiveRestoreIcon,
+  RouteIcon,
+  BookCopyIcon,
+  SendHorizontalIcon,
+  FileOutputIcon,
+  FileInputIcon,
+  BadgeIcon,
+  BrushCleaningIcon
 };

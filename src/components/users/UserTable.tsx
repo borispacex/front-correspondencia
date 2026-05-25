@@ -1,10 +1,19 @@
 import { useState, useMemo } from "react";
-import {PencilIcon, AngleUpIcon, AngleDownIcon, TrashBinIcon} from "../../icons";
+import {
+  PencilIcon,
+  AngleUpIcon,
+  AngleDownIcon,
+  TrashBinIcon,
+  ChevronsRightIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon, ChevronLeftIcon
+} from "../../icons";
 import type { User } from "../../types/users/user.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import {ToggleSwitch} from "../form/switch/ToggleSwitch.tsx";
 import Button from "../ui/button/Button.tsx";
+import Tooltip from "../form/Tooltip.tsx";
 
 interface UserTableProps {
   users: User[];
@@ -223,31 +232,38 @@ export default function UserTable({ users, isLoading, onEdit, onDelete, onToggle
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {can('users.edit') && (
-                          <ToggleSwitch
-                              checked={user.active}
-                              onChange={(checked) => onToggleActive(user, checked)}
-                              showIcon
-                              label=""
-                              size="xs"
-                          />
+                          <Tooltip content="Cambiar estado">
+                            <ToggleSwitch
+                                checked={user.active}
+                                onChange={(checked) => onToggleActive(user, checked)}
+                                showIcon
+                                label=""
+                                size="xs"
+                            />
+                          </Tooltip>
                       )}
                       {can('users.edit') && (
-                          <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => onEdit(user)}
-                              className="w-8 h-8 p-0"
-                              startIcon={<PencilIcon className="size-4"/>}
-                          />
+                          <Tooltip content="Editar">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => onEdit(user)}
+                                className="w-8 h-8 p-0"
+                                startIcon={<PencilIcon className="size-4"/>}
+                            />
+                          </Tooltip>
+
                       )}
                       {can('menu_items.delete') && (
-                          <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => onDelete(user.id)}
-                              className="w-8 h-8 p-0"
-                              startIcon={<TrashBinIcon className="size-4" />}
-                          />
+                          <Tooltip content="Eliminar">
+                            <Button
+                                type="button"
+                                variant="danger"
+                                onClick={() => onDelete(user.id)}
+                                className="w-8 h-8 p-0"
+                                startIcon={<TrashBinIcon className="size-4" />}
+                            />
+                          </Tooltip>
                       )}
                     </div>
                   </td>}
@@ -274,8 +290,12 @@ export default function UserTable({ users, isLoading, onEdit, onDelete, onToggle
               <span>{from}–{to} de {total}</span>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">«</button>
-              <button onClick={() => setPage(safePage - 1)} disabled={safePage === 1} className={btnNormal} title="Anterior">‹</button>
+              <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">
+                <ChevronsLeftIcon />
+              </button>
+              <button onClick={() => setPage(safePage - 1)} disabled={safePage === 1} className={btnNormal} title="Anterior">
+                <ChevronLeftIcon />
+              </button>
               {renderPageNumbers().map((p, i) =>
                   p === "..." ? (
                       <span key={`e-${i}`} className="inline-flex h-8 w-8 items-center justify-center text-sm text-gray-400">…</span>
@@ -283,8 +303,12 @@ export default function UserTable({ users, isLoading, onEdit, onDelete, onToggle
                       <button key={p} onClick={() => setPage(p as number)} className={p === safePage ? btnActive : btnNormal}>{p}</button>
                   )
               )}
-              <button onClick={() => setPage(safePage + 1)} disabled={safePage === totalPages} className={btnNormal} title="Siguiente">›</button>
-              <button onClick={() => setPage(totalPages)} disabled={safePage === totalPages} className={btnNormal} title="Última">»</button>
+              <button onClick={() => setPage(safePage + 1)} disabled={safePage === totalPages} className={btnNormal} title="Siguiente">
+                <ChevronRightIcon />
+              </button>
+              <button onClick={() => setPage(totalPages)} disabled={safePage === totalPages} className={btnNormal} title="Última">
+                <ChevronsRightIcon />
+              </button>
             </div>
           </div>
       )}

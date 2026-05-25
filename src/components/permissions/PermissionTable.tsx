@@ -1,9 +1,18 @@
 import { useState, useMemo } from "react";
-import { PencilIcon, TrashBinIcon, AngleUpIcon, AngleDownIcon } from "../../icons";
+import {
+  PencilIcon,
+  TrashBinIcon,
+  AngleUpIcon,
+  AngleDownIcon,
+  ChevronsLeftIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon, ChevronsRightIcon
+} from "../../icons";
 import type { Permission } from "../../types/permissions/permission.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import Button from "../ui/button/Button.tsx";
+import Tooltip from "../form/Tooltip.tsx";
 
 interface PermissionTableProps {
   permissions: Permission[];
@@ -174,22 +183,26 @@ export default function PermissionTable({
                   {showActions && <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {can('permissions.edit') && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => onEdit(perm)}
-                          className="w-8 h-8 p-0"
-                          startIcon={<PencilIcon className="size-4"/>}
-                        />
-                      )}
-                      {can('permissions.delete') && (
+                        <Tooltip content="Editar">
                           <Button
                               type="button"
-                              variant="outline"
-                              onClick={() => onDelete(perm.id)}
+                              variant="ghost"
+                              onClick={() => onEdit(perm)}
                               className="w-8 h-8 p-0"
-                              startIcon={<TrashBinIcon className="size-4" />}
+                              startIcon={<PencilIcon className="size-4"/>}
                           />
+                        </Tooltip>
+                      )}
+                      {can('permissions.delete') && (
+                          <Tooltip content="Eliminar">
+                            <Button
+                                type="button"
+                                variant="danger"
+                                onClick={() => onDelete(perm.id)}
+                                className="w-8 h-8 p-0"
+                                startIcon={<TrashBinIcon className="size-4" />}
+                            />
+                          </Tooltip>
                       )}
                     </div>
                   </td>}
@@ -216,8 +229,12 @@ export default function PermissionTable({
               <span>{from}–{to} de {total}</span>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">«</button>
-              <button onClick={() => setPage(safePage - 1)} disabled={safePage === 1} className={btnNormal} title="Anterior">‹</button>
+              <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">
+                <ChevronsLeftIcon />
+              </button>
+              <button onClick={() => setPage(safePage - 1)} disabled={safePage === 1} className={btnNormal} title="Anterior">
+                <ChevronLeftIcon />
+              </button>
               {renderPageNumbers().map((p, i) =>
                   p === "..." ? (
                       <span key={`e-${i}`} className="inline-flex h-8 w-8 items-center justify-center text-sm text-gray-400">…</span>
@@ -225,8 +242,12 @@ export default function PermissionTable({
                       <button key={p} onClick={() => setPage(p as number)} className={p === safePage ? btnActive : btnNormal}>{p}</button>
                   )
               )}
-              <button onClick={() => setPage(safePage + 1)} disabled={safePage === totalPages} className={btnNormal} title="Siguiente">›</button>
-              <button onClick={() => setPage(totalPages)} disabled={safePage === totalPages} className={btnNormal} title="Última">»</button>
+              <button onClick={() => setPage(safePage + 1)} disabled={safePage === totalPages} className={btnNormal} title="Siguiente">
+                <ChevronRightIcon />
+              </button>
+              <button onClick={() => setPage(totalPages)} disabled={safePage === totalPages} className={btnNormal} title="Última">
+                <ChevronsRightIcon />
+              </button>
             </div>
           </div>
       )}
