@@ -1,31 +1,32 @@
 import { useState, useMemo } from "react";
-import {usePermissions} from "../../../../hooks/usePermissions.ts";
-
+import { usePermissions } from "../../../../hooks/usePermissions.ts";
 import {
     ArchiveRestoreIcon, BadgeIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    ChevronsLeftIcon,
-    ChevronsRightIcon, CopyIcon,
-    EyeIcon, FileIcon, FileInputIcon, FileTextIcon, PencilIcon, RouteIcon, SendHorizontalIcon, TrashBinIcon
+    ChevronLeftIcon, ChevronRightIcon,
+    ChevronsLeftIcon, ChevronsRightIcon,
+    CopyIcon, EyeIcon, FileIcon, FileInputIcon,
+    FileTextIcon, PencilIcon, RouteIcon,
+    SendHorizontalIcon, TrashBinIcon,
 } from "../../../../icons";
 import Tooltip from "../../../form/Tooltip.tsx";
 import Button from "../../../ui/button/Button.tsx";
-import {formatDateBo} from "../../../../utils/format.utils.ts";
+import { formatDateBo } from "../../../../utils/format.utils.ts";
+import { Document } from "../../types/documents/document.type.ts";
 
+// ── Priority config ────────────────────────────────────────────────────────────
 const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
     NORMAL:  { label: "NORMAL",  cls: "bg-blue-100  text-blue-700  dark:bg-blue-900/40  dark:text-blue-300"  },
     URGENTE: { label: "URGENTE", cls: "bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300"   },
-    ALTO:    { label: "ALTO",    cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+    ALTA:    { label: "ALTA",    cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
 };
 
 function PriorityBadge({ priority }: { priority?: string }) {
     const cfg = PRIORITY_CONFIG[priority ?? "NORMAL"] ?? PRIORITY_CONFIG.NORMAL;
     return (
         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cfg.cls}`}>
-      <BadgeIcon />
+            <BadgeIcon />
             {cfg.label}
-    </span>
+        </span>
     );
 }
 
@@ -38,13 +39,13 @@ function Avatar({ name }: { name?: string }) {
         .toUpperCase();
     const colors = [
         "bg-violet-500", "bg-sky-500", "bg-emerald-500",
-        "bg-rose-500",   "bg-amber-500","bg-teal-500",
+        "bg-rose-500", "bg-amber-500", "bg-teal-500",
     ];
     const color = colors[(name?.charCodeAt(0) ?? 0) % colors.length];
     return (
         <span className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white ${color}`}>
-      {initials}
-    </span>
+            {initials}
+        </span>
     );
 }
 
@@ -70,7 +71,7 @@ function DeletedBanner({ onRestore, canRestore }: { onRestore: () => void; canRe
     );
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────────
 interface DocumentTableProps {
     documents: Document[];
     isLoading?: boolean;
@@ -85,67 +86,29 @@ interface DocumentTableProps {
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
-
 export default function DocumentTable({
-                                         documents,
-                                         isLoading,
-                                         onEdit,
-                                         onDelete,
-                                         onToggleActive,
-                                         onDerive,
-                                         onViewHeader,
-                                         onViewSheet,
-                                         onViewRoutes,
-                                     }: DocumentTableProps) {
+                                          documents,
+                                          isLoading,
+                                          onEdit,
+                                          onDelete,
+                                          onToggleActive,
+                                          onDerive,
+                                          onViewHeader,
+                                          onViewSheet,
+                                          onViewRoutes,
+                                      }: DocumentTableProps) {
     const { can } = usePermissions();
 
-    // Filters
-    const [filterNro, setFilterNro]           = useState("");
-    const [filterOld, setFilterOld]           = useState("");
-    const [filterOrigin, setFilterOrigin]     = useState("");
-    const [filterSubject, setFilterSubject]   = useState("");
-    const [filterPriority, setFilterPriority] = useState("");
-
-    // Pagination / sort
+    // ── Paginación ─────────────────────────────────────────────────────────────
     const [page, setPage]       = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [sortField, setSortField] = useState("id");
-    const [sortDir, setSortDir]     = useState<"asc" | "desc">("desc");
 
-    // ── Filtering ──────────────────────────────────────────────────────────────
-    const filtered = useMemo(() => {
-        const nro      = filterNro.toLowerCase();
-        const old      = filterOld.toLowerCase();
-        const origin   = filterOrigin.toLowerCase();
-        const subject  = filterSubject.toLowerCase();
-        const priority = filterPriority.toLowerCase();
-
-        return documents.filter((r) => {
-            const nroMatch      = !nro      || String(r.nro ?? r.id).toLowerCase().includes(nro);
-            const oldMatch      = !old      || String(r.nro_tramite_antiguo ?? "").toLowerCase().includes(old);
-            const originMatch   = !origin   || (r.procedencia ?? "").toLowerCase().includes(origin);
-            const subjectMatch  = !subject  || (r.objeto_referencia ?? r.name ?? "").toLowerCase().includes(subject);
-            const priorityMatch = !priority || (r.prioridad ?? "normal").toLowerCase().includes(priority);
-            return nroMatch && oldMatch && originMatch && subjectMatch && priorityMatch;
-        });
-    }, [documents, filterNro, filterOld, filterOrigin, filterSubject, filterPriority]);
-
-    // ── Sorting ────────────────────────────────────────────────────────────────
-    const sorted = useMemo(() => {
-        if (!sortField) return filtered;
-        return [...filtered].sort((a, b) => {
-            const aVal = String(a[sortField as keyof Document] ?? "");
-            const bVal = String(b[sortField as keyof Document] ?? "");
-            const cmp  = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: "base" });
-            return sortDir === "asc" ? cmp : -cmp;
-        });
-    }, [filtered, sortField, sortDir]);
-
-    // ── Pagination ─────────────────────────────────────────────────────────────
-    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    // ── Filtrado (viene desde DocumentFilter via props, ya filtrado) ───────────
+    // El filtrado se hace en DocumentPage, aquí solo paginamos
+    const total      = documents.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
     const safePage   = Math.min(page, totalPages);
-    const paged      = sorted.slice((safePage - 1) * perPage, safePage * perPage);
-    const total      = filtered.length;
+    const paged      = documents.slice((safePage - 1) * perPage, safePage * perPage);
     const from       = total === 0 ? 0 : (safePage - 1) * perPage + 1;
     const to         = Math.min(safePage * perPage, total);
 
@@ -159,12 +122,12 @@ export default function DocumentTable({
         return pages;
     }
 
-    // ── Styles ─────────────────────────────────────────────────────────────────
+    // ── Estilos paginación ─────────────────────────────────────────────────────
     const btnBase   = "inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition-colors";
     const btnNormal = `${btnBase} border-gray-200 text-gray-500 hover:border-brand-400 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400 disabled:opacity-40`;
     const btnActive = `${btnBase} border-brand-500 bg-brand-500 text-white`;
 
-    // ── Skeleton card ──────────────────────────────────────────────────────────
+    // ── Skeleton ───────────────────────────────────────────────────────────────
     function SkeletonCard() {
         return (
             <div className="animate-pulse rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
@@ -186,27 +149,24 @@ export default function DocumentTable({
         );
     }
 
+    // ── Copy ───────────────────────────────────────────────────────────────────
     const [copiedId, setCopiedId] = useState<number | null>(null);
+
     async function handleCopy(document: Document) {
         try {
             await navigator.clipboard.writeText(
-                String(document.nro ?? document.id)
+                String(document.doc_contador ?? document.id)
             );
-
             setCopiedId(document.id);
-
-            setTimeout(() => {
-                setCopiedId(null);
-            }, 1800);
-
+            setTimeout(() => setCopiedId(null), 1800);
         } catch (error) {
             console.error("Error copying", error);
         }
     }
 
-    // ── Card row ───────────────────────────────────────────────────────────────
+    // ── Card ───────────────────────────────────────────────────────────────────
     function DocumentCard({ document }: { document: Document }) {
-        const isDeleted = !document.active;
+        const isDeleted = document.deleted_at != null;
 
         return (
             <div className={`rounded-xl border p-4 transition-shadow hover:shadow-sm ${
@@ -216,14 +176,17 @@ export default function DocumentTable({
             }`}>
 
                 <div className="flex flex-wrap items-start justify-between gap-3">
-
                     <div className="flex min-w-0 flex-1 items-start gap-3">
-                        <Avatar name={document.remitente ?? document.name} />
+
+                        {/* Avatar con el remitente */}
+                        <Avatar name={document.doc_remite} />
+
                         <div className="min-w-0">
 
+                            {/* Nro contador + copy */}
                             <div className="mb-1 flex flex-wrap items-center gap-2">
                                 <span className="inline-flex items-center rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs font-semibold text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
-                                  {document.nro ?? document.id}
+                                    {document.doc_contador ?? document.id}
                                 </span>
 
                                 <Tooltip content={copiedId === document.id ? "Copiado" : "Copiar"}>
@@ -236,53 +199,78 @@ export default function DocumentTable({
                                                 : "scale-100"
                                         }`}
                                     >
-                                        <CopyIcon
-                                            className={`size-4 transition-all duration-200 ${
-                                                copiedId === document.id
-                                                    ? "text-green-600 dark:text-green-400"
-                                                    : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300"
-                                            }
-                                            `}
-                                        />
+                                        <CopyIcon className={`size-4 transition-all duration-200 ${
+                                            copiedId === document.id
+                                                ? "text-green-600 dark:text-green-400"
+                                                : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300"
+                                        }`} />
                                     </button>
                                 </Tooltip>
-
                             </div>
 
-                            {document.prioridad && (
+                            {/* Prioridad → pri_name (join) */}
+                            {document.pri_name && (
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                     <span className="font-medium text-gray-600 dark:text-gray-300">PRIORIDAD:</span>{" "}
-                                    <PriorityBadge priority={document.prioridad} />
+                                    <PriorityBadge priority={document.pri_name} />
                                 </p>
                             )}
 
-                            {document.nro_tramite_antiguo && (
+                            {/* Cite */}
+                            {document.doc_cite && (
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    <span className="font-medium text-gray-600 dark:text-gray-300">NRO TRAMITE ANTIGUO:</span>{" "}
-                                    {document.nro_tramite_antiguo}
+                                    <span className="font-medium text-gray-600 dark:text-gray-300">CITE:</span>{" "}
+                                    {document.doc_cite}
+                                    {document.doc_numero_cite && (
+                                        <span className="ml-1 text-gray-400">— Nro. {document.doc_numero_cite}</span>
+                                    )}
                                 </p>
                             )}
 
-                            {document.procedencia && (
+                            {/* Procedencia → doc_dep_name */}
+                            {document.doc_dep_name && (
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                     <span className="font-medium text-gray-600 dark:text-gray-300">PROCEDENCIA:</span>{" "}
-                                    {document.procedencia}
+                                    {document.doc_dep_name}
                                 </p>
                             )}
 
-                            {(document.objeto_referencia ?? document.name) && (
-                                <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="font-medium text-gray-600 dark:text-gray-300">OBJETO/REFERENCIA: </span>{" "}
-                                    {document.objeto_referencia ?? document.name}
+                            {/* Remitente → doc_remite */}
+                            {document.doc_remite && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="font-medium text-gray-600 dark:text-gray-300">REMITENTE:</span>{" "}
+                                    {document.doc_remite}
                                 </p>
                             )}
+
+                            {/* Tipo documento → typ_name */}
+                            {document.typ_name && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="font-medium text-gray-600 dark:text-gray-300">TIPO:</span>{" "}
+                                    {document.typ_name}
+                                </p>
+                            )}
+
+                            {/* Objeto / Referencia → doc_referencia */}
+                            {document.doc_referencia && (
+                                <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="font-medium text-gray-600 dark:text-gray-300">OBJETO/REFERENCIA:</span>{" "}
+                                    {document.doc_referencia}
+                                </p>
+                            )}
+
                         </div>
                     </div>
+
+                    {/* Fecha → doc_fecha_origen */}
                     <span className="shrink-0 whitespace-nowrap text-right text-xs text-gray-400 dark:text-gray-500">
-                        {document.fecha ? formatDateBo(document.fecha) : "—"}
+                        {document.doc_fecha_origen
+                            ? formatDateBo(document.doc_fecha_origen)
+                            : "—"}
                     </span>
                 </div>
 
+                {/* Banner eliminado */}
                 {isDeleted && (
                     <div className="mt-3">
                         <DeletedBanner
@@ -292,9 +280,11 @@ export default function DocumentTable({
                     </div>
                 )}
 
+                {/* Acciones */}
                 {!isDeleted && (
                     <div className="mt-3 flex flex-wrap items-center gap-2">
-                        {document.has_routes && onViewRoutes && (
+
+                        {document.doc_parent != null && onViewRoutes && (
                             <Tooltip content="Ver rutas">
                                 <Button
                                     variant="secondary"
@@ -307,7 +297,6 @@ export default function DocumentTable({
                             </Tooltip>
                         )}
 
-                        {/* Permission-gated action buttons */}
                         {can("documents.edit") && onViewHeader && (
                             <Tooltip content="Cabecera de ruta">
                                 <Button
@@ -385,12 +374,14 @@ export default function DocumentTable({
                                 </Button>
                             </Tooltip>
                         )}
+
                     </div>
                 )}
             </div>
         );
     }
 
+    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <div className="space-y-4">
             <div className="space-y-3">
@@ -399,7 +390,9 @@ export default function DocumentTable({
                 ) : paged.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center dark:border-gray-700 dark:bg-transparent">
                         <FileIcon className="size-10 text-gray-300 dark:text-gray-600" />
-                        <p className="text-sm font-medium text-gray-400 dark:text-gray-500">No hay documentos registrados</p>
+                        <p className="text-sm font-medium text-gray-400 dark:text-gray-500">
+                            No hay documentos registrados
+                        </p>
                     </div>
                 ) : (
                     paged.map((document) => (
@@ -413,6 +406,7 @@ export default function DocumentTable({
                 )}
             </div>
 
+            {/* Paginación */}
             {!isLoading && total > 0 && (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 dark:border-white/[0.05] dark:bg-white/[0.02]">
                     <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">

@@ -1,102 +1,56 @@
+import {useCallback, useMemo, useState} from "react";
+
 import PageMeta from "../../common/PageMeta.tsx";
 import PageBreadCrumb from "../../common/PageBreadCrumb.tsx";
+
 import Button from "../../ui/button/Button.tsx";
-import {PlusIcon} from "../../../icons";
-import {usePermissions} from "../../../hooks/usePermissions.ts";
-import {useNotifications} from "../../../hooks/useNotification.tsx";
-import {useMemo, useState} from "react";
-import {Document, DocumentFilters, SortConfig} from "../types/documents/document.type.ts";
+
+import { PlusIcon } from "../../../icons";
+
+import { usePermissions } from "../../../hooks/usePermissions.ts";
+import { useNotifications } from "../../../hooks/useNotification.tsx";
+
+import {
+    CreateDocumentRequest,
+    Document,
+    DocumentFilters,
+    SortConfig, UpdateDocumentRequest,
+} from "../types/documents/document.type.ts";
+
 import DocumentTable from "../components/documents/DocumentTable.tsx";
-import {DocumentShow} from "../components/documents/DocumentShow.tsx";
-import {DocumentFilter} from "../components/documents/DocumentFilter.tsx";
-
-interface OrderItem {
-    id: number;
-    product: string;
-    quantity: number;
-    unitCost: number;
-    discount: number;
-}
-
-const orderItems: OrderItem[] = [
-    { id: 1, product: 'Macbook pro 13"', quantity: 1, unitCost: 1200, discount: 0 },
-    { id: 2, product: "Apple Watch Ultra", quantity: 1, unitCost: 300, discount: 50 },
-    { id: 3, product: "iPhone 15 Pro Max", quantity: 2, unitCost: 800, discount: 0 },
-    { id: 4, product: "iPad Pro 3rd Gen", quantity: 1, unitCost: 900, discount: 0 },
-];
-
-function getTotal(item: OrderItem): number {
-    const base = item.unitCost * item.quantity;
-    return item.discount > 0 ? base * (1 - item.discount / 100) : base;
-}
+import { DocumentShow } from "../components/documents/DocumentShow.tsx";
+import { DocumentFilter } from "../components/documents/DocumentFilter.tsx";
+import ModalDelete from "../../modal/ModalDelete.tsx";
+import {Modal} from "../../ui/modal";
+import DocumentForm from "../components/documents/DocumentForm.tsx";
 
 export const DocumentPage = () => {
-
-    const subTotal = orderItems.reduce((sum, item) => sum + getTotal(item), 0);
-    const vat = Math.round(subTotal * 0.1);
-    const total = subTotal + vat;
 
     const { can } = usePermissions();
     const { addNotification } = useNotifications();
 
+
+    const [documents, setDocuments] = useState<Document[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selected, setSelected] = useState<Document | null>(null);
     const [confirmId, setConfirmId] = useState<number | null>(null);
 
-    const [openStatusModal, setOpenStatusModal] = useState(false);
-    const [loadingStatus, setLoadingStatus] = useState(false);
-    const [selectedStatusItem, setSelectedStatusItem] = useState<Document | null>(null);
-
-    function handleCreate() {
-        setSelected(null);
-        setIsModalOpen(true);
-    }
-
-    const [documents, setDocuments] = useState<Document[]>([
-        {
-            id: 1,
-            nro: "HR-001",
-            nro_tramite_antiguo: "TR-2023-55",
-            procedencia: "RECTORADO",
-            objeto_referencia: "Solicitud de revisión",
-            prioridad: "URGENTE",
-            remitente: "Juan Perez",
-            fecha: "2026-05-25T10:00:00",
-            active: false,
-            has_routes: true,
-        },
-        {
-            id: 2,
-            nro: "HR-002",
-            procedencia: "FINANZAS",
-            objeto_referencia: "Pago pendiente lorem Pago pendiente lorem Pago pendiente lorem Pago pendiente lorem Pago pendiente lorem Pago pendiente lorem Pago pendiente lorem",
-            prioridad: "NORMAL",
-            remitente: "Maria Lopez",
-            fecha: "2026-05-24T09:30:00",
-            active: true,
-            has_routes: false,
-        },
-    ]);
-
-    // ─── Eventos ─────────────────────────────────────────
-
-    const handleEdit = (document: Document) => {
-        console.log("Editar:", document);
-    };
-
-    const handleDelete = (id: number) => {
-        console.log("Eliminar:", id);
-    };
-
-    const handleToggleActive = (item: Document, active: boolean) => {
-        console.log("Activar/Inactivar:", item, active);
+    const handleToggleActive = (
+        item: Document,
+        active: boolean
+    ) => {
 
         setDocuments((prev) =>
-            prev.map((r) =>
-                r.id === item.id
-                    ? { ...r, active }
-                    : r
+            prev.map((doc) =>
+                doc.id === item.id
+                    ? {
+                        ...doc,
+                        deleted_at: active
+                            ? null
+                            : new Date().toISOString(),
+                    }
+                    : doc
             )
         );
     };
@@ -117,7 +71,10 @@ export const DocumentPage = () => {
         console.log("Rutas:", document);
     };
 
-    // Filter
+    // ─────────────────────────────────────────────────────────────
+    // Filters
+    // ─────────────────────────────────────────────────────────────
+
     const [filters, setFilters] = useState<DocumentFilters>({
         nro: "",
         old: "",
@@ -130,35 +87,42 @@ export const DocumentPage = () => {
         field: "id",
         dir: "desc",
     });
+
+    // ─────────────────────────────────────────────────────────────
+    // Filtered data
+    // ─────────────────────────────────────────────────────────────
+
     const filteredDocuments = useMemo(() => {
-        const filtered = documents.filter((r) => {
+
+        const filtered = documents.filter((document) => {
+
             const nroMatch =
                 !filters.nro ||
-                String(r.nro ?? r.id)
+                String(document.doc_contador ?? "")
                     .toLowerCase()
                     .includes(filters.nro.toLowerCase());
 
             const oldMatch =
                 !filters.old ||
-                String(r.nro_tramite_antiguo ?? "")
+                String(document.doc_cite ?? "")
                     .toLowerCase()
                     .includes(filters.old.toLowerCase());
 
             const originMatch =
                 !filters.origin ||
-                (r.procedencia ?? "")
+                String(document.doc_dep_name ?? "")
                     .toLowerCase()
                     .includes(filters.origin.toLowerCase());
 
             const subjectMatch =
                 !filters.subject ||
-                (r.objeto_referencia ?? r.name ?? "")
+                String(document.doc_referencia ?? "")
                     .toLowerCase()
                     .includes(filters.subject.toLowerCase());
 
             const priorityMatch =
                 !filters.priority ||
-                (r.prioridad ?? "normal")
+                String(document.pri_name ?? "")
                     .toLowerCase()
                     .includes(filters.priority.toLowerCase());
 
@@ -172,47 +136,210 @@ export const DocumentPage = () => {
         });
 
         return [...filtered].sort((a, b) => {
-            const aVal = String(a[sort.field as keyof Document] ?? "");
-            const bVal = String(b[sort.field as keyof Document] ?? "");
 
-            const cmp = aVal.localeCompare(bVal, undefined, {
-                numeric: true,
-                sensitivity: "base",
+            const aVal = String(
+                a[sort.field as keyof Document] ?? ""
+            );
+
+            const bVal = String(
+                b[sort.field as keyof Document] ?? ""
+            );
+
+            const cmp = aVal.localeCompare(
+                bVal,
+                undefined,
+                {
+                    numeric: true,
+                    sensitivity: "base",
+                }
+            );
+
+            return sort.dir === "asc"
+                ? cmp
+                : -cmp;
+        });
+
+    }, [documents, filters, sort]);
+
+    function handleCreate() {
+        setSelected(null);
+        setIsModalOpen(true);
+    }
+
+    function handleEdit(document: Document) {
+        setSelected(document);
+        setIsModalOpen(true);
+    }
+
+    function handleDelete(id: number) {
+        setConfirmId(id);
+    }
+
+    async function handleConfirmDelete() {
+        if (confirmId === null) return;
+
+        try {
+            // await deleteDocument(confirmId);
+
+            addNotification({
+                type: "success",
+                title: "Documento eliminado",
+                message: "El documento fue eliminado correctamente.",
             });
 
-            return sort.dir === "asc" ? cmp : -cmp;
-        });
-    }, [documents, filters, sort]);
+            setConfirmId(null);
+            fetchDocuments();
+        } catch (err: any) {
+            addNotification({
+                type: "error",
+                title: "Error",
+                message:
+                    err?.response?.data?.message ??
+                    "Error al eliminar el documento",
+            });
+        }
+    }
+
+    const fetchDocuments = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            // const data = await getDocuments();
+            const data: Document[] = [
+                {
+                    id: 1,
+                    department_id: 1,
+                    type_document_id: 1,
+                    priority_id: 1,
+                    state_document_id: 1,
+
+                    doc_fecha_origen: "2026-05-26",
+                    doc_cite: "DNTIC-001/2026",
+                    doc_numero_cite: "001/2026",
+
+                    doc_referencia: "Solicitud de revisión de sistema",
+                    doc_procedencia: "I",
+
+                    doc_remite: "Juan Pérez",
+
+                    created_at: "2026-05-26T10:00:00",
+                    updated_at: "2026-05-26T10:00:00",
+
+                    doc_contador: 15,
+
+                    dep_name: "DNTIC",
+                    typ_name: "NOTA",
+                    pri_name: "URGENTE",
+                    sdoc_name: "PENDIENTE",
+
+                    doc_dep_name: "RECTORADO",
+                },
+
+                {
+                    id: 2,
+                    department_id: 2,
+                    type_document_id: 2,
+                    priority_id: 2,
+                    state_document_id: 1,
+
+                    doc_fecha_origen: "2026-05-25",
+                    doc_cite: "FIN-122/2026",
+
+                    doc_referencia:
+                        "Remisión de documentación administrativa para validación",
+
+                    doc_procedencia: "E",
+
+                    doc_remite: "María López",
+
+                    created_at: "2026-05-25T09:00:00",
+                    updated_at: "2026-05-25T09:00:00",
+
+                    doc_contador: 16,
+
+                    dep_name: "FINANZAS",
+                    typ_name: "MEMORÁNDUM",
+                    pri_name: "NORMAL",
+                    sdoc_name: "RECIBIDO",
+
+                    doc_dep_name: "VICERRECTORADO",
+                },
+            ]
+            setDocuments(data);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    async function handleSubmit(data: CreateDocumentRequest | UpdateDocumentRequest) {
+        try {
+            if (selected) {
+                // await updateDocument(selected.id, data as UpdateDocumentRequest);
+
+                addNotification({
+                    type: "info",
+                    title: "Documento actualizado",
+                    message: `El documento "${data.doc_numero_cite}" fue actualizado correctamente.`,
+                });
+            } else {
+                // await createDocument(data as CreateDocumentRequest);
+
+                addNotification({
+                    type: "success",
+                    title: "Documento creado",
+                    message: `El documento "${data.doc_numero_cite}" fue creado correctamente.`,
+                });
+            }
+
+            setIsModalOpen(false);
+            fetchDocuments();
+        } catch (err: any) {
+            addNotification({
+                type: "error",
+                title: "Error",
+                message:
+                    err?.response?.data?.message ??
+                    "Error al guardar el usuario",
+            });
+        }
+    }
 
     return (
         <>
-            <PageMeta title="Documentos" description="Gestión de documentos del sistema" />
+            <PageMeta
+                title="Documentos"
+                description="Gestión de documentos del sistema"
+            />
+
             <PageBreadCrumb pageTitle="Documentos" />
 
             <div className="space-y-5">
-                <div className="rounded-2xl border border-gray-200 dark:border-white/[0.05] bg-white dark:bg-white/[0.03] px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <DocumentFilter
-                            filters={filters}
-                            sort={sort}
-                            onFiltersChange={setFilters}
-                            onSortChange={setSort}
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {can("users.create") && (
-                            <Button
-                                size="sm"
-                                onClick={handleCreate}
-                                startIcon={<PlusIcon className="size-4 text-white" />}
-                            >
-                                Nuevo Documento
-                            </Button>
-                        )}
 
-                    </div>
+                {/* Header */}
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+
+                    <DocumentFilter
+                        filters={filters}
+                        sort={sort}
+                        onFiltersChange={setFilters}
+                        onSortChange={setSort}
+                    />
+
+                    {can("documents.create") && (
+                        <Button
+                            size="sm"
+                            onClick={handleCreate}
+                            startIcon={
+                                <PlusIcon className="size-4 text-white" />
+                            }
+                        >
+                            Nuevo Documento
+                        </Button>
+                    )}
+
                 </div>
-                <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-5">
+
+                {/* Content */}
+                <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_300px]">
 
                     <DocumentTable
                         documents={filteredDocuments}
@@ -226,8 +353,35 @@ export const DocumentPage = () => {
                         onViewRoutes={handleViewRoutes}
                     />
                     <DocumentShow />
+
                 </div>
+
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                size="lg"
+                onClose={() => setIsModalOpen(false)}
+                className="w-full max-w-6xl p-6 sm:p-8"
+            >
+                <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+                    {selected ? "Editar Documento" : "Nuevo Documento"}
+                </h3>
+
+                <DocumentForm
+                    document={selected}
+                    onSubmit={handleSubmit}
+                    onCancel={() => setIsModalOpen(false)}
+                />
+            </Modal>
+
+            <ModalDelete isOpen={confirmId !== null}
+                         onClose={() => setConfirmId(null)}
+                         onConfirm={handleConfirmDelete}
+                         title="¿Eliminar este Documento?"
+                         message="Esta acción no se puede deshacer."
+            />
+
         </>
     );
-}
+};

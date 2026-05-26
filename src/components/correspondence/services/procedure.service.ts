@@ -2,10 +2,10 @@ import type {ApiQueryParams, ApiResponse} from "../../../types/common/api.types.
 import http from "../../../services/http.service.ts";
 import {API_ENDPOINTS} from "../../../constants/api.constants.ts";
 import {buildQueryParams} from "../../../utils/query.utils.ts";
-import {Document} from "../types/documents/document.type.ts";
+import {Procedure} from "../types/procedure.type.ts";
 
-export async function getDocuments(params?: ApiQueryParams): Promise<Document[]> {
-    const { data } = await http.get<ApiResponse<Document[]>>(API_ENDPOINTS.CORRESPONDENCE.DOCUMENT.BASE, {
+export async function getProcedures(params?: ApiQueryParams): Promise<Procedure[]> {
+    const { data } = await http.get<ApiResponse<Procedure[]>>(API_ENDPOINTS.CORRESPONDENCE.PROCEDURE.BASE, {
         params: params ? buildQueryParams(params) : undefined,
     });
     return data.data;

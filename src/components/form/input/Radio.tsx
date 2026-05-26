@@ -1,62 +1,167 @@
+import type React from "react";
+
 interface RadioProps {
-  id: string; // Unique ID for the radio button
-  name: string; // Radio group name
-  value: string; // Value of the radio button
-  checked: boolean; // Whether the radio button is checked
-  label: string; // Label for the radio button
-  onChange: (value: string) => void; // Handler for value change
-  className?: string; // Optional additional classes
-  disabled?: boolean; // Optional disabled state for the radio button
+  id: string;
+  name: string;
+  value: string;
+  checked: boolean;
+  label: string;
+
+  onChange: (value: string) => void;
+
+  className?: string;
+  disabled?: boolean;
+
+  size?: "sm" | "md" | "lg";
 }
 
+const SIZE_CLASSES = {
+  sm: {
+    radio: "h-4 w-4",
+    dot: "h-1.5 w-1.5",
+    text: "text-xs",
+  },
+
+  md: {
+    radio: "h-5 w-5",
+    dot: "h-2 w-2",
+    text: "text-sm",
+  },
+
+  lg: {
+    radio: "h-6 w-6",
+    dot: "h-2.5 w-2.5",
+    text: "text-base",
+  },
+};
+
 const Radio: React.FC<RadioProps> = ({
-  id,
-  name,
-  value,
-  checked,
-  label,
-  onChange,
-  className = "",
-  disabled = false,
-}) => {
+                                       id,
+                                       name,
+                                       value,
+                                       checked,
+                                       label,
+
+                                       onChange,
+
+                                       className = "",
+                                       disabled = false,
+
+                                       size = "md",
+                                     }) => {
+
+  const styles = SIZE_CLASSES[size];
+
   return (
-    <label
-      htmlFor={id}
-      className={`relative flex cursor-pointer  select-none items-center gap-3 text-sm font-medium ${
-        disabled
-          ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-          : "text-gray-700 dark:text-gray-400"
-      } ${className}`}
-    >
-      <input
-        id={id}
-        name={name}
-        type="radio"
-        value={value}
-        checked={checked}
-        onChange={() => !disabled && onChange(value)} // Prevent onChange when disabled
-        className="sr-only"
-        disabled={disabled} // Disable input
-      />
-      <span
-        className={`flex h-5 w-5 items-center justify-center rounded-full border-[1.25px] ${
-          checked
-            ? "border-brand-500 bg-brand-500"
-            : "bg-transparent border-gray-300 dark:border-gray-700"
-        } ${
-          disabled
-            ? "bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-700"
-            : ""
-        }`}
+      <label
+          htmlFor={id}
+          className={`
+                group
+                relative
+                inline-flex
+                cursor-pointer
+                select-none
+                items-center
+                gap-3
+                font-medium
+                transition-colors
+                duration-200
+
+                ${styles.text}
+
+                ${
+              disabled
+                  ? "cursor-not-allowed text-gray-300 dark:text-gray-600"
+                  : "text-gray-700 dark:text-gray-300"
+          }
+
+                ${className}
+            `}
       >
+        <input
+            id={id}
+            name={name}
+            type="radio"
+            value={value}
+            checked={checked}
+            disabled={disabled}
+            onChange={() => {
+              if (!disabled) {
+                onChange(value);
+              }
+            }}
+            className="sr-only"
+        />
+
         <span
-          className={`h-2 w-2 rounded-full bg-white ${
-            checked ? "block" : "hidden"
-          }`}
-        ></span>
-      </span>
-      {label}
-    </label>
+            className={`
+                    relative
+                    flex
+                    items-center
+                    justify-center
+                    rounded-full
+                    border
+                    transition-all
+                    duration-200
+
+                    ${styles.radio}
+
+                    ${
+                checked
+                    ? "border-brand-500 bg-brand-500"
+                    : `
+                                border-gray-300
+                                bg-white
+
+                                group-hover:border-brand-400
+
+                                dark:border-gray-600
+                                dark:bg-gray-900
+                                dark:group-hover:border-brand-500
+                              `
+            }
+
+                    ${
+                disabled
+                    ? `
+                                border-gray-200
+                                bg-gray-100
+
+                                dark:border-gray-700
+                                dark:bg-gray-800
+                              `
+                    : ""
+            }
+
+                    ${
+                checked && !disabled
+                    ? "shadow-[0_0_0_4px_rgba(59,130,246,0.10)]"
+                    : ""
+            }
+                `}
+        >
+                <span
+                    className={`
+                        rounded-full
+                        bg-white
+                        transition-all
+                        duration-200
+
+                        ${styles.dot}
+
+                        ${
+                        checked
+                            ? "scale-100 opacity-100"
+                            : "scale-0 opacity-0"
+                    }
+                    `}
+                />
+            </span>
+
+        <span>
+                {label}
+            </span>
+      </label>
   );
 };
 

@@ -1,20 +1,18 @@
 import type { ChangeEvent } from "react";
 
 import Button from "../../../ui/button/Button.tsx";
-
 import Label from "../../../form/Label";
 import InputField from "../../../form/input/InputField";
 import Select, { Option } from "../../../form/Select.tsx";
-
 import { BrushCleaningIcon } from "../../../../icons";
 import Tooltip from "../../../form/Tooltip.tsx";
 
 interface DocumentFilters {
     nro: string;
-    old: string;
     origin: string;
     subject: string;
     priority: string;
+    sender: string;
 }
 
 interface SortConfig {
@@ -30,109 +28,76 @@ interface DocumentFilterProps {
 }
 
 export const DocumentFilter = ({
-                                  filters,
-                                  sort,
-                                  onFiltersChange,
-                                  onSortChange,
-                              }: DocumentFilterProps) => {
+                                   filters,
+                                   sort,
+                                   onFiltersChange,
+                                   onSortChange,
+                               }: DocumentFilterProps) => {
+
     const handleInputChange =
         (field: keyof DocumentFilters) =>
-            (
-                e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-            ) => {
-                onFiltersChange({
-                    ...filters,
-                    [field]: e.target.value,
-                });
+            (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+                onFiltersChange({ ...filters, [field]: e.target.value });
             };
 
     const handleSelectChange =
         (field: keyof DocumentFilters) =>
             (value: string) => {
-                onFiltersChange({
-                    ...filters,
-                    [field]: value,
-                });
+                onFiltersChange({ ...filters, [field]: value });
             };
 
     const handleSortChange = (value: string) => {
         const [field, dir] = value.split(":");
-
-        onSortChange({
-            field,
-            dir: dir as "asc" | "desc",
-        });
+        onSortChange({ field, dir: dir as "asc" | "desc" });
     };
 
     const clearFilters = () => {
         onFiltersChange({
-            nro: "",
-            old: "",
-            origin: "",
-            subject: "",
+            nro:      "",
+            origin:   "",
+            subject:  "",
             priority: "",
+            sender:   "",
         });
-
-        onSortChange({
-            field: "id",
-            dir: "desc",
-        });
+        onSortChange({ field: "id", dir: "desc" });
     };
 
     const PRIORITY_OPTIONS: Option[] = [
-        { value: "", label: "Todas" },
-        { value: "normal", label: "Normal" },
-        { value: "alto", label: "Alto" },
-        { value: "urgente", label: "Urgente" },
+        { value: "",        label: "Todas"   },
+        { value: "NORMAL",  label: "Normal"  },
+        { value: "URGENTE", label: "Urgente" },
+        { value: "ALTA",    label: "Alta"    },
     ];
 
     const SORT_OPTIONS: Option[] = [
-        { value: "id:desc", label: "Más reciente" },
-        { value: "id:asc", label: "Más antiguo" },
-        { value: "prioridad:asc", label: "Prioridad A→Z" },
-        { value: "fecha:desc", label: "Fecha ↓" },
-        { value: "fecha:asc", label: "Fecha ↑" },
+        { value: "id:desc",              label: "Más reciente"   },
+        { value: "id:asc",               label: "Más antiguo"    },
+        { value: "priority_id:asc",      label: "Prioridad A→Z"  },
+        { value: "doc_fecha_origen:desc", label: "Fecha ↓"       },
+        { value: "doc_fecha_origen:asc",  label: "Fecha ↑"       },
     ];
 
     return (
         <div className="flex flex-wrap items-end gap-2">
+
+            {/* doc_contador / nro generado */}
             <div className="flex min-w-[100px] flex-col gap-1">
-                <Label
-                    size="xs"
-                    className=" uppercase tracking-wide">
+                <Label size="xs" className="uppercase tracking-wide">
                     Nro
                 </Label>
-
                 <InputField
-                    value={filters.nro}
                     size="xs"
+                    value={filters.nro}
                     onChange={handleInputChange("nro")}
                     placeholder="Buscar Nro…"
                 />
             </div>
 
-            <div className="flex min-w-[120px] flex-col gap-1">
-                <Label
-                    size="xs"
-                    className="uppercase tracking-wide">
-                    Trámite antiguo
-                </Label>
-
-                <InputField
-                    size="xs"
-                    value={filters.old}
-                    onChange={handleInputChange("old")}
-                    placeholder="Buscar…"
-                />
-            </div>
-
+            {/* doc_procedencia → dep_name / doc_dep_name */}
             <div className="flex min-w-[160px] flex-1 flex-col gap-1">
-                <Label
-                    size="xs"
-                    className=" uppercase tracking-wide">
+                <Label size="xs" className="uppercase tracking-wide">
                     Procedencia
                 </Label>
-
                 <InputField
                     size="xs"
                     value={filters.origin}
@@ -141,11 +106,24 @@ export const DocumentFilter = ({
                 />
             </div>
 
+            {/* doc_remite */}
+            <div className="flex min-w-[140px] flex-col gap-1">
+                <Label size="xs" className="uppercase tracking-wide">
+                    Remitente
+                </Label>
+                <InputField
+                    size="xs"
+                    value={filters.sender}
+                    onChange={handleInputChange("sender")}
+                    placeholder="Buscar remitente…"
+                />
+            </div>
+
+            {/* doc_referencia */}
             <div className="flex min-w-[200px] flex-1 flex-col gap-1">
                 <Label size="xs" className="uppercase tracking-wide">
                     Objeto / Referencia
                 </Label>
-
                 <InputField
                     size="xs"
                     value={filters.subject}
@@ -154,11 +132,11 @@ export const DocumentFilter = ({
                 />
             </div>
 
+            {/* priority_id → pri_name */}
             <div className="flex min-w-[110px] flex-col gap-1">
                 <Label size="xs" className="uppercase tracking-wide">
                     Prioridad
                 </Label>
-
                 <Select
                     size="xs"
                     options={PRIORITY_OPTIONS}
@@ -168,11 +146,11 @@ export const DocumentFilter = ({
                 />
             </div>
 
+            {/* Ordenar */}
             <div className="flex min-w-[150px] flex-col gap-1">
                 <Label size="xs" className="uppercase tracking-wide">
                     Ordenar por
                 </Label>
-
                 <Select
                     size="xs"
                     options={SORT_OPTIONS}
@@ -182,6 +160,7 @@ export const DocumentFilter = ({
                 />
             </div>
 
+            {/* Limpiar */}
             <Tooltip content="Limpiar">
                 <Button
                     size="xs"
@@ -192,6 +171,7 @@ export const DocumentFilter = ({
                     <BrushCleaningIcon width="20" height="20" />
                 </Button>
             </Tooltip>
+
         </div>
     );
 };

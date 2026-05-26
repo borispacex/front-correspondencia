@@ -45,4 +45,34 @@ export const API_ENDPOINTS = {
       SEARCH: "/saga/usuarios/search",
     },
   },
+  // CORRESPONDENCIA
+  CORRESPONDENCE: {
+    PROCEDURE: {
+      BASE: "/correspondencia/procedures"
+    },
+    PRIORITY: {
+      BASE: "/correspondencia/priorities"
+    },
+    TYPE_DOCUMENT: {
+      BASE: "/correspondencia/type-documents"
+    },
+    STATE_DOCUMENT: {
+      BASE: "/correspondencia/state-documents"
+    },
+    DEPARTMENT: {
+      BASE: "/correspondencia/departments"
+    },
+    PROVIDED: {
+      BASE: "/correspondencia/provides"
+    },
+    UNIT: {
+      BASE: "/correspondencia/units"
+    },
+    DOCUMENT: {
+      BASE: "/correspondencia/documents"
+    },
+    ROUTER: {
+      BASE: "/correspondencia/routers"
+    },
+  }
 } as const;
