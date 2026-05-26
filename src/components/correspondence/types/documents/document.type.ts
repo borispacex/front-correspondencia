@@ -1,5 +1,5 @@
 
-export interface Roadmap {
+export interface Document {
     id: number;
     name?: string;
     nro: string;
@@ -16,7 +16,7 @@ export interface Roadmap {
 }
 
 
-export interface RoadmapFilters {
+export interface DocumentFilters {
     nro: string;
     old: string;
     origin: string;
@@ -31,7 +31,7 @@ export interface SortConfig {
 
 
 
-export interface CreateRoadmapRequest {
+export interface CreateDocumentRequest {
     document_origin: "INTERNO" | "EXTERNO";
     procedure_type: string;
     document_date: string;
@@ -49,7 +49,7 @@ export interface CreateRoadmapRequest {
     active?: boolean;
 }
 
-export interface UpdateRoadmapRequest {
+export interface UpdateDocumentRequest {
     id: number;
     document_origin: "INTERNO" | "EXTERNO";
     procedure_type: string;

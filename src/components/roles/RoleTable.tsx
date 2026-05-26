@@ -8,7 +8,7 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon, ChevronsLeftIcon
 } from "../../icons";
-import type { Role, RoleFilters } from "../../types/roles/role.types";
+import type { Role, RoleFilters } from "../../types/admin/roles/role.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import type { Pagination } from "../../types/common/api.types";
 import TableSkeleton from "../animation/TableSkeleton.tsx";

@@ -1,4 +1,4 @@
-import type { PermissionGroup } from "../../types/permissions/permission.types";
+import type { PermissionGroup } from "../../types/admin/permissions/permission.types";
 
 interface PermissionCheckboxGroupProps {
   groups: PermissionGroup[];

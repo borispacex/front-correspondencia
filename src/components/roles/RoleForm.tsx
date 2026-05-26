@@ -3,9 +3,9 @@ import { useState, useEffect, useMemo } from "react";
 import type {
   Role,
   CreateRoleRequest,
-} from "../../types/roles/role.types";
+} from "../../types/admin/roles/role.types";
 
-import type { Permission } from "../../types/permissions/permission.types";
+import type { Permission } from "../../types/admin/permissions/permission.types";
 
 import { getPermissions } from "../../services/admin/permissions.service.ts";
 

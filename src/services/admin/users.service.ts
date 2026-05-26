@@ -1,6 +1,6 @@
 import http from "../http.service.ts";
 import { API_ENDPOINTS } from "../../constants/api.constants.ts";
-import type { User, CreateUserRequest, UpdateUserRequest } from "../../types/users/user.types.ts";
+import type { User, CreateUserRequest, UpdateUserRequest } from "../../types/admin/users/user.types.ts";
 import type { ApiResponse, ApiQueryParams } from "../../types/common/api.types.ts";
 import { buildQueryParams } from "../../utils/query.utils.ts";
 

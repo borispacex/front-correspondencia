@@ -22,7 +22,7 @@ import BarChart from "./pages/Charts/BarChart.tsx";
 import SignIn from "./pages/AuthPages/SignIn.tsx";
 import SignUp from "./pages/AuthPages/SignUp.tsx";
 import NotFound from "./pages/OtherPage/NotFound.tsx";
-import {correspondenciaRoutes} from "./components/correspondence/correspondence.route.tsx";
+import {correspondenceRoutes} from "./components/correspondence/correspondence.route.tsx";
 import ResetPassword from "./pages/AuthPages/ResetPassword.tsx";
 import {ROUTES} from "./constants/routes.constants.ts";
 import MsalCallbackPage from "./pages/auth/MsalCallbackPage.tsx";
@@ -66,7 +66,7 @@ export const appRouter = createBrowserRouter([
                     { path: "line-chart", element: <LineChart /> },
                     { path: "bar-chart", element: <BarChart /> },
 
-                    ...correspondenciaRoutes
+                    ...correspondenceRoutes
                 ],
             },
 

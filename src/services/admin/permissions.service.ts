@@ -1,6 +1,6 @@
 import http from "../http.service.ts";
 import { API_ENDPOINTS } from "../../constants/api.constants.ts";
-import type { Permission } from "../../types/permissions/permission.types.ts";
+import type { Permission } from "../../types/admin/permissions/permission.types.ts";
 import type { ApiResponse, ApiQueryParams } from "../../types/common/api.types.ts";
 import { buildQueryParams } from "../../utils/query.utils.ts";
 

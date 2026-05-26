@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PhotoUserRequest } from "../../types/users/user.types.ts";
+import type { PhotoUserRequest } from "../../types/admin/users/user.types.ts";
 import Button from "../ui/button/Button.tsx";
 import { AuthUser } from "../../types/auth/auth.types.ts";
 import { CameraIcon } from "../../icons";

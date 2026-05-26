@@ -11,7 +11,7 @@ import {
   deletePermission,
 } from "../../services/admin/permissions.service.ts";
 
-import type { Permission } from "../../types/permissions/permission.types";
+import type { Permission } from "../../types/admin/permissions/permission.types";
 
 import { usePermissions } from "../../hooks/usePermissions";
 

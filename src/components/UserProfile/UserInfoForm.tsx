@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import type {InfoUserRequest} from "../../types/users/user.types.ts";
+import type {InfoUserRequest} from "../../types/admin/users/user.types.ts";
 import Label from "../form/Label.tsx";
 import InputField from "../form/input/InputField.tsx";
 import Button from "../ui/button/Button.tsx";

@@ -1,6 +1,6 @@
 import http from "../http.service.ts";
 import { API_ENDPOINTS } from "../../constants/api.constants.ts";
-import type { Role, CreateRoleRequest, UpdateRoleRequest } from "../../types/roles/role.types.ts";
+import type { Role, CreateRoleRequest, UpdateRoleRequest } from "../../types/admin/roles/role.types.ts";
 import type { ApiResponse, ApiQueryParams, Pagination, LaravelResourcePagination } from "../../types/common/api.types.ts";
 import { buildQueryParams } from "../../utils/query.utils.ts";
 

@@ -8,7 +8,7 @@ import {
   ChevronRightIcon,
   ChevronsLeftIcon, ChevronLeftIcon
 } from "../../icons";
-import type { MenuItem } from "../../types/menu-items/menu-item.types";
+import type { MenuItem } from "../../types/admin/menu-items/menu-item.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import {ToggleSwitch} from "../form/switch/ToggleSwitch.tsx";

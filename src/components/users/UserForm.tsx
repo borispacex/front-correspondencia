@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import type { User, CreateUserRequest, UpdateUserRequest } from "../../types/users/user.types";
-import type { Role } from "../../types/roles/role.types";
+import type { User, CreateUserRequest, UpdateUserRequest } from "../../types/admin/users/user.types";
+import type { Role } from "../../types/admin/roles/role.types";
 import { getRoles } from "../../services/admin/roles.service.ts";
 import Label from "../form/Label";
 import InputField from "../form/input/InputField";

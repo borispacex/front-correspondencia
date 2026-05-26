@@ -17,7 +17,7 @@ import {
 import type {
   MenuItem,
   CreateMenuItemRequest,
-} from "../../types/menu-items/menu-item.types";
+} from "../../types/admin/menu-items/menu-item.types";
 
 import { useMenu } from "../../hooks/useMenu";
 import { usePermissions } from "../../hooks/usePermissions";

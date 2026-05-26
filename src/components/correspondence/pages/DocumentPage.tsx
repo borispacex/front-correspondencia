@@ -5,10 +5,10 @@ import {PlusIcon} from "../../../icons";
 import {usePermissions} from "../../../hooks/usePermissions.ts";
 import {useNotifications} from "../../../hooks/useNotification.tsx";
 import {useMemo, useState} from "react";
-import {Roadmap, RoadmapFilters, SortConfig} from "../../../types/roadmaps/roadmap.type.ts";
-import RoadmapTable from "../components/roadmaps/RoadmapTable.tsx";
-import {RoadmapShow} from "../components/roadmaps/RoadmapShow.tsx";
-import {RoadmapFilter} from "../components/roadmaps/RoadmapFilter.tsx";
+import {Document, DocumentFilters, SortConfig} from "../types/documents/document.type.ts";
+import DocumentTable from "../components/documents/DocumentTable.tsx";
+import {DocumentShow} from "../components/documents/DocumentShow.tsx";
+import {DocumentFilter} from "../components/documents/DocumentFilter.tsx";
 
 interface OrderItem {
     id: number;
@@ -30,7 +30,7 @@ function getTotal(item: OrderItem): number {
     return item.discount > 0 ? base * (1 - item.discount / 100) : base;
 }
 
-export const RoadmapPage = () => {
+export const DocumentPage = () => {
 
     const subTotal = orderItems.reduce((sum, item) => sum + getTotal(item), 0);
     const vat = Math.round(subTotal * 0.1);
@@ -41,19 +41,19 @@ export const RoadmapPage = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selected, setSelected] = useState<Roadmap | null>(null);
+    const [selected, setSelected] = useState<Document | null>(null);
     const [confirmId, setConfirmId] = useState<number | null>(null);
 
     const [openStatusModal, setOpenStatusModal] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState(false);
-    const [selectedStatusItem, setSelectedStatusItem] = useState<Roadmap | null>(null);
+    const [selectedStatusItem, setSelectedStatusItem] = useState<Document | null>(null);
 
     function handleCreate() {
         setSelected(null);
         setIsModalOpen(true);
     }
 
-    const [roadmaps, setRoadmaps] = useState<Roadmap[]>([
+    const [documents, setDocuments] = useState<Document[]>([
         {
             id: 1,
             nro: "HR-001",
@@ -81,18 +81,18 @@ export const RoadmapPage = () => {
 
     // ─── Eventos ─────────────────────────────────────────
 
-    const handleEdit = (roadmap: Roadmap) => {
-        console.log("Editar:", roadmap);
+    const handleEdit = (document: Document) => {
+        console.log("Editar:", document);
     };
 
     const handleDelete = (id: number) => {
         console.log("Eliminar:", id);
     };
 
-    const handleToggleActive = (item: Roadmap, active: boolean) => {
+    const handleToggleActive = (item: Document, active: boolean) => {
         console.log("Activar/Inactivar:", item, active);
 
-        setRoadmaps((prev) =>
+        setDocuments((prev) =>
             prev.map((r) =>
                 r.id === item.id
                     ? { ...r, active }
@@ -101,24 +101,24 @@ export const RoadmapPage = () => {
         );
     };
 
-    const handleDerive = (roadmap: Roadmap) => {
-        console.log("Derivar:", roadmap);
+    const handleDerive = (document: Document) => {
+        console.log("Derivar:", document);
     };
 
-    const handleViewHeader = (roadmap: Roadmap) => {
-        console.log("Cabecera:", roadmap);
+    const handleViewHeader = (document: Document) => {
+        console.log("Cabecera:", document);
     };
 
-    const handleViewSheet = (roadmap: Roadmap) => {
-        console.log("Hoja:", roadmap);
+    const handleViewSheet = (document: Document) => {
+        console.log("Hoja:", document);
     };
 
-    const handleViewRoutes = (roadmap: Roadmap) => {
-        console.log("Rutas:", roadmap);
+    const handleViewRoutes = (document: Document) => {
+        console.log("Rutas:", document);
     };
 
     // Filter
-    const [filters, setFilters] = useState<RoadmapFilters>({
+    const [filters, setFilters] = useState<DocumentFilters>({
         nro: "",
         old: "",
         origin: "",
@@ -130,8 +130,8 @@ export const RoadmapPage = () => {
         field: "id",
         dir: "desc",
     });
-    const filteredRoadmaps = useMemo(() => {
-        const filtered = roadmaps.filter((r) => {
+    const filteredDocuments = useMemo(() => {
+        const filtered = documents.filter((r) => {
             const nroMatch =
                 !filters.nro ||
                 String(r.nro ?? r.id)
@@ -172,8 +172,8 @@ export const RoadmapPage = () => {
         });
 
         return [...filtered].sort((a, b) => {
-            const aVal = String(a[sort.field as keyof Roadmap] ?? "");
-            const bVal = String(b[sort.field as keyof Roadmap] ?? "");
+            const aVal = String(a[sort.field as keyof Document] ?? "");
+            const bVal = String(b[sort.field as keyof Document] ?? "");
 
             const cmp = aVal.localeCompare(bVal, undefined, {
                 numeric: true,
@@ -182,17 +182,17 @@ export const RoadmapPage = () => {
 
             return sort.dir === "asc" ? cmp : -cmp;
         });
-    }, [roadmaps, filters, sort]);
+    }, [documents, filters, sort]);
 
     return (
         <>
-            <PageMeta title="Usuarios" description="Gestión de usuarios del sistema" />
-            <PageBreadCrumb pageTitle="Usuarios" />
+            <PageMeta title="Documentos" description="Gestión de documentos del sistema" />
+            <PageBreadCrumb pageTitle="Documentos" />
 
             <div className="space-y-5">
                 <div className="rounded-2xl border border-gray-200 dark:border-white/[0.05] bg-white dark:bg-white/[0.03] px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <RoadmapFilter
+                        <DocumentFilter
                             filters={filters}
                             sort={sort}
                             onFiltersChange={setFilters}
@@ -206,7 +206,7 @@ export const RoadmapPage = () => {
                                 onClick={handleCreate}
                                 startIcon={<PlusIcon className="size-4 text-white" />}
                             >
-                                Nueva Hoja de Ruta
+                                Nuevo Documento
                             </Button>
                         )}
 
@@ -214,8 +214,8 @@ export const RoadmapPage = () => {
                 </div>
                 <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-5">
 
-                    <RoadmapTable
-                        roadmaps={filteredRoadmaps}
+                    <DocumentTable
+                        documents={filteredDocuments}
                         isLoading={isLoading}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
@@ -225,7 +225,7 @@ export const RoadmapPage = () => {
                         onViewSheet={handleViewSheet}
                         onViewRoutes={handleViewRoutes}
                     />
-                    <RoadmapShow />
+                    <DocumentShow />
                 </div>
             </div>
         </>

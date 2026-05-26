@@ -17,7 +17,7 @@ import type {
   Role,
   CreateRoleRequest,
   RoleFilters,
-} from "../../types/roles/role.types";
+} from "../../types/admin/roles/role.types";
 
 import type { Pagination } from "../../types/common/api.types";
 

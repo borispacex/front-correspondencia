@@ -16,7 +16,7 @@ import {
   LockOpenIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import type { MenuItem } from "../types/menu-items/menu-item.types";
+import type { MenuItem } from "../types/admin/menu-items/menu-item.types";
 import { useMenu } from "../hooks/useMenu";
 import { useAuth } from "../hooks/auth/useAuth";
 import {ROUTES} from "../constants/routes.constants.ts";

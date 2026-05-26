@@ -5,7 +5,7 @@ import UserInfoForm from "./UserInfoForm.tsx";
 import {useState} from "react";
 import {useNotifications} from "../../hooks/useNotification.tsx";
 import {infoUser} from "../../services/main/users-profile.service.ts";
-import {InfoUserRequest} from "../../types/users/user.types.ts";
+import {InfoUserRequest} from "../../types/admin/users/user.types.ts";
 
 export default function UserInfoCard() {
   const { user, refreshUser } = useAuth();

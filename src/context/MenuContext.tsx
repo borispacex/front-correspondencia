@@ -1,6 +1,6 @@
 import { createContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import { getMenuItems } from "../services/admin/menu-items.service.ts";
-import type { MenuItem } from "../types/menu-items/menu-item.types";
+import type { MenuItem } from "../types/admin/menu-items/menu-item.types";
 import { useAuth } from "../hooks/auth/useAuth";
 
 interface MenuContextValue {

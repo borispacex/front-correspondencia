@@ -1,7 +1,7 @@
 import { Modal } from "../ui/modal";
 import {PencilIcon} from "../../icons";
 import UserChangePasswordForm from "./UserChangePasswordForm.tsx";
-import type {ChangePasswordUserRequest} from "../../types/users/user.types.ts";
+import type {ChangePasswordUserRequest} from "../../types/admin/users/user.types.ts";
 import {useNotifications} from "../../hooks/useNotification.tsx";
 import {useState} from "react";
 import {changePasswordUser} from "../../services/main/users-profile.service.ts";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type {ChangePasswordUserRequest} from "../../types/users/user.types.ts";
+import type {ChangePasswordUserRequest} from "../../types/admin/users/user.types.ts";
 import Label from "../form/Label.tsx";
 import InputField from "../form/input/InputField.tsx";
 import Button from "../ui/button/Button.tsx";

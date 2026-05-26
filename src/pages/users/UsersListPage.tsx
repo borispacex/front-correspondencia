@@ -17,7 +17,7 @@ import type {
   User,
   CreateUserRequest,
   UpdateUserRequest,
-} from "../../types/users/user.types";
+} from "../../types/admin/users/user.types";
 
 import { usePermissions } from "../../hooks/usePermissions";
 import { useNotifications } from "../../hooks/useNotification";

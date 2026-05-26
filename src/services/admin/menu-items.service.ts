@@ -1,6 +1,6 @@
 import http from "../http.service.ts";
 import { API_ENDPOINTS } from "../../constants/api.constants.ts";
-import type { MenuItem, CreateMenuItemRequest, UpdateMenuItemRequest } from "../../types/menu-items/menu-item.types.ts";
+import type { MenuItem, CreateMenuItemRequest, UpdateMenuItemRequest } from "../../types/admin/menu-items/menu-item.types.ts";
 import type { ApiResponse, ApiQueryParams } from "../../types/common/api.types.ts";
 import { buildQueryParams } from "../../utils/query.utils.ts";
 

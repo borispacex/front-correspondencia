@@ -3,7 +3,7 @@ import { useAuth } from "../../hooks/auth/useAuth";
 import { PencilIcon } from "../../icons";
 import { useState } from "react";
 import { useNotifications } from "../../hooks/useNotification.tsx";
-import { PhotoUserRequest } from "../../types/users/user.types.ts";
+import { PhotoUserRequest } from "../../types/admin/users/user.types.ts";
 import { photoUser } from "../../services/main/users-profile.service.ts";
 import UserPhotoForm from "./UserPhotoForm.tsx";
 

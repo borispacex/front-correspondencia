@@ -8,7 +8,7 @@ import {
     updatePermission,
 } from "../../services/admin/permissions.service.ts";
 
-import type { Permission } from "../../types/permissions/permission.types";
+import type { Permission } from "../../types/admin/permissions/permission.types";
 
 import Button from "../ui/button/Button.tsx";
 import {useNotifications} from "../../hooks/useNotification.tsx";

@@ -8,7 +8,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon, ChevronsRightIcon
 } from "../../icons";
-import type { Permission } from "../../types/permissions/permission.types";
+import type { Permission } from "../../types/admin/permissions/permission.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import Button from "../ui/button/Button.tsx";

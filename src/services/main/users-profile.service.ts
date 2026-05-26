@@ -1,6 +1,6 @@
 import http from "../http.service.ts";
 import { API_ENDPOINTS } from "../../constants/api.constants.ts";
-import type {User, ChangePasswordUserRequest, InfoUserRequest, PhotoUserRequest} from "../../types/users/user.types.ts";
+import type {User, ChangePasswordUserRequest, InfoUserRequest, PhotoUserRequest} from "../../types/admin/users/user.types.ts";
 import type { ApiResponse,  } from "../../types/common/api.types.ts";
 
 export async function changePasswordUser(payload: ChangePasswordUserRequest): Promise<User> {

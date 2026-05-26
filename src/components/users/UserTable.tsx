@@ -8,7 +8,7 @@ import {
   ChevronRightIcon,
   ChevronsLeftIcon, ChevronLeftIcon
 } from "../../icons";
-import type { User } from "../../types/users/user.types";
+import type { User } from "../../types/admin/users/user.types";
 import { usePermissions } from "../../hooks/usePermissions";
 import TableSkeleton from "../animation/TableSkeleton.tsx";
 import {ToggleSwitch} from "../form/switch/ToggleSwitch.tsx";
