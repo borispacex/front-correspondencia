@@ -1,8 +1,8 @@
-import http from "./http.service";
-import { API_ENDPOINTS } from "../constants/api.constants";
-import type { Role, CreateRoleRequest, UpdateRoleRequest } from "../types/roles/role.types";
-import type { ApiResponse, ApiQueryParams, Pagination, LaravelResourcePagination } from "../types/common/api.types";
-import { buildQueryParams } from "../utils/query.utils";
+import http from "../http.service.ts";
+import { API_ENDPOINTS } from "../../constants/api.constants.ts";
+import type { Role, CreateRoleRequest, UpdateRoleRequest } from "../../types/roles/role.types.ts";
+import type { ApiResponse, ApiQueryParams, Pagination, LaravelResourcePagination } from "../../types/common/api.types.ts";
+import { buildQueryParams } from "../../utils/query.utils.ts";
 
 export async function getRoles(params?: ApiQueryParams): Promise<Role[]> {
   const { data } = await http.get<ApiResponse<Role[]>>(API_ENDPOINTS.ROLES.BASE, {

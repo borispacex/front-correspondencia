@@ -12,7 +12,7 @@ import {
   getMenuItemsAll,
   deleteMenuItem,
   getMenuItemById,
-} from "../../services/menu-items.service";
+} from "../../services/admin/menu-items.service.ts";
 
 import type {
   MenuItem,

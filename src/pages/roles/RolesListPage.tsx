@@ -11,7 +11,7 @@ import {
   createRole,
   updateRole,
   deleteRole,
-} from "../../services/roles.service";
+} from "../../services/admin/roles.service.ts";
 
 import type {
   Role,

@@ -22,7 +22,7 @@ import BarChart from "./pages/Charts/BarChart.tsx";
 import SignIn from "./pages/AuthPages/SignIn.tsx";
 import SignUp from "./pages/AuthPages/SignUp.tsx";
 import NotFound from "./pages/OtherPage/NotFound.tsx";
-import {correspondenciaRoutes} from "./components/correspondencia/correspondencia.route.tsx";
+import {correspondenciaRoutes} from "./components/correspondence/correspondence.route.tsx";
 import ResetPassword from "./pages/AuthPages/ResetPassword.tsx";
 import {ROUTES} from "./constants/routes.constants.ts";
 import MsalCallbackPage from "./pages/auth/MsalCallbackPage.tsx";

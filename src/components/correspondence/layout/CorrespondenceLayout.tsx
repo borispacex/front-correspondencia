@@ -1,6 +1,6 @@
 import {Outlet} from "react-router";
 
-export const CorrespondenciaLayout = () => {
+export const CorrespondenceLayout = () => {
     return(
         <div>
             <Outlet />

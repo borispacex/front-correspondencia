@@ -1,8 +1,8 @@
-import http from "./http.service";
-import { API_ENDPOINTS } from "../constants/api.constants";
-import type { Permission } from "../types/permissions/permission.types";
-import type { ApiResponse, ApiQueryParams } from "../types/common/api.types";
-import { buildQueryParams } from "../utils/query.utils";
+import http from "../http.service.ts";
+import { API_ENDPOINTS } from "../../constants/api.constants.ts";
+import type { Permission } from "../../types/permissions/permission.types.ts";
+import type { ApiResponse, ApiQueryParams } from "../../types/common/api.types.ts";
+import { buildQueryParams } from "../../utils/query.utils.ts";
 
 export async function getPermissions(params?: ApiQueryParams): Promise<Permission[]> {
   const { data } = await http.get<ApiResponse<Permission[]>>(API_ENDPOINTS.PERMISSIONS.BASE, {

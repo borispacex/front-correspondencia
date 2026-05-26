@@ -1,5 +1,5 @@
 import { createContext, useState, useCallback, useEffect, type ReactNode } from "react";
-import { getMenuItems } from "../services/menu-items.service";
+import { getMenuItems } from "../services/admin/menu-items.service.ts";
 import type { MenuItem } from "../types/menu-items/menu-item.types";
 import { useAuth } from "../hooks/auth/useAuth";
 

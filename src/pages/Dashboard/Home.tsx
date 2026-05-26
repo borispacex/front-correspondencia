@@ -1,4 +1,4 @@
-import { CorrespondenciaDashboard } from "../../components/correspondencia/components/CorrespondenciaDashboard.tsx";
+import { CorrespondenceDashboard } from "../../components/correspondence/components/CorrespondenceDashboard.tsx";
 import { useAuth } from "../../hooks/auth/useAuth.ts";
 
 export default function Home() {
@@ -19,7 +19,7 @@ export default function Home() {
                     </p>
                 </div>
             </div>
-            <CorrespondenciaDashboard />
+            <CorrespondenceDashboard />
         </>
     );
 }

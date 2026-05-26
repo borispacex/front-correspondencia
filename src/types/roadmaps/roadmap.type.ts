@@ -29,3 +29,51 @@ export interface SortConfig {
     dir: "asc" | "desc";
 }
 
+
+
+export interface CreateRoadmapRequest {
+    document_origin: "INTERNO" | "EXTERNO";
+    procedure_type: string;
+    document_date: string;
+    created_date?: string;
+    origin_area_id: number;
+    document_type_id: number;
+    priority: string;
+    cite?: string;
+    cite_number?: string;
+    sender?: string;
+    reference: string;
+    attachments?: string;
+    pages?: number;
+    file?: File | null;
+    active?: boolean;
+}
+
+export interface UpdateRoadmapRequest {
+    id: number;
+    document_origin: "INTERNO" | "EXTERNO";
+    procedure_type: string;
+    document_date: string;
+    created_date?: string;
+    origin_area_id: number;
+    document_type_id: number;
+    priority: string;
+    cite?: string;
+    cite_number?: string;
+    sender?: string;
+    reference: string;
+    attachments?: string;
+    pages?: number;
+    file?: File | null;
+    active?: boolean;
+}
+export interface Area {
+    id: number;
+    name: string;
+    active?: boolean;
+}
+export interface DocumentType {
+    id: number;
+    name: string;
+    active?: boolean;
+}

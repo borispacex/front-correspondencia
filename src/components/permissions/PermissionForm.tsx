@@ -6,7 +6,7 @@ import InputField from "../form/input/InputField";
 import {
     createPermission,
     updatePermission,
-} from "../../services/permissions.service";
+} from "../../services/admin/permissions.service.ts";
 
 import type { Permission } from "../../types/permissions/permission.types";
 

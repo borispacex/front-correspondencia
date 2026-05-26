@@ -7,7 +7,7 @@ import type {
 
 import type { Permission } from "../../types/permissions/permission.types";
 
-import { getPermissions } from "../../services/permissions.service";
+import { getPermissions } from "../../services/admin/permissions.service.ts";
 
 import Label from "../form/Label";
 import InputField from "../form/input/InputField";

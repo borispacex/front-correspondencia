@@ -1,7 +1,7 @@
-import http from "./http.service";
-import { API_ENDPOINTS } from "../constants/api.constants";
-import type {User, ChangePasswordUserRequest, InfoUserRequest, PhotoUserRequest} from "../types/users/user.types";
-import type { ApiResponse,  } from "../types/common/api.types";
+import http from "../http.service.ts";
+import { API_ENDPOINTS } from "../../constants/api.constants.ts";
+import type {User, ChangePasswordUserRequest, InfoUserRequest, PhotoUserRequest} from "../../types/users/user.types.ts";
+import type { ApiResponse,  } from "../../types/common/api.types.ts";
 
 export async function changePasswordUser(payload: ChangePasswordUserRequest): Promise<User> {
     const { data } = await http.patch<ApiResponse<User>>(API_ENDPOINTS.PROFILE.CHANGE_PASSWORD, payload);

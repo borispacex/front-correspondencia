@@ -4,7 +4,7 @@ import {CorrespPendienteMetrics} from "./metrics/corresp/CorrespPendienteMetrics
 import {CorrespAtendidaMetrics} from "./metrics/corresp/CorrespAtendidaMetrics.tsx";
 import {CorrespGeneradaMetrics} from "./metrics/corresp/CorrespGeneradaMetrics.tsx";
 
-export const CorrespondenciaDashboard = () => {
+export const CorrespondenceDashboard = () => {
     return (
         <>
             <div className="col-span-6 space-y-6 xl:col-span-7">

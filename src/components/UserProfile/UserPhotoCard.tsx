@@ -4,7 +4,7 @@ import { PencilIcon } from "../../icons";
 import { useState } from "react";
 import { useNotifications } from "../../hooks/useNotification.tsx";
 import { PhotoUserRequest } from "../../types/users/user.types.ts";
-import { photoUser } from "../../services/users-profile.service.ts";
+import { photoUser } from "../../services/main/users-profile.service.ts";
 import UserPhotoForm from "./UserPhotoForm.tsx";
 
 const API_URL = import.meta.env.VITE_API_URL;

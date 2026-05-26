@@ -1,8 +1,8 @@
-import http from "./http.service";
-import { API_ENDPOINTS } from "../constants/api.constants";
-import type { User, CreateUserRequest, UpdateUserRequest } from "../types/users/user.types";
-import type { ApiResponse, ApiQueryParams } from "../types/common/api.types";
-import { buildQueryParams } from "../utils/query.utils";
+import http from "../http.service.ts";
+import { API_ENDPOINTS } from "../../constants/api.constants.ts";
+import type { User, CreateUserRequest, UpdateUserRequest } from "../../types/users/user.types.ts";
+import type { ApiResponse, ApiQueryParams } from "../../types/common/api.types.ts";
+import { buildQueryParams } from "../../utils/query.utils.ts";
 
 export async function getUsers(params?: ApiQueryParams): Promise<User[]> {
   const { data } = await http.get<ApiResponse<User[]>>(API_ENDPOINTS.USERS.BASE, {

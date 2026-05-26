@@ -11,7 +11,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
-} from "../../services/users.service";
+} from "../../services/admin/users.service.ts";
 
 import type {
   User,

@@ -9,7 +9,7 @@ import { PlusIcon } from "../../icons";
 import {
   getPermissions,
   deletePermission,
-} from "../../services/permissions.service";
+} from "../../services/admin/permissions.service.ts";
 
 import type { Permission } from "../../types/permissions/permission.types";
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { MenuItem, CreateMenuItemRequest } from "../../types/menu-items/menu-item.types";
 import type { Role } from "../../types/roles/role.types";
-import { getRoles } from "../../services/roles.service";
+import { getRoles } from "../../services/admin/roles.service.ts";
 import Label from "../form/Label";
 import InputField from "../form/input/InputField";
 import {
