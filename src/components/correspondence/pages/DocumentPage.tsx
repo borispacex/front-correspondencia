@@ -201,67 +201,6 @@ export const DocumentPage = () => {
         setIsLoading(true);
         try {
             const data = await getDocuments();
-            console.log('data', data);
-            // const data: Document[] = [
-            //     {
-            //         id: 1,
-            //         department_id: 1,
-            //         type_document_id: 1,
-            //         priority_id: 1,
-            //         state_document_id: 1,
-            //
-            //         doc_fecha_origen: "2026-05-26",
-            //         doc_cite: "DNTIC-001/2026",
-            //         doc_numero_cite: "001/2026",
-            //
-            //         doc_referencia: "Solicitud de revisión de sistema",
-            //         doc_procedencia: "I",
-            //
-            //         doc_remite: "Juan Pérez",
-            //
-            //         created_at: "2026-05-26T10:00:00",
-            //         updated_at: "2026-05-26T10:00:00",
-            //
-            //         doc_contador: 15,
-            //
-            //         dep_name: "DNTIC",
-            //         typ_name: "NOTA",
-            //         pri_name: "URGENTE",
-            //         sdoc_name: "PENDIENTE",
-            //
-            //         doc_dep_name: "RECTORADO",
-            //     },
-            //
-            //     {
-            //         id: 2,
-            //         department_id: 2,
-            //         type_document_id: 2,
-            //         priority_id: 2,
-            //         state_document_id: 1,
-            //
-            //         doc_fecha_origen: "2026-05-25",
-            //         doc_cite: "FIN-122/2026",
-            //
-            //         doc_referencia:
-            //             "Remisión de documentación administrativa para validación",
-            //
-            //         doc_procedencia: "E",
-            //
-            //         doc_remite: "María López",
-            //
-            //         created_at: "2026-05-25T09:00:00",
-            //         updated_at: "2026-05-25T09:00:00",
-            //
-            //         doc_contador: 16,
-            //
-            //         dep_name: "FINANZAS",
-            //         typ_name: "MEMORÁNDUM",
-            //         pri_name: "NORMAL",
-            //         sdoc_name: "RECIBIDO",
-            //
-            //         doc_dep_name: "VICERRECTORADO",
-            //     },
-            // ]
             setDocuments(data);
         } finally {
             setIsLoading(false);
