@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import Button from "../../ui/button/Button.tsx";
+import {FileIcon, TrashBinIcon} from "../../../icons";
 
 interface DropZonePdfProps {
     value?: File | null;
@@ -172,14 +174,7 @@ export default function DropZonePdf({
                             ${styles.icon}
                         `}
                     >
-                        <svg
-                            className="fill-current"
-                            width="28"
-                            height="28"
-                            viewBox="0 0 24 24"
-                        >
-                            <path d="M6 2C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2H6ZM13 3.5L18.5 9H13V3.5ZM8 13H16V15H8V13ZM8 17H16V19H8V17Z" />
-                        </svg>
+                        <FileIcon className="fill-current" width="28" height="28"/>
                     </div>
 
                     <h4 className={`mb-1 font-semibold text-gray-800 dark:text-white/90 ${styles.title}`}>
@@ -215,7 +210,7 @@ export default function DropZonePdf({
 
             {/* FILE */}
             {value && (
-                <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
+                <div className={`flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-white px-4 py-3  dark:bg-gray-900`}>
 
                     <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
@@ -226,16 +221,15 @@ export default function DropZonePdf({
                             {(value.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                     </div>
-
-                    <button
+                    <Button
                         type="button"
-                        onClick={removeFile}
                         disabled={disabled}
-                        className="text-sm text-error-500 hover:underline disabled:opacity-50"
+                        onClick={removeFile}
+                        variant="danger"
+                        size="sm"
                     >
-                        Quitar
-                    </button>
-
+                        <TrashBinIcon className="text-sm disabled:opacity-50" />
+                    </Button>
                 </div>
             )}
         </div>

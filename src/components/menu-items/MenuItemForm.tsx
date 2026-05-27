@@ -62,7 +62,6 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
 
   const [loadingRoles, setLoadingRoles] = useState(true);
 
@@ -155,10 +154,8 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
         />
       </div>
 
-      {/* Icon picker */}
       <div>
         <Label>Icono<span className="text-error-500">*</span></Label>
-        {/*<div className="mt-2 grid grid-cols-5 gap-2">*/}
         <div className={`mt-2 flex flex-wrap  gap-y-2 rounded-lg border  px-2 py-2 ${errors.icon ? "border-error-500 dark:border-error-700" : "border-gray-200 dark:border-gray-700"}` }>
         {ICON_OPTIONS.map(({ value, label: iconLabel, Icon }) => (
             <button
@@ -216,7 +213,6 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
         />
       </div>
 
-      {/* Roles */}
       <div>
           <Label>Roles que pueden ver este ítem</Label>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">

@@ -22,6 +22,8 @@ import DropZonePdf from "../../../form/form-elements/DropZonePdf.tsx";
 import {InfoIcon} from "../../../../icons";
 import Tooltip from "../../../form/Tooltip.tsx";
 import TextArea from "../../../form/input/TextArea.tsx";
+import {useFormValidation} from "../../../../hooks/useFormValidation.ts";
+import {useNotifications} from "../../../../hooks/useNotification.tsx";
 
 interface DocumentFormProps {
     document?: Document | null;
@@ -50,6 +52,28 @@ export default function DocumentForm({
                                          onCancel,
                                      }: DocumentFormProps) {
 
+    const {
+        values,
+        errors,
+        setValue,
+        setMultipleErrors,
+    } = useFormValidation({
+        selectedProcedureType: "",
+        docFechaOrigen: "",
+        selectedDepartment: "",
+        selectedTypeDocument: "",
+        selectedPriority: "",
+        docCite: "",
+        docNumeroCite: "",
+        docRemite: "",
+        docReferencia: "",
+        docAnexos: "",
+        docFojas: "",
+        file: null as File | null,
+    });
+
+    const { addNotification } = useNotifications();
+
     const [procedures, setProcedures] = useState<Option[]>([]);
     const [priorities, setPriorities] = useState<Option[]>([]);
     const [typeDocuments, setTypeDocuments] = useState<Option[]>([]);
@@ -57,37 +81,25 @@ export default function DocumentForm({
     const [loadingCatalogs, setLoadingCatalogs] = useState(false);
 
     const [docProcedencia, setDocProcedencia] = useState<"I" | "E">("I");
-    const [selectedProcedureType, setSelectedProcedureType] = useState<Option | null>(null);
-    const [selectedPriority, setSelectedPriority] = useState<Option | null>(null);
-    const [selectedDepartment, setSelectedDepartment] = useState<Option | null>(null);
-    const [selectedTypeDocument, setSelectedTypeDocument] = useState<Option | null>(null);
-    const [docFechaOrigen, setDocFechaOrigen] = useState("");
+    // const [docFechaOrigen, setDocFechaOrigen] = useState("");
     const [createdDate, setCreatedDate] = useState(() =>
                 new Date()
                     .toISOString()
                     .split("T")[0]
         );
 
-    const [docCite, setDocCite] = useState("");
-    const [docNumeroCite, setDocNumeroCite] = useState("");
-    const [docRemite, setDocRemite] = useState("");
-    const [docReferencia, setDocReferencia] = useState("");
-    const [docAnexos, setDocAnexos] = useState("");
-    const [docFojas, setDocFojas] = useState("");
-    const [file, setFile] = useState<File | null>(null);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     function resetForm() {
         setDocProcedencia("I");
 
-        setSelectedProcedureType(null);
-        setSelectedPriority(null);
-        setSelectedDepartment(null);
-        setSelectedTypeDocument(null);
+        setValue('selectedProcedureType', "");
+        setValue('selectedPriority', "");
+        setValue('selectedDepartment', "");
+        setValue('selectedTypeDocument', "");
 
-        setDocFechaOrigen("");
+        setValue('docFechaOrigen', "");
 
         setCreatedDate(
             new Date()
@@ -95,17 +107,14 @@ export default function DocumentForm({
                 .split("T")[0]
         );
 
-        setDocCite("");
-        setDocNumeroCite("");
-        setDocRemite("");
-        setDocReferencia("");
-        setDocAnexos("");
-        setDocFojas("");
+        setValue('docCite',"");
+        setValue('docNumeroCite', "");
+        setValue('docRemite', "");
+        setValue('docReferencia', "");
+        setValue('docAnexos',"");
+        setValue('docFojas', "");
 
-        setFile(null);
-        setError(null);
-
-        setFieldErrors({});
+        setValue('file', null);
     }
 
     useEffect(() => {
@@ -153,9 +162,12 @@ export default function DocumentForm({
                     )
                 );
             } catch (err) {
-                setError(
-                    "No se pudieron cargar los catálogos"
-                );
+                addNotification({
+                    type: "error",
+                    title: "Error",
+                    message: (err ? "No se pudieron cargar los catálogos" : ""),
+                });
+
             } finally {
                 setLoadingCatalogs(false);
             }
@@ -169,149 +181,66 @@ export default function DocumentForm({
             resetForm();
             return;
         }
-        setDocProcedencia(
-            document.doc_procedencia ?? "I"
-        );
-        setDocFechaOrigen(
-            document.doc_fecha_origen ?? ""
-        );
-        setDocCite(
-            document.doc_cite ?? ""
-        );
-        setDocNumeroCite(
-            document.doc_numero_cite ?? ""
-        );
-        setDocRemite(
-            document.doc_remite ?? ""
-        );
-        setDocReferencia(
-            document.doc_referencia ?? ""
-        );
-        setDocAnexos(
-            document.doc_anexos ?? ""
-        );
-        setDocFojas(
-            document.doc_fojas?.toString() ?? ""
-        );
-        setSelectedProcedureType(
-            procedures.find(
-                (item) =>
-                    item.value ===
-                    String(document.procedure_id)
-            ) ?? null
-        );
-        setSelectedPriority(
-            priorities.find(
-                (item) =>
-                    item.value ===
-                    String(document.priority_id)
-            ) ?? null
-        );
-
-        setSelectedDepartment(
-            departments.find(
-                (item) =>
-                    item.value ===
-                    String(document.department_id)
-            ) ?? null
-        );
-
-        setSelectedTypeDocument(
-            typeDocuments.find(
-                (item) =>
-                    item.value ===
-                    String(document.type_document_id)
-            ) ?? null
-        );
-
-    }, [
-        document,
-        procedures,
-        priorities,
-        departments,
-        typeDocuments,
-    ]);
+        setDocProcedencia(document.doc_procedencia ?? "I");
+        setValue('docFechaOrigen', document.doc_fecha_origen ?? "");
+        setValue('docCite', document.doc_cite ?? "");
+        setValue('docNumeroCite', document.doc_numero_cite ?? "");
+        setValue('docRemite', document.doc_remite ?? "");
+        setValue('docReferencia', document.doc_referencia ?? "");
+        setValue('docAnexos', document.doc_anexos ?? "");
+        setValue('docFojas', document.doc_fojas?.toString() ?? "");
+        setValue('selectedProcedureType', String(document.procedure_id ?? ""));
+        setValue('selectedPriority', String(document.priority_id ?? ""));
+        setValue('selectedDepartment', String(document.department_id ?? ""));
+        setValue('selectedTypeDocument', String(document.type_document_id ?? ""));
+    }, [document]);
 
     function validate(): boolean {
 
-        const errors: Record<string, string> = {};
-        if (!docFechaOrigen) {
-            errors.docFechaOrigen = "La fecha del documento es requerida";
-        }
-        if (!selectedDepartment) {
-            errors.selectedDepartment = "Debe seleccionar un departamento";
-        }
-        if (!selectedTypeDocument) {
-            errors.selectedTypeDocument = "Debe seleccionar un tipo de documento";
-        }
-        if (!docRemite.trim()) {
-            errors.docRemite = "El remitente es requerido";
-        }
-        if (!docReferencia.trim()) {
-            errors.docReferencia = "El objeto / referencia es requerido";
-        }
-        if (docFojas && isNaN(Number(docFojas))) {
-            errors.docFojas = "Las fojas deben ser numéricas";
-        }
-        if (!docCite.trim()) {
-            errors.docCite = "El cite es requerido";
-        }
-        if (!docAnexos.trim()) {
-            errors.docAnexos = "Los anexos son requeridos";
-        }
-        if (!docFojas.trim()) {
-            errors.docFojas = "El número de fojas es requerido";
-        }
-        if (!docNumeroCite.trim()) {
-            errors.docNumeroCite = "El número de cite es requerido";
-        }
-        if (!selectedPriority) {
-            errors.selectedPriority = "Debe seleccionar una prioridad";
-        }
-        if (!selectedProcedureType) {
-            errors.selectedProcedureType = "Debe seleccionar un tipo de tramite";
-        }
-        if (!file) {
-            errors.file = "El archivo es requerido";
-        }
-        setFieldErrors(errors);
-        return Object.keys(errors).length === 0;
+        const newErrors: any = {};
+        if (!values.docFechaOrigen) newErrors.docFechaOrigen = "La fecha del documento es requerida";
+        if (!values.selectedDepartment) newErrors.selectedDepartment = "Debe seleccionar un departamento";
+        if (!values.selectedTypeDocument) newErrors.selectedTypeDocument = "Debe seleccionar un tipo de documento";
+        if (!values.docRemite.trim()) newErrors.docRemite = "El remitente es requerido";
+        if (!values.docReferencia.trim()) newErrors.docReferencia = "El objeto / referencia es requerido";
+        if (values.docFojas && isNaN(Number(values.docFojas))) newErrors.docFojas = "Las fojas deben ser numéricas";
+        if (!values.docCite.trim()) newErrors.docCite = "El cite es requerido";
+        if (!values.docAnexos.trim()) newErrors.docAnexos = "Los anexos son requeridos";
+        if (!values.docFojas.trim()) newErrors.docFojas = "El número de fojas es requerido";
+        if (!values.docNumeroCite.trim()) newErrors.docNumeroCite = "El número de cite es requerido";
+        if (!values.selectedPriority) newErrors.selectedPriority = "Debe seleccionar una prioridad";
+        if (!values.selectedProcedureType) newErrors.selectedProcedureType = "Debe seleccionar un tipo de tramite";
+        if (!values.file) newErrors.file = "El archivo es requerido";
+
+        setMultipleErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
     }
 
     async function handleSubmit(
         e: React.FormEvent
     ) {
         e.preventDefault();
+
         if (!validate()) return;
+
         setIsSubmitting(true);
-        setError(null);
+
         try {
             const payload = {
                 doc_procedencia: docProcedencia,
-                procedure_id: selectedProcedureType?.value
-                        ? Number(
-                            selectedProcedureType.value
-                        ) : null,
-                department_id: selectedDepartment?.value
-                        ? Number(
-                            selectedDepartment.value
-                        ) : null,
-                type_document_id: selectedTypeDocument?.value
-                        ? Number(
-                            selectedTypeDocument.value
-                        ) : null,
-                priority_id: selectedPriority?.value
-                        ? Number(
-                            selectedPriority.value
-                        ) : null,
-                doc_fecha_origen: docFechaOrigen,
-                doc_cite: docCite.trim(),
-                doc_numero_cite: docNumeroCite.trim(),
-                doc_remite: docRemite.trim(),
-                doc_referencia: docReferencia.trim(),
-                doc_anexos: docAnexos.trim(),
-                doc_fojas: docFojas ? Number(docFojas) : undefined,
-                file,
+                procedure_id: values.selectedProcedureType ? Number(values.selectedProcedureType) : null,
+                department_id: values.selectedDepartment ? Number(values.selectedDepartment) : null,
+                type_document_id: values.selectedTypeDocument ? Number(values.selectedTypeDocument) : null,
+                priority_id: values.selectedPriority ? Number(values.selectedPriority) : null,
+                doc_fecha_origen: values.docFechaOrigen,
+                doc_cite: values.docCite.trim(),
+                doc_numero_cite: values.docNumeroCite.trim(),
+                doc_remite: values.docRemite.trim(),
+                doc_referencia: values.docReferencia.trim(),
+                doc_anexos: values.docAnexos.trim(),
+                doc_fojas: values.docFojas ? Number(values.docFojas) : undefined,
+                file: values.file,
             };
 
             if (document) {
@@ -332,10 +261,13 @@ export default function DocumentForm({
                     };
                 };
             };
-            setError(
-                axiosErr?.response?.data?.message ??
-                "Error al guardar el documento"
-            );
+            addNotification({
+                type: "error",
+                title: "Error",
+                message:
+                    axiosErr?.response?.data?.message ??
+                    "Error al guardar el documento"
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -345,7 +277,7 @@ export default function DocumentForm({
         <form onSubmit={handleSubmit} className="space-y-5">
             <div>
                 <Label>
-                    {'Origen Documento '}
+                    Origen Documento {' '}
                     <Tooltip
                         position="bottom"
                         content={
@@ -389,23 +321,20 @@ export default function DocumentForm({
                     />
                 </div>
             </div>
-
             <div>
                 <Label>
-                    {'Tipo de Trámite '}
+                    Tipo de Trámite<span className="text-error-500">*</span>
                 </Label>
                 <Select
                     options={procedures}
-                    value={selectedProcedureType}
+                    defaultValue={values.selectedProcedureType}
                     loading={loadingCatalogs}
-                    onChange={setSelectedProcedureType}
+                    onChange={(value) => setValue('selectedProcedureType', value)}
                     placeholder="Seleccione un trámite"
-                    error={!!fieldErrors.selectedProcedureType}
-                    hint={fieldErrors.selectedProcedureType}
+                    error={!!errors.selectedProcedureType}
+                    hint={errors.selectedProcedureType}
                 />
-
             </div>
-
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                     <Label>
@@ -429,14 +358,13 @@ export default function DocumentForm({
                     </Label>
                     <DatePicker
                         id="docFechaOrigen"
-                        value={docFechaOrigen}
-                        onChange={setDocFechaOrigen}
+                        value={values.docFechaOrigen}
+                        onChange={(value) => setValue('docFechaOrigen', value)}
                         placeholder="Seleccione una fecha"
-                        error={!!fieldErrors.docFechaOrigen}
-                        hint={fieldErrors.docFechaOrigen}
+                        error={!!errors.docFechaOrigen}
+                        hint={errors.docFechaOrigen}
                     />
                 </div>
-
                 <div>
                     <Label>
                         {'Fecha Creación '}
@@ -460,12 +388,9 @@ export default function DocumentForm({
                         value={createdDate}
                         disabled
                         onChange={() => {}}
-                        error={!!fieldErrors.createdDate}
-                        hint={fieldErrors.createdDate}
                     />
                 </div>
             </div>
-
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                     <Label>
@@ -474,9 +399,7 @@ export default function DocumentForm({
                         <Tooltip
                             content={
                                 <div>
-                                    <p className="mb-2 font-bold">
-                                        Departamento Origen:
-                                    </p>
+                                    <p className="mb-2 font-bold">Departamento Origen:</p>
                                     <p className="mb-2 font-medium">
                                         Se deberá seleccionar el área funcional a la que pertenece.
                                     </p>
@@ -488,15 +411,14 @@ export default function DocumentForm({
                     </Label>
                     <Select
                         options={departments}
-                        value={selectedDepartment}
+                        defaultValue={values.selectedDepartment}
                         loading={loadingCatalogs}
-                        onChange={setSelectedDepartment}
+                        onChange={(value) => setValue('selectedDepartment', value)}
                         placeholder="Seleccione un área"
-                        error={!!fieldErrors.selectedDepartment}
-                        hint={fieldErrors.selectedDepartment}
+                        error={!!errors.selectedDepartment}
+                        hint={errors.selectedDepartment}
                     />
                 </div>
-
                 <div>
                     <Label>
                         Tipo de Documento<span className="text-error-500">*</span>
@@ -504,9 +426,7 @@ export default function DocumentForm({
                         <Tooltip
                             content={
                                 <div>
-                                    <p className="mb-2 font-bold">
-                                        Tipo de Documento:
-                                    </p>
+                                    <p className="mb-2 font-bold">Tipo de Documento:</p>
                                     <p className="mb-2 font-medium">
                                         Se debe seleccionar el tipo de documento que se adjunta a la hora de tramite.
                                     </p>
@@ -518,30 +438,24 @@ export default function DocumentForm({
                     </Label>
                     <Select
                         options={typeDocuments}
-                        value={selectedTypeDocument}
+                        defaultValue={values.selectedTypeDocument}
                         loading={loadingCatalogs}
-                        onChange={setSelectedTypeDocument}
+                        onChange={(value) => setValue('selectedTypeDocument', value)}
                         placeholder="Seleccione un documento"
-                        error={!!fieldErrors.selectedTypeDocument}
-                        hint={fieldErrors.selectedTypeDocument}
+                        error={!!errors.selectedTypeDocument}
+                        hint={errors.selectedTypeDocument}
                     />
                 </div>
-
             </div>
-            {/* Prioridad / Cite */}
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-
                 <div>
-
                     <Label>
                         Prioridad<span className="text-error-500">*</span>
                         {' '}
                         <Tooltip
                             content={
                                 <div>
-                                    <p className="mb-2 font-bold">
-                                        Prioridad:
-                                    </p>
+                                    <p className="mb-2 font-bold">Prioridad:</p>
                                     <p className="mb-2 font-medium">
                                         Se debe seleccionar la prioridad con la que se debe atender este documento.
                                     </p>
@@ -551,21 +465,17 @@ export default function DocumentForm({
                             <InfoIcon className="size-4 text-gray-400 cursor-pointer" />
                         </Tooltip>
                     </Label>
-
                     <Select
                         options={priorities}
-                        value={selectedPriority}
+                        defaultValue={values.selectedPriority}
                         loading={loadingCatalogs}
-                        onChange={setSelectedPriority}
+                        onChange={(value) => setValue('selectedPriority', value)}
                         placeholder="Seleccione prioridad"
-                        error={!!fieldErrors.selectedPriority}
-                        hint={fieldErrors.selectedPriority}
+                        error={!!errors.selectedPriority}
+                        hint={errors.selectedPriority}
                     />
-
                 </div>
-
                 <div>
-
                     <Label>
                         Cite<span className="text-error-500">*</span>
                         {' '}
@@ -584,44 +494,27 @@ export default function DocumentForm({
                             <InfoIcon className="size-4 text-gray-400 cursor-pointer" />
                         </Tooltip>
                     </Label>
-
                     <InputField
-                        value={docCite}
-                        onChange={(e) =>
-                            setDocCite(e.target.value)
-                        }
+                        value={values.docCite}
+                        onChange={(e) => setValue('docCite', e.target.value)}
                         placeholder="Cite"
-                        error={!!fieldErrors.docCite}
-                        hint={fieldErrors.docCite}
+                        error={!!errors.docCite}
+                        hint={errors.docCite}
                     />
-
                 </div>
-
             </div>
-
-            {/* Número Cite / Remitente */}
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-
                 <div>
-
-                    <Label>
-                        Nro. Cite<span className="text-error-500">*</span>
-                    </Label>
-
+                    <Label>Nro. Cite<span className="text-error-500">*</span></Label>
                     <InputField
-                        value={docNumeroCite}
-                        onChange={(e) =>
-                            setDocNumeroCite(e.target.value)
-                        }
+                        value={values.docNumeroCite}
+                        onChange={(e) => setValue('docNumeroCite', e.target.value)}
                         placeholder="Nro. Cite"
-                        error={!!fieldErrors.docNumeroCite}
-                        hint={fieldErrors.docNumeroCite}
+                        error={!!errors.docNumeroCite}
+                        hint={errors.docNumeroCite}
                     />
-
                 </div>
-
                 <div>
-
                     <Label>
                         Remitente
                         <span className="text-error-500">*</span>
@@ -629,9 +522,7 @@ export default function DocumentForm({
                         <Tooltip
                             content={
                                 <div>
-                                    <p className="mb-2 font-bold">
-                                        Remitente:
-                                    </p>
+                                    <p className="mb-2 font-bold">Remitente:</p>
                                     <p className="mb-2 font-medium">
                                         La persona encargada del área funcional quien está enviando la hoja de tramite.
                                     </p>
@@ -641,23 +532,16 @@ export default function DocumentForm({
                             <InfoIcon className="size-4 text-gray-400 cursor-pointer" />
                         </Tooltip>
                     </Label>
-
                     <InputField
-                        value={docRemite}
-                        onChange={(e) =>
-                            setDocRemite(e.target.value)
-                        }
+                        value={values.docRemite}
+                        onChange={(e) => setValue('docRemite', e.target.value)}
                         placeholder="Remitente"
-                        error={!!fieldErrors.docRemite}
-                        hint={fieldErrors.docRemite}
+                        error={!!errors.docRemite}
+                        hint={errors.docRemite}
                     />
                 </div>
-
             </div>
-
-            {/* Referencia */}
             <div>
-
                 <Label>
                     Objeto / Referencia
                     <span className="text-error-500">*</span>
@@ -665,9 +549,7 @@ export default function DocumentForm({
                     <Tooltip
                         content={
                             <div>
-                                <p className="mb-2 font-bold">
-                                    Objeto / Referencia:
-                                </p>
+                                <p className="mb-2 font-bold">Objeto / Referencia:</p>
                                 <p className="mb-2 font-medium">
                                     Se debe colocar el objeto del documento que se adjunta a la hoja de tramite.
                                 </p>
@@ -677,36 +559,29 @@ export default function DocumentForm({
                         <InfoIcon className="size-4 text-gray-400 cursor-pointer" />
                     </Tooltip>
                 </Label>
-
                 <TextArea
                     rows={4}
-                    value={docReferencia}
-                    onChange={setDocReferencia}
+                    value={values.docReferencia}
+                    onChange={(value) => setValue('docReferencia', value)}
                     placeholder="Referencia"
-                    error={!!fieldErrors.docReferencia}
-                    hint={fieldErrors.docReferencia}
+                    error={!!errors.docReferencia}
+                    hint={errors.docReferencia}
                 />
             </div>
-
-            {/* Anexos / Fojas */}
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-
                 <div>
                     <Label>
                         Anexos
                         <span className="text-error-500">*</span>
                     </Label>
                     <InputField
-                        value={docAnexos}
-                        onChange={(e) =>
-                            setDocAnexos(e.target.value)
-                        }
+                        value={values.docAnexos}
+                        onChange={(e) => setValue('docAnexos', e.target.value)}
                         placeholder="Anexos"
-                        error={!!fieldErrors.docAnexos}
-                        hint={fieldErrors.docAnexos}
+                        error={!!errors.docAnexos}
+                        hint={errors.docAnexos}
                     />
                 </div>
-
                 <div>
                     <Label>
                         Fojas
@@ -714,22 +589,16 @@ export default function DocumentForm({
                     </Label>
                     <InputField
                         type="number"
-                        value={docFojas}
-                        onChange={(e) =>
-                            setDocFojas(e.target.value)
-                        }
+                        value={values.docFojas}
+                        onChange={(e) => setValue('docFojas', e.target.value)}
                         placeholder="0"
                         min="0"
-                        error={!!fieldErrors.docFojas}
-                        hint={fieldErrors.docFojas}
+                        error={!!errors.docFojas}
+                        hint={errors.docFojas}
                     />
                 </div>
-
             </div>
-
-            {/* Archivo */}
             <div>
-
                 <Label>
                     Archivo
                     <span className="text-error-500">*</span>
@@ -737,9 +606,7 @@ export default function DocumentForm({
                     <Tooltip
                         content={
                             <div>
-                                <p className="mb-2 font-bold">
-                                    Archivo:
-                                </p>
+                                <p className="mb-2 font-bold">Archivo:</p>
                                 <p className="mb-2 font-medium">
                                     Se debe adjuntar el archivo en formato PDF.
                                 </p>
@@ -752,14 +619,14 @@ export default function DocumentForm({
 
                 <DropZonePdf
                     size="sm"
-                    value={file}
-                    onChange={setFile}
+                    value={values.file}
+                    onChange={(value) => setValue('file', value)}
                     maxSizeMB={10}
-                    error={!!fieldErrors.file}
-                    hint={fieldErrors.file}
+                    error={!!errors.file}
+                    hint={errors.file}
                     required
                 />
-                {document?.doc_url && !file && (
+                {document?.doc_url && !values.file && (
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         Archivo actual:{" "}
                         <a
@@ -774,19 +641,7 @@ export default function DocumentForm({
                 )}
 
             </div>
-
-            {/* Error Global */}
-            {error && (
-
-                <div className="rounded-lg bg-error-50 px-4 py-3 text-sm text-error-600 dark:bg-error-900/20 dark:text-error-400">
-                    {error}
-                </div>
-
-            )}
-
-            {/* Botones */}
             <div className="flex items-center justify-end gap-3 pt-2">
-
                 <Button
                     type="button"
                     variant="outline"
@@ -795,22 +650,17 @@ export default function DocumentForm({
                 >
                     Cancelar
                 </Button>
-
                 <Button
                     type="submit"
                     disabled={isSubmitting}
                 >
-
                     {isSubmitting
                         ? "Guardando..."
                         : document
                             ? "Actualizar"
                             : "Guardar"}
-
                 </Button>
-
             </div>
-
         </form>
     );
 }

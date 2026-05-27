@@ -82,6 +82,16 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
     }
   }, [values.ci, user]);
 
+  useEffect(() => {
+    if (!selectedUser) return;
+    setValue('ci', selectedUser.ci ?? "");
+    setValue('name', selectedUser.name ?? "");
+    setValue('lastName', selectedUser.last_name ?? "");
+    setValue('motherLastname', selectedUser.mother_last_name ?? "");
+    setValue('email', selectedUser.email ?? "");
+    setValue('phone', selectedUser.phone ?? "");
+  }, [selectedUser]);
+
   function toggleRole(id: number) {
     setSelectedRoleIds((prev) =>
       prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
