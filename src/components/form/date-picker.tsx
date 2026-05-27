@@ -11,119 +11,160 @@ import Label from "./Label";
 import { CalenderIcon } from "../../icons";
 
 interface DatePickerProps {
-  id: string;
+    id: string;
 
-  label?: string;
-  placeholder?: string;
+    label?: string;
 
-  value?: string;
+    placeholder?: string;
 
-  onChange?: (date: string) => void;
+    value?: string;
 
-  disabled?: boolean;
-  required?: boolean;
-  error?: boolean;
+    onChange?: (date: string) => void;
 
-  mode?: "single" | "multiple" | "range" | "time";
+    disabled?: boolean;
 
-  className?: string;
+    required?: boolean;
+
+    error?: boolean;
+
+    hint?: string;
+
+    mode?: "single" | "multiple" | "range" | "time";
+
+    className?: string;
 }
 
 export default function DatePicker({
-                                     id,
+                                       id,
 
-                                     label,
-                                     placeholder,
+                                       label,
 
-                                     value,
+                                       placeholder,
 
-                                     onChange,
+                                       value,
 
-                                     disabled = false,
-                                     required = false,
-                                     error = false,
+                                       onChange,
 
-                                     mode = "single",
+                                       disabled = false,
 
-                                     className = "",
+                                       required = false,
+
+                                       error = false,
+
+                                       hint = "",
+
+                                       mode = "single",
+
+                                       className = "",
                                    }: DatePickerProps) {
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
+    const inputRef =
+        useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
+    useEffect(() => {
 
-    if (!inputRef.current) return;
+        if (!inputRef.current) return;
 
-    const instance = flatpickr(inputRef.current, {
+        const instance = flatpickr(
+            inputRef.current,
+            {
 
-      mode,
+                mode,
 
-      static: true,
+                static: true,
 
-      monthSelectorType: "static",
+                monthSelectorType: "static",
 
-      locale: Spanish,
+                locale: Spanish,
 
-      dateFormat: "d/m/Y",
+                dateFormat: "d/m/Y",
 
-      defaultDate: value || new Date(),
+                defaultDate:
+                    value || new Date(),
 
-      disableMobile: true,
+                disableMobile: true,
 
-      onChange: (_selectedDates, dateStr) => {
-        onChange?.(dateStr);
-      },
-    });
+                onChange: (
+                    _selectedDates,
+                    dateStr
+                ) => {
+                    onChange?.(dateStr);
+                },
+            }
+        );
 
-    return () => {
-      instance.destroy();
-    };
+        return () => {
+            instance.destroy();
+        };
 
-  }, [mode]);
+    }, [mode]);
 
-  useEffect(() => {
+    useEffect(() => {
 
-    if (inputRef.current && value !== undefined) {
-      inputRef.current.value = value;
-    }
+        if (
+            inputRef.current &&
+            value !== undefined
+        ) {
+            inputRef.current.value = value;
+        }
 
-  }, [value]);
+    }, [value]);
 
-  return (
-      <div>
+    return (
 
-        {label && (
-            <Label htmlFor={id}>
-              {label}
+        <div>
 
-              {required && (
-                  <span className="text-error-500"> *</span>
-              )}
-            </Label>
-        )}
+            {label && (
 
-        <div className="relative">
+                <Label htmlFor={id}>
 
-          <input
-              ref={inputRef}
-              id={id}
-              placeholder={placeholder}
-              disabled={disabled}
-              className={`
+                    {label}
+
+                    {required && (
+                        <span className="text-error-500">
+                            {" "}*
+                        </span>
+                    )}
+
+                </Label>
+
+            )}
+
+            <div className="relative">
+
+                <input
+                    ref={inputRef}
+
+                    id={id}
+
+                    placeholder={placeholder}
+
+                    disabled={disabled}
+
+                    className={`
                         h-11
                         w-full
+
                         appearance-none
+
                         rounded-lg
+
                         border
+
                         bg-transparent
+
                         px-4
                         py-2.5
                         pr-11
+
                         text-sm
                         text-gray-800
+
                         shadow-theme-xs
-                        outline-none
+
                         transition
+
+                        outline-none
 
                         placeholder:text-gray-400
 
@@ -134,54 +175,79 @@ export default function DatePicker({
                         dark:placeholder:text-white/30
 
                         ${
-                  error
-                      ? `
+                        error
+                            ? `
                                     border-error-500
-                                    focus:border-error-400
+
+                                    focus:border-error-500
                                     focus:ring-error-500/20
+
+                                    dark:border-error-500
+                                    dark:focus:border-error-400
                                   `
-                      : `
+                            : `
                                     border-gray-300
+
                                     focus:border-brand-300
                                     focus:ring-brand-500/20
 
                                     dark:border-gray-700
                                     dark:focus:border-brand-800
                                   `
-              }
+                    }
 
                         ${
-                  disabled
-                      ? `
+                        disabled
+                            ? `
                                     cursor-not-allowed
+
                                     bg-gray-100
+
                                     opacity-60
 
                                     dark:bg-gray-800
                                   `
-                      : ""
-              }
+                            : ""
+                    }
 
                         ${className}
                     `}
-          />
+                />
 
-          <span
-              className="
+                <span
+                    className="
                         pointer-events-none
+
                         absolute
+
                         right-3
                         top-1/2
+
                         -translate-y-1/2
+
                         text-gray-500
                         dark:text-gray-400
                     "
-          >
+                >
                     <CalenderIcon className="size-5" />
                 </span>
 
-        </div>
+            </div>
 
-      </div>
-  );
+            {hint && (
+
+                <p
+                    className={`mt-2 text-sm ${
+                        error
+                            ? "text-error-500"
+                            : "text-gray-500 dark:text-gray-400"
+                    }`}
+                >
+                    {hint}
+                </p>
+
+            )}
+
+        </div>
+    );
 }

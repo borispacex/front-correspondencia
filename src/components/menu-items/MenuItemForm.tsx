@@ -19,6 +19,7 @@ import Checkbox from "../form/input/Checkbox.tsx";
 import Select from "../form/Select.tsx";
 import CheckboxSkeleton from "../animation/CheckboxSkeleton.tsx";
 import Button from "../ui/button/Button.tsx";
+import {useFormValidation} from "../../hooks/useFormValidation.ts";
 
 const ICON_OPTIONS: { value: string; label: string; Icon: React.FC<{ className?: string }> }[] = [
   { value: "dashboard", label: "Dashboard", Icon: GridIcon },
@@ -40,16 +41,28 @@ interface MenuItemFormProps {
 }
 
 export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }: MenuItemFormProps) {
-  const [label, setLabel] = useState("");
-  const [url, setUrl] = useState("");
-  const [icon, setIcon] = useState("");
-  const [order, setOrder] = useState("");
+  // const [label, setLabel] = useState("");
+  // const [url, setUrl] = useState("");
+  // const [icon, setIcon] = useState("");
+  // const [order, setOrder] = useState("");
+  const {
+    values,
+    errors,
+    setValue,
+    setMultipleErrors,
+  } = useFormValidation({
+    label: "",
+    url: "",
+    icon: "",
+    order: "",
+  });
+
   const [active, setActive] = useState(true);
   const [parentId, setParentId] = useState<number | null>(null);
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
 
   const [loadingRoles, setLoadingRoles] = useState(true);
 
@@ -66,14 +79,14 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
   }, []);
 
   useEffect(() => {
-    setLabel(item?.label ?? "");
-    setUrl(item?.url ?? "");
-    setIcon(item?.icon ?? "");
-    setOrder(item?.order?.toString() ?? "");
+    setValue('label', item?.label ?? "");
+    setValue('url', item?.url ?? "");
+    setValue('icon', item?.icon ?? "");
+    setValue('order', item?.order?.toString() ?? "");
     setActive(item?.active ?? true);
     setParentId(item?.parent_id ?? null);
     setSelectedRoleIds(item?.roles?.map((r) => r.id) ?? []);
-    setError(null);
+
   }, [item]);
 
   function toggleRole(id: number) {
@@ -82,27 +95,42 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
     );
   }
 
+  function validate() {
+    const newErrors: any = {};
+
+    if (!values.label) newErrors.label = "Label es requerido";
+    if (!values.url) newErrors.url = "Url es requerido";
+    if (!values.icon) newErrors.icon = "Icon requerido";
+    if (!values.order) newErrors.order = "Order requerido";
+
+    setMultipleErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!label.trim()) {
-      setError("La etiqueta es requerida");
-      return;
-    }
+
+    if (!validate()) return;
+
     setIsSubmitting(true);
-    setError(null);
+
     try {
       await onSubmit({
-        label: label.trim(),
-        url: url.trim() || null,
-        icon: icon.trim() || null,
-        order: order ? parseInt(order, 10) : undefined,
+        label: values.label.trim(),
+        url: values.url.trim() || null,
+        icon: values.icon.trim() || null,
+        order: values.order ? parseInt(values.order, 10) : undefined,
         active,
         parent_id: parentId,
         roles: selectedRoleIds,
       });
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
-      setError(axiosErr?.response?.data?.message ?? "Error al guardar el ítem");
+      if (axiosErr?.response?.data?.message) {
+        console.log('Error al guardar el ítem');
+      }
+
     } finally {
       setIsSubmitting(false);
     }
@@ -112,25 +140,34 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label>Etiqueta <span className="text-error-500">*</span></Label>
-        <InputField value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ej: Dashboard" />
+        <InputField value={values.label} onChange={(e) => setValue('label', e.target.value)}
+                    placeholder="Ej: Dashboard"
+                    error={!!errors.label}
+                    hint={errors.label}
+        />
       </div>
       <div>
-        <Label>URL</Label>
-        <InputField value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Ej: /dashboard" />
+        <Label>URL<span className="text-error-500">*</span></Label>
+        <InputField value={values.url} onChange={(e) => setValue('url', e.target.value)}
+                    placeholder="Ej: /dashboard"
+                    error={!!errors.url}
+                    hint={errors.url}
+        />
       </div>
 
       {/* Icon picker */}
       <div>
-        <Label>Icono</Label>
-        <div className="mt-2 grid grid-cols-5 gap-2">
-          {ICON_OPTIONS.map(({ value, label: iconLabel, Icon }) => (
+        <Label>Icono<span className="text-error-500">*</span></Label>
+        {/*<div className="mt-2 grid grid-cols-5 gap-2">*/}
+        <div className={`mt-2 flex flex-wrap  gap-y-2 rounded-lg border  px-2 py-2 ${errors.icon ? "border-error-500 dark:border-error-700" : "border-gray-200 dark:border-gray-700"}` }>
+        {ICON_OPTIONS.map(({ value, label: iconLabel, Icon }) => (
             <button
               key={value}
               type="button"
-              onClick={() => setIcon(icon === value ? "" : value)}
+              onClick={() => setValue('icon', values.icon === value ? "" : value)}
               title={iconLabel}
-              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
-                icon === value
+              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 mx-1 text-xs transition-colors ${
+                values.icon === value
                   ? "border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400"
                   : "border-gray-200 bg-white text-gray-500 hover:border-brand-300 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
               }`}
@@ -141,9 +178,9 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
           ))}
           <button
             type="button"
-            onClick={() => setIcon("")}
+            onClick={() => setValue('icon', "")}
             className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
-              icon === ""
+              values.icon === ""
                 ? "border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400"
                 : "border-gray-200 bg-white text-gray-400 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800"
             }`}
@@ -152,11 +189,15 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
             <span>Ninguno</span>
           </button>
         </div>
+        {errors.icon && <p className="text-sm text-error-500 mt-1">Icono es requerido</p>}
       </div>
 
       <div>
-        <Label>Orden</Label>
-        <InputField type="number" value={order} onChange={(e) => setOrder(e.target.value)} placeholder="Ej: 1" />
+        <Label>Orden<span className="text-error-500">*</span></Label>
+        <InputField type="number" value={values.order} onChange={(e) => setValue('order', e.target.value)}
+                    placeholder="Ej: 1"
+                    error={!!errors.order}
+                    hint={errors.order}/>
       </div>
       <div>
         <Label>Ítem padre</Label>
@@ -210,7 +251,6 @@ export default function MenuItemForm({ item, allItems = [], onSubmit, onCancel }
             size="md"
         />
       </div>
-      {error && <p className="text-sm text-error-500">{error}</p>}
       <div className="flex items-center justify-end gap-3 pt-2">
         <Button
             variant="outline"

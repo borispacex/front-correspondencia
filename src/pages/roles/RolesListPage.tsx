@@ -263,6 +263,9 @@ export default function RolesListPage() {
                 ? "Editar Rol"
                 : "Nuevo Rol"}
           </h3>
+          <p className="mb-5 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+          </p>
 
           <RoleForm
               role={selectedRole}

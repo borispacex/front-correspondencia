@@ -16,6 +16,7 @@ import CheckboxSkeleton from "../animation/CheckboxSkeleton.tsx";
 import Button from "../ui/button/Button.tsx";
 
 import { useNotifications } from "../../hooks/useNotification.tsx";
+import {useFormValidation} from "../../hooks/useFormValidation.ts";
 
 interface RoleFormProps {
   role?: Role | null;
@@ -28,22 +29,20 @@ export default function RoleForm({
                                    onSubmit,
                                    onCancel,
                                  }: RoleFormProps) {
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
+  const {
+    values,
+    errors,
+    setValue,
+    setMultipleErrors,
+  } = useFormValidation({
+    name: "",
+  });
 
-  const [allPermissions, setAllPermissions] =
-      useState<Permission[]>([]);
-
+  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
-  const [isSubmitting, setIsSubmitting] =
-      useState(false);
-
-  const [error, setError] =
-      useState<string | null>(null);
-
-  const [groupLoading, setGroupLoading] =
-      useState<boolean>(true);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [groupLoading, setGroupLoading] = useState<boolean>(true);
   const { addNotification } = useNotifications();
 
   useEffect(() => {
@@ -56,10 +55,7 @@ export default function RoleForm({
   }, []);
 
   useEffect(() => {
-    setName(role?.name ?? "");
-
-    setError(null);
-
+    setValue('name', role?.name ?? "");
     if (role?.permissions && allPermissions.length > 0) {
       const rolePermIds = role.permissions.map(
           (p) => p.id
@@ -123,30 +119,28 @@ export default function RoleForm({
     }
   }
 
+  function validate() {
+    const newErrors: any = {};
+
+    if (!values.name) newErrors.name = "EL nombre es requerido";
+
+    setMultipleErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  }
+
   async function handleSubmit(
       e: React.FormEvent
   ) {
     e.preventDefault();
 
-    if (!name.trim()) {
-      setError("El nombre es requerido");
-
-      addNotification({
-        type: "warning",
-        title: "Campo requerido",
-        message: "El nombre es obligatorio.",
-      });
-
-      return;
-    }
+    if (!validate()) return;
 
     setIsSubmitting(true);
 
-    setError(null);
-
     try {
       await onSubmit({
-        name: name.trim(),
+        name: values.name.trim(),
         permissions: selectedIds,
       });
     } catch (err: unknown) {
@@ -157,11 +151,14 @@ export default function RoleForm({
           };
         };
       };
+      if (axiosErr?.response?.data?.message) {
+        addNotification({
+          type: "error",
+          title: "Error",
+          message: 'Error al guardar el rol',
+        });
+      }
 
-      setError(
-          axiosErr?.response?.data?.message ??
-          "Error al guardar el rol"
-      );
     } finally {
       setIsSubmitting(false);
     }
@@ -181,11 +178,13 @@ export default function RoleForm({
           </Label>
 
           <InputField
-              value={name}
+              value={values.name}
               onChange={(e) =>
-                  setName(e.target.value)
+                  setValue('name', e.target.value)
               }
               placeholder="Ej: Administrador"
+              error={!!errors.name}
+              hint={errors.name}
           />
         </div>
 
@@ -272,12 +271,6 @@ export default function RoleForm({
             )}
           </div>
         </div>
-
-        {error && (
-            <p className="text-sm text-error-500">
-              {error}
-            </p>
-        )}
 
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button

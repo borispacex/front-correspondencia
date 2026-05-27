@@ -1,4 +1,11 @@
-import type { ReactNode } from "react";
+import {
+    ReactNode,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+
+import { createPortal } from "react-dom";
 
 interface TooltipProps {
     content: ReactNode;
@@ -11,107 +18,202 @@ export default function Tooltip({
                                     children,
                                     position = "top",
                                 }: TooltipProps) {
-    const positions = {
-        top: {
-            wrapper:
-                "bottom-full left-1/2 -translate-x-1/2 mb-2",
-            animation:
-                "translate-y-1 group-hover:translate-y-0",
-            arrow:
-                "top-full left-1/2 -translate-x-1/2 border-t-white dark:border-t-gray-900 border-x-transparent border-b-transparent",
-        },
+    const triggerRef = useRef<HTMLDivElement>(null);
 
-        bottom: {
-            wrapper:
-                "top-full left-1/2 -translate-x-1/2 mt-2",
-            animation:
-                "-translate-y-1 group-hover:translate-y-0",
-            arrow:
-                "bottom-full left-1/2 -translate-x-1/2 border-b-white dark:border-b-gray-900 border-x-transparent border-t-transparent",
-        },
+    const [open, setOpen] = useState(false);
 
-        left: {
-            wrapper:
-                "right-full top-1/2 -translate-y-1/2 mr-2",
-            animation:
-                "translate-x-1 group-hover:translate-x-0",
-            arrow:
-                "left-full top-1/2 -translate-y-1/2 border-l-white dark:border-l-gray-900 border-y-transparent border-r-transparent",
-        },
+    const [coords, setCoords] = useState({
+        top: 0,
+        left: 0,
+        transform: "",
+    });
 
-        right: {
-            wrapper:
-                "left-full top-1/2 -translate-y-1/2 ml-2",
-            animation:
-                "-translate-x-1 group-hover:translate-x-0",
-            arrow:
-                "right-full top-1/2 -translate-y-1/2 border-r-white dark:border-r-gray-900 border-y-transparent border-l-transparent",
-        },
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+
+        window.addEventListener("resize", checkMobile);
+
+        return () => {
+            window.removeEventListener(
+                "resize",
+                checkMobile
+            );
+        };
+    }, []);
+
+    const updatePosition = () => {
+        if (!triggerRef.current) return;
+
+        const rect =
+            triggerRef.current.getBoundingClientRect();
+
+        const spacing = 10;
+
+        const positions = {
+            top: {
+                top: rect.top - spacing,
+                left: rect.left + rect.width / 2,
+                transform:
+                    "translate(-50%, -100%)",
+            },
+
+            bottom: {
+                top: rect.bottom + spacing,
+                left: rect.left + rect.width / 2,
+                transform: "translateX(-50%)",
+            },
+
+            left: {
+                top: rect.top + rect.height / 2,
+                left: rect.left - spacing,
+                transform:
+                    "translate(-100%, -50%)",
+            },
+
+            right: {
+                top: rect.top + rect.height / 2,
+                left: rect.right + spacing,
+                transform: "translateY(-50%)",
+            },
+        };
+
+        setCoords(positions[position]);
     };
 
+    useEffect(() => {
+        if (!open) return;
+
+        updatePosition();
+
+        window.addEventListener(
+            "scroll",
+            updatePosition,
+            true
+        );
+
+        window.addEventListener(
+            "resize",
+            updatePosition
+        );
+
+        return () => {
+            window.removeEventListener(
+                "scroll",
+                updatePosition,
+                true
+            );
+
+            window.removeEventListener(
+                "resize",
+                updatePosition
+            );
+        };
+    }, [open, position]);
+
+    // cerrar click afuera mobile
+    useEffect(() => {
+        if (!isMobile) return;
+
+        const handleOutside = (
+            e: MouseEvent
+        ) => {
+            if (
+                triggerRef.current &&
+                !triggerRef.current.contains(
+                    e.target as Node
+                )
+            ) {
+                setOpen(false);
+            }
+        };
+
+        document.addEventListener(
+            "click",
+            handleOutside
+        );
+
+        return () => {
+            document.removeEventListener(
+                "click",
+                handleOutside
+            );
+        };
+    }, [isMobile]);
+
     return (
-        <div className="group relative inline-flex">
-            {children}
-
+        <>
             <div
-                className={`
-          pointer-events-none
-          absolute z-50
+                ref={triggerRef}
+                className="inline-flex cursor-pointer"
+                onMouseEnter={() => {
+                    if (!isMobile) {
+                        setOpen(true);
+                    }
+                }}
+                onMouseLeave={() => {
+                    if (!isMobile) {
+                        setOpen(false);
+                    }
+                }}
+                onClick={(e) => {
+                    if (isMobile) {
+                        e.stopPropagation();
 
-          invisible opacity-0 scale-95
-
-          transition-all duration-200 ease-out
-
-          group-hover:visible
-          group-hover:opacity-100
-          group-hover:scale-100
-
-          ${positions[position].wrapper}
-          ${positions[position].animation}
-        `}
+                        setOpen((prev) => !prev);
+                    }
+                }}
             >
-                <div
-                    className="
-            relative
-
-            w-max
-            max-w-[280px]
-
-            rounded-xl
-
-            border border-gray-200
-            dark:border-gray-700
-
-            bg-white
-            dark:bg-gray-900
-
-            px-3 py-2
-
-            text-sm
-            leading-relaxed
-
-            text-gray-700
-            dark:text-gray-200
-
-            shadow-xl
-            shadow-black/5
-            dark:shadow-black/25
-
-            whitespace-normal
-            break-words
-          "
-                >
-                    {content}
-
-                    {/* Arrow */}
-                    <div
-                        className={`
-              absolute h-0 w-0 border-[6px]
-              ${positions[position].arrow}
-            `}
-                    />
-                </div>
+                {children}
             </div>
-        </div>
+
+            {open &&
+                createPortal(
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: coords.top,
+                            left: coords.left,
+                            transform:
+                            coords.transform,
+                            zIndex: 999999,
+                        }}
+                        className="
+                            pointer-events-none
+
+                            max-w-[280px]
+
+                            rounded-xl
+
+                            border border-gray-200
+                            dark:border-gray-700
+
+                            bg-white
+                            dark:bg-gray-900
+
+                            px-3 py-2
+
+                            text-sm
+                            leading-relaxed
+
+                            text-gray-700
+                            dark:text-gray-200
+
+                            shadow-2xl
+
+                            whitespace-normal
+                            break-words
+                        "
+                    >
+                        {content}
+                    </div>,
+                    document.body
+                )}
+        </>
     );
 }

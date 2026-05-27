@@ -11,9 +11,9 @@ import {
 import type { Permission } from "../../types/admin/permissions/permission.types";
 
 import Button from "../ui/button/Button.tsx";
-import {useNotifications} from "../../hooks/useNotification.tsx";
-import Select, {Option} from "../form/Select.tsx";
-
+import { useNotifications } from "../../hooks/useNotification.tsx";
+import Select, { Option } from "../form/Select.tsx";
+import {useFormValidation} from "../../hooks/useFormValidation.ts";
 
 interface Props {
     permission?: Permission | null;
@@ -26,72 +26,59 @@ export default function PermissionForm({
                                            onSuccess,
                                            onCancel,
                                        }: Props) {
-    const [formName, setFormName] = useState("");
-    const [formGuardName, setFormGuardName] = useState<"web" | "api" | "">("");
+
     const [formGroup, setFormGroup] = useState("");
-
-    const [formError, setFormError] = useState<string | null>(null);
-
+    const {
+        values,
+        errors,
+        setValue,
+        setMultipleErrors,
+    } = useFormValidation({
+        formName: "",
+        formGuardName: "",
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addNotification } = useNotifications();
 
     const GUARD_OPTIONS: Option[] = [
-        {value: 'web', label: 'WEB'},
-        {value: 'api', label: 'API'}
+        { value: "web", label: "WEB" },
+        { value: "api", label: "API" },
     ];
-
-    const { addNotification } = useNotifications();
 
     useEffect(() => {
         if (permission) {
-            setFormName(permission.name ?? "");
-            setFormGuardName(
-                permission?.guard_name === "web"
-                    ? "web"
-                    : "api"
-            );
+            setValue('formName', permission.name ?? "");
+            setValue('formGuardName', permission.guard_name === "web" ? "web" : "api")
             setFormGroup(permission.group ?? "");
         } else {
-            setFormName("");
-            setFormGuardName("");
+            setValue('formGuardName', '');
+            setValue('formGuardName', '')
             setFormGroup("");
         }
     }, [permission]);
 
+    function validate() {
+        const newErrors: any = {};
+
+        if (!values.formName) newErrors.formName = "El nombre es requerido";
+        if (!values.formGuardName) newErrors.formGuardName = "El guard es requerido";
+
+        setMultipleErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        if (!formName.trim()) {
-            setFormError("El nombre es requerido");
-
-            addNotification({
-                type: "warning",
-                title: "Campo requerido",
-                message: "El nombre es obligatorio.",
-            });
-
-            return;
-        }
-
-        if (!formGuardName.trim()) {
-            setFormError("El guard es requerido");
-
-            addNotification({
-                type: "warning",
-                title: "Campo requerido",
-                message: "El guard es obligatorio.",
-            });
-
-            return;
-        }
+        if (!validate()) return;
 
         setIsSubmitting(true);
 
-        setFormError(null);
-
         try {
             const payload = {
-                name: formName.trim(),
-                guard_name: formGuardName.trim(),
+                name: values.formName.trim(),
+                guard_name: values.formGuardName,
                 group: formGroup.trim() || undefined,
             };
 
@@ -101,7 +88,7 @@ export default function PermissionForm({
                 addNotification({
                     type: "info",
                     title: "Permiso actualizado",
-                    message: `El permiso ${formName} fue actualizado correctamente.`,
+                    message: `El permiso ${values.formName} fue actualizado correctamente.`,
                 });
             } else {
                 await createPermission(payload);
@@ -109,94 +96,82 @@ export default function PermissionForm({
                 addNotification({
                     type: "success",
                     title: "Permiso creado",
-                    message: `El permiso ${formName} fue creado correctamente.`,
+                    message: `El permiso ${values.formName} fue creado correctamente.`,
                 });
             }
 
             onSuccess();
         } catch (err: unknown) {
             const axiosErr = err as {
-                response?: {
-                    data?: {
-                        message?: string;
-                    };
-                };
+                response?: { data?: { message?: string } };
             };
 
-            const errorMessage =
-                axiosErr?.response?.data?.message ??
-                "Error al guardar";
-
-            setFormError(errorMessage);
+            const message =
+                axiosErr?.response?.data?.message ?? "Error al guardar";
 
             addNotification({
                 type: "error",
                 title: "Error",
-                message: errorMessage,
+                message,
             });
         } finally {
             setIsSubmitting(false);
         }
     }
 
+    // -------------------------
+    // UI
+    // -------------------------
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* NAME */}
             <div>
                 <Label>
-                    Nombre
-                    <span className="text-error-500">
-                        {" "}
-                        *
-                    </span>
+                    Nombre <span className="text-error-500">*</span>
                 </Label>
 
                 <InputField
-                    value={formName}
-                    onChange={(e) =>
-                        setFormName(e.target.value)
-                    }
+                    value={values.formName}
+                    onChange={(e) => setValue('formName', e.target.value)}
                     placeholder="Ej: roles.view"
+                    error={!!errors.formName}
+                    hint={errors.formName}
                 />
             </div>
 
+            {/* GUARD */}
             <div>
                 <Label>
-                    Guard
-                    <span className="text-error-500">
-                        {" "}
-                        *
-                    </span>
+                    Guard <span className="text-error-500">*</span>
                 </Label>
 
                 <Select
                     options={GUARD_OPTIONS}
-                    defaultValue={formGuardName}
+                    defaultValue={values.formGuardName}
                     onChange={(value) =>
-                        setFormGuardName(value)
+                        setValue('formGuardName', value as "web" | "api")
                     }
                     placeholder="Seleccione un guard"
+                    error={!!errors.formGuardName}
+                    hint={errors.formGuardName}
                 />
             </div>
 
+            {/* GROUP */}
             <div>
                 <Label>Grupo</Label>
 
                 <InputField
                     value={formGroup}
-                    onChange={(e) =>
-                        setFormGroup(e.target.value)
-                    }
+                    onChange={(e) => setFormGroup(e.target.value)}
                     placeholder="Ej: Roles"
                 />
             </div>
 
-            {formError && (
-                <p className="text-sm text-error-500">
-                    {formError}
-                </p>
-            )}
-
+            {/* ACTIONS */}
             <div className="flex items-center justify-end gap-3 pt-2">
+
                 <Button
                     variant="outline"
                     type="button"
@@ -217,7 +192,9 @@ export default function PermissionForm({
                             ? "Actualizar"
                             : "Crear"}
                 </Button>
+
             </div>
+
         </form>
     );
 }

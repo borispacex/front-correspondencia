@@ -10,6 +10,7 @@ import CheckboxSkeleton from "../animation/CheckboxSkeleton.tsx";
 import {InputFieldPassword} from "../form/input/InputFieldPassword.tsx";
 import SearchSelect from "../form/SearchSelect.tsx";
 import {searchUsuariosSaga} from "../../services/saga/users-saga.service.ts";
+import {useFormValidation} from "../../hooks/useFormValidation.ts";
 
 interface UserFormProps {
   user?: User | null;
@@ -18,21 +19,33 @@ interface UserFormProps {
 }
 
 export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
-  const [ci, setCi] = useState("");
-  const [name, setName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [motherLastname, setMotherLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
   const [active, setActive] = useState(true);
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [loadingRoles, setLoadingRoles] = useState(true);
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    values,
+    errors,
+    setValue,
+    setMultipleErrors,
+  } = useFormValidation({
+    ci: "",
+    name: "",
+    lastName: "",
+    motherLastname: "",
+    email: "",
+    phone: "",
+    password: "",
+    passwordConfirmation: "",
+  });
 
   useEffect(() => {
     setLoadingRoles(true);
@@ -44,15 +57,15 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
   }, []);
 
   useEffect(() => {
-    setCi(user?.ci ?? "");
-    setName(user?.name ?? "");
-    setLastName(user?.last_name ?? "");
-    setMotherLastName(user?.mother_last_name ?? "");
-    setEmail(user?.email ?? "");
-    setPhone(user?.phone ?? "");
-    setPassword("");
+    setValue('ci', user?.ci ?? "");
+    setValue('name', user?.name ?? "");
+    setValue('lastName', user?.last_name ?? "");
+    setValue('motherLastname', user?.mother_last_name ?? "");
+    setValue('email', user?.email ?? "");
+    setValue('phone', user?.phone ?? "");
+    setValue('password', "");
     setActive(user?.active ?? true);
-    setPasswordConfirmation("");
+    setValue('passwordConfirmation', "");
     setError(null);
     if (user?.roles && allRoles.length > 0) {
       const matched = allRoles.filter((r) => user.roles!.some(ur => ur.name === r.name)).map((r) => r.id);
@@ -64,10 +77,10 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
 
   useEffect(() => {
     if (!user) {
-      setPassword(ci);
-      setPasswordConfirmation(ci);
+      setValue('password', values.ci);
+      setValue('passwordConfirmation', values.ci);
     }
-  }, [ci, user]);
+  }, [values.ci, user]);
 
   function toggleRole(id: number) {
     setSelectedRoleIds((prev) =>
@@ -77,56 +90,39 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!ci.trim()) {
-      setError("Ci es requerido");
-      return;
-    }
-    if (!name.trim() || !lastName.trim() || !motherLastname.trim()) {
-      setError("Nombre, Apellido paterno y materno son requeridos");
-      return;
-    }
-    if (!email.trim() || !phone.trim()) {
-      setError("Nombre y correo y telefono son requeridos");
-      return;
-    }
-    if (!user && !password) {
-      setError("La contraseña es requerida para crear un usuario");
-      return;
-    }
-    if (password && password !== passwordConfirmation) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
+
+    if (!validate()) return;
+
     setIsSubmitting(true);
     setError(null);
     try {
       if (user) {
         const payload: UpdateUserRequest = {
           id: user.id,
-          ci: user.ci.trim(),
-          name: name.trim(),
-          last_name: lastName.trim(),
-          mother_last_name: motherLastname.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
+          ci: values.ci.trim(),
+          name: values.name.trim(),
+          last_name: values.lastName.trim(),
+          mother_last_name: values.motherLastname.trim(),
+          email: values.email.trim(),
+          phone: values.phone.trim(),
           roles: selectedRoleIds,
           active: active,
         };
-        if (password) {
-          payload.password = password;
-          payload.password_confirmation = passwordConfirmation;
+        if (values.password) {
+          payload.password = values.password;
+          payload.password_confirmation = values.passwordConfirmation;
         }
         await onSubmit(payload);
       } else {
         await onSubmit({
-          ci: ci.trim(),
-          name: name.trim(),
-          last_name: lastName.trim(),
-          mother_last_name: motherLastname.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          password,
-          password_confirmation: passwordConfirmation,
+          ci: values.ci.trim(),
+          name: values.name.trim(),
+          last_name: values.lastName.trim(),
+          mother_last_name: values.motherLastname.trim(),
+          email: values.email.trim(),
+          phone: values.phone.trim(),
+          password: values.password,
+          password_confirmation: values.passwordConfirmation,
           roles: selectedRoleIds,
         });
       }
@@ -138,10 +134,6 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
     }
   }
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
-
   async function handleSearch(query: string) {
     try {
       setLoading(true);
@@ -150,6 +142,32 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function validate() {
+    const newErrors: any = {};
+
+    if (!values.ci) newErrors.ci = "CI es requerido";
+    if (!values.name) newErrors.name = "Nombre es requerido";
+    if (!values.lastName) newErrors.lastName = "Apellido paterno requerido";
+    if (!values.motherLastname) newErrors.motherLastname = "Apellido materno requerido";
+    if (!values.email) newErrors.email = "Correo requerido";
+    if (!values.phone) newErrors.phone = "Teléfono requerido";
+
+    if (!user && !values.password) {
+      newErrors.password = "Contraseña requerida";
+    }
+    if (!user && !values.passwordConfirmation) {
+      newErrors.passwordConfirmation = "Confirmar contraseña requerida";
+    }
+
+    if (!user && values.password !== values.passwordConfirmation) {
+      newErrors.passwordConfirmation = "Las contraseñas no coinciden";
+    }
+
+    setMultipleErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   }
 
   return (
@@ -177,31 +195,43 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <div className="col-span-2 lg:col-span-1">
               <Label>Ci <span className="text-error-500">*</span></Label>
-              <InputField value={ci} onChange={(e) => setCi(e.target.value)} placeholder="9884972" />
+              <InputField value={values.ci} onChange={(e) => setValue('ci', e.target.value)} placeholder="9884972"
+                          error={!!errors.ci}
+                          hint={errors.ci}/>
             </div>
             <div className="col-span-2 lg:col-span-1">
               <Label>Nombre(s) <span className="text-error-500">*</span></Label>
-              <InputField value={name} onChange={(e) => setName(e.target.value)} placeholder="Juan" />
+              <InputField value={values.name} onChange={(e) => setValue('name',  e.target.value)} placeholder="Juan"
+                          error={!!errors.name}
+                          hint={errors.name}/>
             </div>
           </div>
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <div className="col-span-2 lg:col-span-1">
               <Label>Apellido paterno <span className="text-error-500">*</span></Label>
-              <InputField value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Perez" />
+              <InputField value={values.lastName} onChange={(e) => setValue('lastName', e.target.value)} placeholder="Perez"
+                          error={!!errors.lastName}
+                          hint={errors.lastName}/>
             </div>
             <div className="col-span-2 lg:col-span-1">
               <Label>Apellido materno <span className="text-error-500">*</span></Label>
-              <InputField value={motherLastname} onChange={(e) => setMotherLastName(e.target.value)} placeholder="Lopez" />
+              <InputField value={values.motherLastname} onChange={(e) => setValue('motherLastname', e.target.value)} placeholder="Lopez"
+                          error={!!errors.motherLastname}
+                          hint={errors.motherLastname}/>
             </div>
           </div>
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
             <div className="col-span-2 lg:col-span-1">
               <Label>Correo electrónico <span className="text-error-500">*</span></Label>
-              <InputField type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@adm.emi.edu.bo" />
+              <InputField type="email" value={values.email} onChange={(e) => setValue('email', e.target.value)} placeholder="correo@adm.emi.edu.bo"
+                          error={!!errors.email}
+                          hint={errors.email}/>
             </div>
             <div className="col-span-2 lg:col-span-1">
               <Label>Teléfono <span className="text-error-500">*</span></Label>
-              <InputField value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="60514138" />
+              <InputField value={values.phone} onChange={(e) => setValue('phone', e.target.value)} placeholder="60514138"
+                          error={!!errors.phone}
+                          hint={errors.phone}/>
             </div>
           </div>
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -213,9 +243,11 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
                 <span className="text-error-500"> *</span>
               </Label>
               <InputFieldPassword
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={values.password}
+                  onChange={(e) => setValue('password', e.target.value)}
                   placeholder="••••••••"
+                  error={!!errors.password}
+                  hint={errors.password}
               />
             </div>
             <div className="col-span-2 lg:col-span-1">
@@ -224,9 +256,11 @@ export default function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
                 <span className="text-xs text-gray-400 ml-1">{user ? '(Dejar en blanco para no cambiar)' : '(Las contraseñas deben coincidir)'}<span className="text-error-500"> *</span></span>
               </Label>
               <InputFieldPassword
-                  value={passwordConfirmation}
-                  onChange={(e) => setPasswordConfirmation(e.target.value)}
+                  value={values.passwordConfirmation}
+                  onChange={(e) => setValue('passwordConfirmation',  e.target.value)}
                   placeholder="••••••••"
+                  error={!!errors.passwordConfirmation}
+                  hint={errors.passwordConfirmation}
               />
             </div>
           </div>

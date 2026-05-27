@@ -17,6 +17,10 @@ interface DropZonePdfProps {
     title?: string;
 
     description?: string;
+
+    error?: boolean;
+
+    hint?: string;
 }
 
 export default function DropZonePdf({
@@ -28,34 +32,29 @@ export default function DropZonePdf({
                                         size = "md",
                                         title = "Arrastra tu PDF aquí",
                                         description = "Seleccione o arrastre un archivo PDF",
+
+                                        error = false,
+                                        hint = "",
                                     }: DropZonePdfProps) {
 
-    const [error, setError] =
+    const [internalError, setInternalError] =
         useState<string | null>(null);
 
-    const maxSizeBytes =
-        maxSizeMB * 1024 * 1024;
-
-    // ─────────────────────────────────────────────
-    // Sizes
-    // ─────────────────────────────────────────────
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     const sizeStyles = {
-
         sm: {
             container: "p-3",
             icon: "h-10 w-10",
             title: "text-sm",
             description: "text-xs",
         },
-
         md: {
             container: "p-4",
             icon: "h-12 w-12",
             title: "text-base",
             description: "text-sm",
         },
-
         lg: {
             container: "p-6 lg:p-9",
             icon: "h-[68px] w-[68px]",
@@ -64,12 +63,7 @@ export default function DropZonePdf({
         },
     };
 
-    const styles =
-        sizeStyles[size];
-
-    // ─────────────────────────────────────────────
-    // Dropzone
-    // ─────────────────────────────────────────────
+    const styles = sizeStyles[size];
 
     const {
         getRootProps,
@@ -77,103 +71,56 @@ export default function DropZonePdf({
         isDragActive,
         fileRejections,
     } = useDropzone({
-
         multiple: false,
-
         disabled,
-
         maxFiles: 1,
-
         maxSize: maxSizeBytes,
-
         accept: {
             "application/pdf": [".pdf"],
         },
 
         onDrop: (acceptedFiles) => {
-
-            setError(null);
+            setInternalError(null);
 
             if (acceptedFiles.length > 0) {
-
-                onChange(
-                    acceptedFiles[0]
-                );
+                onChange(acceptedFiles[0]);
             }
         },
     });
 
-    // ─────────────────────────────────────────────
-    // Errors
-    // ─────────────────────────────────────────────
-
     useEffect(() => {
+        if (fileRejections.length === 0) return;
 
-        if (fileRejections.length === 0) {
-            return;
-        }
-
-        const firstError =
-            fileRejections[0]?.errors?.[0];
-
+        const firstError = fileRejections[0]?.errors?.[0];
         if (!firstError) return;
 
         switch (firstError.code) {
-
             case "file-invalid-type":
-
-                setError(
-                    "Solo se permiten archivos PDF"
-                );
-
+                setInternalError("Solo se permiten archivos PDF");
                 break;
-
             case "file-too-large":
-
-                setError(
-                    `El archivo supera ${maxSizeMB}MB`
-                );
-
+                setInternalError(`El archivo supera ${maxSizeMB}MB`);
                 break;
-
             case "too-many-files":
-
-                setError(
-                    "Solo se permite un archivo"
-                );
-
+                setInternalError("Solo se permite un archivo");
                 break;
-
             default:
-
-                setError(
-                    "Archivo no válido"
-                );
+                setInternalError("Archivo no válido");
         }
-
     }, [fileRejections, maxSizeMB]);
 
-    // ─────────────────────────────────────────────
-    // Remove file
-    // ─────────────────────────────────────────────
-
-    function removeFile(
-        e: React.MouseEvent<HTMLButtonElement>
-    ) {
-
+    function removeFile(e: React.MouseEvent<HTMLButtonElement>) {
         e.stopPropagation();
-
         onChange(null);
-
-        setError(null);
+        setInternalError(null);
     }
 
-    // ─────────────────────────────────────────────
-    // Render
-    // ─────────────────────────────────────────────
+    // 🔥 PRIORIDAD DE ERROR: externo > interno
+    const showError = error || !!internalError;
+
+    const message = hint || internalError;
 
     return (
-
         <div className="space-y-3">
 
             {/* DROPZONE */}
@@ -201,18 +148,16 @@ export default function DropZonePdf({
                 }
 
                     ${
-                    error
+                    showError
                         ? "border-error-500"
                         : ""
                 }
                 `}
             >
-
                 <input {...getInputProps()} />
 
                 <div className="flex flex-col items-center text-center">
 
-                    {/* ICON */}
                     <div
                         className={`
                             mb-2
@@ -224,57 +169,27 @@ export default function DropZonePdf({
                             text-gray-700
                             dark:bg-gray-800
                             dark:text-gray-400
-
                             ${styles.icon}
                         `}
                     >
-
                         <svg
                             className="fill-current"
                             width="28"
                             height="28"
                             viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
                         >
                             <path d="M6 2C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2H6ZM13 3.5L18.5 9H13V3.5ZM8 13H16V15H8V13ZM8 17H16V19H8V17Z" />
                         </svg>
-
                     </div>
 
-                    {/* TITLE */}
-                    <h4
-                        className={`
-                            mb-1
-                            font-semibold
-                            text-gray-800
-                            dark:text-white/90
-
-                            ${styles.title}
-                        `}
-                    >
-
-                        {isDragActive
-                            ? "Suelte el PDF aquí"
-                            : title}
-
+                    <h4 className={`mb-1 font-semibold text-gray-800 dark:text-white/90 ${styles.title}`}>
+                        {isDragActive ? "Suelte el PDF aquí" : title}
                     </h4>
 
-                    {/* DESCRIPTION */}
-                    <p
-                        className={`
-                            mb-2
-                            max-w-[320px]
-                            text-gray-600
-                            dark:text-gray-400
-
-                            ${styles.description}
-                        `}
-                    >
-
+                    <p className={`mb-2 max-w-[320px] text-gray-600 dark:text-gray-400 ${styles.description}`}>
                         {description}
-
                     </p>
-                    {/* LIMIT */}
+
                     <p className="mb-4 text-xs text-gray-500 dark:text-gray-500">
                         PDF • Máximo {maxSizeMB}MB
                         {required && (
@@ -285,43 +200,31 @@ export default function DropZonePdf({
                     </p>
 
                 </div>
-
             </div>
 
-            {/* ERROR */}
-            {error && (
-
-                <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/20 dark:bg-error-500/10 dark:text-error-400">
-
-                    {error}
-
-                </div>
-
+            {/* ERROR / HINT */}
+            {message && (
+                <p className={`text-sm ${
+                    showError
+                        ? "text-error-500"
+                        : "text-gray-500 dark:text-gray-400"
+                }`}>
+                    {message}
+                </p>
             )}
 
             {/* FILE */}
             {value && (
-
                 <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
 
                     <div className="min-w-0">
-
                         <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
-
                             {value.name}
-
                         </p>
 
                         <p className="text-xs text-gray-500">
-
-                            {(
-                                value.size /
-                                1024 /
-                                1024
-                            ).toFixed(2)} MB
-
+                            {(value.size / 1024 / 1024).toFixed(2)} MB
                         </p>
-
                     </div>
 
                     <button
@@ -334,9 +237,7 @@ export default function DropZonePdf({
                     </button>
 
                 </div>
-
             )}
-
         </div>
     );
 }

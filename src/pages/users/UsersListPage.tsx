@@ -206,7 +206,9 @@ export default function UsersListPage() {
           <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
             {selected ? "Editar Usuario" : "Nuevo Usuario"}
           </h3>
-
+          <p className="mb-5 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+          </p>
           <UserForm
               user={selected}
               onSubmit={handleSubmit}
