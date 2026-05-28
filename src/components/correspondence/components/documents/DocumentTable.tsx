@@ -75,6 +75,7 @@ function DeletedBanner({ onRestore, canRestore }: { onRestore: () => void; canRe
 interface DocumentTableProps {
     documents: Document[];
     isLoading?: boolean;
+    selectedDocumentId?: number;
     onToggleActive: (item: Document, active: boolean) => void;
     onViewHeader?: (document: Document) => void;
     onViewRoutes?: (document: Document) => void;
@@ -90,6 +91,7 @@ const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 export default function DocumentTable({
                                           documents,
                                           isLoading,
+                                          selectedDocumentId,
                                           onEdit,
                                           onDelete,
                                           onToggleActive,
@@ -170,13 +172,42 @@ export default function DocumentTable({
     // ── Card ───────────────────────────────────────────────────────────────────
     function DocumentCard({ document }: { document: Document }) {
         const isDeleted = document.deleted_at != null;
+        const isSelected = selectedDocumentId === document.id;
 
         return (
-            <div className={`rounded-xl border p-4 transition-shadow hover:shadow-sm ${
-                isDeleted
-                    ? "border-red-100 bg-red-50/30 dark:border-red-900/20 dark:bg-red-900/5"
-                    : "border-gray-100 bg-white hover:border-gray-200 dark:border-white/[0.05] dark:bg-white/[0.02] dark:hover:border-white/[0.08]"
-            }`}>
+            <div
+                className={`rounded-xl border p-4 transition-all duration-200 hover:shadow-sm
+
+                ${
+                    isDeleted
+                        ? "border-red-100 bg-red-50/30 dark:border-red-900/20 dark:bg-red-900/5"
+                        : `
+                    bg-white dark:bg-white/[0.02]
+
+                    ${
+                            isSelected
+                                ? `
+                                border-brand-300
+                                shadow-md
+                                ring-2
+                                ring-brand-500/20
+
+                                dark:border-brand-500/40
+                                dark:ring-brand-500/30
+                                dark:shadow-black/20
+                              `
+                                : `
+                                border-gray-100
+                                hover:border-gray-200
+
+                                dark:border-white/[0.05]
+                                dark:hover:border-white/[0.08]
+                              `
+                        }
+                  `
+                }
+            `}
+            >
 
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-1 items-start gap-3">

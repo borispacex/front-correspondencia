@@ -1,4 +1,6 @@
 import { Document } from "../../types/documents/document.type.ts";
+import {FileIcon, FileInputIcon, FileTextIcon} from "../../../../icons";
+import {formatDateBo} from "../../../../utils/format.utils.ts";
 
 interface HistoryEvent {
     icon: "cart" | "card" | "mail";
@@ -176,19 +178,7 @@ const EmptyDocumentState = () => {
             <div className="flex flex-col items-center justify-center text-center">
 
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-                    <svg
-                        className="h-7 w-7 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={1.8}
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"
-                        />
-                    </svg>
+                    <FileIcon className="h-7 w-7 text-gray-400"/>
                 </div>
 
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -204,16 +194,50 @@ const EmptyDocumentState = () => {
     );
 };
 
+const EmptyHistoryState = () => {
+    return (
+        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 dark:border-white/[0.08] dark:bg-white/[0.03]">
+
+            <div className="flex flex-col items-center justify-center text-center">
+
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                    <FileInputIcon className="h-7 w-7 text-gray-400"/>
+                </div>
+
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Ningún documento seleccionado
+                </h3>
+
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Selecciona un documento de la tabla para visualizar sus rutas.
+                </p>
+            </div>
+        </div>
+    );
+};
+
+const selectedCardClasses = `
+    rounded-2xl border bg-white p-6
+    transition-all duration-300
+    border-brand-200
+    shadow-md
+    ring-1 ring-brand-500/10
+
+    dark:border-brand-500/20
+    dark:bg-white/[0.03]
+    dark:ring-brand-500/20
+    dark:shadow-black/20
+`;
+
 const DocumentInfoCard = ({
                               document,
                           }: {
     document: Document;
 }) => {
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03]">
-
+        <div className={selectedCardClasses}>
             <h2 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">
-                Documento #{document.id}
+                # <span className="text-medium">{document.id}</span>
             </h2>
 
             <div className="space-y-3">
@@ -235,8 +259,8 @@ const DocumentInfoCard = ({
                         value: document.doc_numero_cite ?? "-",
                     },
                     {
-                        label: "FECHA",
-                        value: document.doc_fecha_origen ?? "-",
+                        label: "FECHA ORIGEN DOC.",
+                        value: formatDateBo(document.doc_fecha_origen) ?? "-",
                     },
                     {
                         label: "REMITE",
@@ -257,6 +281,10 @@ const DocumentInfoCard = ({
                     {
                         label: "FOJAS",
                         value: document.doc_fojas ?? "-",
+                    },
+                    {
+                        label: "FECHA CREACION",
+                        value: formatDateBo(document.created_at) ?? "-",
                     },
                 ].map(({ label, value }, i) => (
                     <div
@@ -279,10 +307,9 @@ const DocumentInfoCard = ({
 
 const DocumentHistoryCard = () => {
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03]">
-
+        <div className={selectedCardClasses}>
             <h2 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">
-                Historial
+                Rutas
             </h2>
 
             <div className="relative">
@@ -360,6 +387,8 @@ export const DocumentShow = ({
 
             {isLoadingHistory ? (
                 <DocumentHistorySkeleton />
+            ) : !document ? (
+                <EmptyHistoryState />
             ) : (
                 <DocumentHistoryCard />
             )}

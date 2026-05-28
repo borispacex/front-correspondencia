@@ -287,6 +287,7 @@ export const DocumentPage = () => {
                     <DocumentTable
                         documents={filteredDocuments}
                         isLoading={isLoading}
+                        selectedDocumentId={selected?.id}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onToggleActive={handleToggleActive}
