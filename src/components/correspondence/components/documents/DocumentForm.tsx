@@ -345,6 +345,7 @@ export default function DocumentForm({
                     </Label>
                     <DatePicker
                         id="docFechaOrigen"
+                        picker="date"
                         value={values.docFechaOrigen}
                         onChange={(value) => setValue('docFechaOrigen', value)}
                         placeholder="Seleccione una fecha"

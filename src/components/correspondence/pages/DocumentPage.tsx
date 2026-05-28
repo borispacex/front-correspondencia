@@ -24,6 +24,7 @@ import {Modal} from "../../ui/modal";
 import DocumentForm from "../components/documents/DocumentForm.tsx";
 import {getDocuments} from "../services/document.service.ts";
 import {DocumentDashboard} from "../components/documents/DocumentDashboard.tsx";
+import RouterForm from "../components/router/RouterForm.tsx";
 
 export const DocumentPage = () => {
 
@@ -34,6 +35,7 @@ export const DocumentPage = () => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRouterModalOpen, setIsRouterModalOpen] = useState(false);
     const [selected, setSelected] = useState<Document | null>(null);
     const [confirmId, setConfirmId] = useState<number | null>(null);
 
@@ -56,8 +58,9 @@ export const DocumentPage = () => {
         );
     };
 
-    const handleDerive = (document: Document) => {
-        console.log("Derivar:", document);
+    const handleRouter = (document: Document) => {
+        setSelected(document);
+        setIsRouterModalOpen(true);
     };
 
     const handleViewHeader = (document: Document) => {
@@ -259,6 +262,10 @@ export const DocumentPage = () => {
         }
     }
 
+    async function handleSubmitRouter(data: any) {
+        console.log("derive", data);
+    }
+
     return (
         <>
             <PageMeta
@@ -302,7 +309,7 @@ export const DocumentPage = () => {
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onToggleActive={handleToggleActive}
-                        onDerive={handleDerive}
+                        onDerive={handleRouter}
                         onViewHeader={handleViewHeader}
                         onViewSheet={handleViewSheet}
                         onViewRoutes={handleViewRoutes}
@@ -330,6 +337,26 @@ export const DocumentPage = () => {
                     document={selected}
                     onSubmit={handleSubmit}
                     onCancel={() => setIsModalOpen(false)}
+                />
+            </Modal>
+
+            <Modal
+                isOpen={isRouterModalOpen}
+                size="lg"
+                onClose={() => setIsRouterModalOpen(false)}
+                className="w-full max-w-6xl p-6 sm:p-8"
+            >
+                <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+                    {selected ? "Editar Derivar Hoja de Tramite" : "Derivar Hoja de Tramite"}
+                </h3>
+                <p className="mb-5 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+                    Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+                </p>
+
+                <RouterForm
+                    document={selected}
+                    onSubmit={handleSubmitRouter}
+                    onCancel={() => setIsRouterModalOpen(false)}
                 />
             </Modal>
 

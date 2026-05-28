@@ -11,6 +11,13 @@ export async function getUsers(params?: ApiQueryParams): Promise<User[]> {
   return data.data;
 }
 
+export async function getUsersByDepartment( deparment_id?: number): Promise<User[]> {
+  const { data } = await http.get<ApiResponse<User[]>>(API_ENDPOINTS.USERS.BASE, {
+    params: buildQueryParams({}) ,
+  });
+  return data.data;
+}
+
 export async function getUserById(id: number, params?: ApiQueryParams): Promise<User> {
   const { data } = await http.get<ApiResponse<User>>(API_ENDPOINTS.USERS.BY_ID(id), {
     params: params ? buildQueryParams(params) : undefined,

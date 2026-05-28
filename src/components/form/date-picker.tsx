@@ -8,7 +8,10 @@ import "flatpickr/dist/flatpickr.css";
 
 import Label from "./Label";
 
-import { CalenderIcon } from "../../icons";
+import {
+    CalenderIcon,
+    TimeIcon,
+} from "../../icons";
 
 interface DatePickerProps {
     id: string;
@@ -31,11 +34,16 @@ interface DatePickerProps {
 
     hint?: string;
 
-    mode?: "single" | "multiple" | "range" | "time";
-
     className?: string;
 
-    enableTime?: boolean;
+    /*
+     * date      -> solo fecha
+     * datetime  -> fecha + hora
+     * time      -> solo hora
+     */
+    picker?: "date" | "datetime" | "time";
+
+    mode?: "single" | "multiple" | "range";
 }
 
 export default function DatePicker({
@@ -49,9 +57,9 @@ export default function DatePicker({
                                        required = false,
                                        error = false,
                                        hint = "",
-                                       mode = "single",
                                        className = "",
-                                       enableTime = true,
+                                       picker = "datetime",
+                                       mode = "single",
                                    }: DatePickerProps) {
 
     const inputRef =
@@ -59,6 +67,18 @@ export default function DatePicker({
 
     const flatpickrRef =
         useRef<flatpickr.Instance | null>(null);
+
+    /*
+     * Helpers
+     */
+    const isDateTime =
+        picker === "datetime";
+
+    const isTimeOnly =
+        picker === "time";
+
+    const enableTime =
+        isDateTime || isTimeOnly;
 
     useEffect(() => {
 
@@ -77,31 +97,31 @@ export default function DatePicker({
 
                 enableTime,
 
-                enableSeconds: enableTime,
+                noCalendar: isTimeOnly,
+
+                enableSeconds: false,
 
                 time_24hr: true,
 
                 /*
-                 * Valor REAL para backend y BD
-                 *
-                 * Ejemplo:
-                 * 2026-05-28 14:35:22
+                 * Backend / BD
                  */
-                dateFormat: enableTime
-                    ? "Y-m-d H:i:S"
-                    : "Y-m-d",
+                dateFormat: isTimeOnly
+                    ? "H:i"
+                    : isDateTime
+                        ? "Y-m-d H:i"
+                        : "Y-m-d",
 
                 /*
-                 * Visual para usuario
-                 *
-                 * Ejemplo:
-                 * 28/05/2026 14:35:22
+                 * UI Usuario
                  */
                 altInput: true,
 
-                altFormat: enableTime
-                    ? "d/m/Y H:i:S"
-                    : "d/m/Y",
+                altFormat: isTimeOnly
+                    ? "H:i"
+                    : isDateTime
+                        ? "d/m/Y H:i"
+                        : "d/m/Y",
 
                 altInputClass: `
                     h-11
@@ -112,7 +132,6 @@ export default function DatePicker({
                     rounded-lg
 
                     border
-                    transition-colors
 
                     bg-transparent
 
@@ -125,7 +144,8 @@ export default function DatePicker({
 
                     shadow-theme-xs
 
-                    transition
+                    transition-all
+                    duration-200
 
                     outline-none
 
@@ -143,6 +163,7 @@ export default function DatePicker({
                                 border-error-500
                                 focus:border-error-500
                                 focus:ring-error-500/20
+
                                 dark:border-error-500
                                 dark:focus:border-error-400
                               `
@@ -150,6 +171,7 @@ export default function DatePicker({
                                 border-gray-300
                                 focus:border-brand-300
                                 focus:ring-brand-500/20
+
                                 dark:border-gray-700
                                 dark:focus:border-brand-800
                               `
@@ -160,7 +182,9 @@ export default function DatePicker({
                         ? `
                                 cursor-not-allowed
                                 bg-gray-100
+
                                 dark:bg-gray-800
+
                                 opacity-60
                               `
                         : ""
@@ -180,10 +204,6 @@ export default function DatePicker({
                     dateStr
                 ) => {
 
-                    /*
-                     * Devuelve:
-                     * 2026-05-28 14:35:22
-                     */
                     onChange?.(dateStr);
                 },
 
@@ -194,7 +214,7 @@ export default function DatePicker({
                 ) => {
 
                     /*
-                     * Placeholder para altInput
+                     * Placeholder
                      */
                     if (instance.altInput) {
 
@@ -217,14 +237,16 @@ export default function DatePicker({
                         items-center
                         justify-between
                         gap-2
+
                         border-t
                         border-gray-200
-                        dark:border-gray-700
+                        dark:border-white/[0.08]
+
                         p-2
                     `;
 
                     /*
-                     * Botón limpiar
+                     * Limpiar
                      */
                     const clearButton =
                         document.createElement("button");
@@ -236,9 +258,10 @@ export default function DatePicker({
 
                     clearButton.className = `
                         rounded-md
+
                         border
                         border-gray-300
-                        dark:border-gray-600
+                        dark:border-white/[0.08]
 
                         px-3
                         py-1.5
@@ -252,7 +275,7 @@ export default function DatePicker({
                         transition-colors
 
                         hover:bg-gray-100
-                        dark:hover:bg-gray-800
+                        dark:hover:bg-white/[0.08]
                     `;
 
                     clearButton.addEventListener(
@@ -266,7 +289,7 @@ export default function DatePicker({
                     );
 
                     /*
-                     * Botón ahora
+                     * Ahora / Hoy
                      */
                     const nowButton =
                         document.createElement("button");
@@ -274,9 +297,11 @@ export default function DatePicker({
                     nowButton.type = "button";
 
                     nowButton.textContent =
-                        enableTime
+                        isTimeOnly
                             ? "Ahora"
-                            : "Hoy";
+                            : enableTime
+                                ? "Ahora"
+                                : "Hoy";
 
                     nowButton.className = `
                         rounded-md
@@ -288,6 +313,7 @@ export default function DatePicker({
 
                         text-xs
                         font-medium
+
                         text-white
 
                         transition-colors
@@ -361,9 +387,6 @@ export default function DatePicker({
         const input =
             flatpickrRef.current.altInput;
 
-        /*
-         * Clases error
-         */
         const errorClasses = [
             "border-error-500",
             "focus:border-error-500",
@@ -372,9 +395,6 @@ export default function DatePicker({
             "dark:focus:border-error-400",
         ];
 
-        /*
-         * Clases normales
-         */
         const normalClasses = [
             "border-gray-300",
             "focus:border-brand-300",
@@ -430,9 +450,7 @@ export default function DatePicker({
 
                 <input
                     ref={inputRef}
-
                     id={id}
-
                     className="hidden"
                 />
 
@@ -451,7 +469,11 @@ export default function DatePicker({
                         dark:text-gray-400
                     "
                 >
-                    <CalenderIcon className="size-5" />
+                    {isTimeOnly ? (
+                        <TimeIcon className="size-5" />
+                    ) : (
+                        <CalenderIcon className="size-5" />
+                    )}
                 </span>
 
             </div>
