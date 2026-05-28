@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 import PageMeta from "../../common/PageMeta.tsx";
 import PageBreadCrumb from "../../common/PageBreadCrumb.tsx";
@@ -18,18 +18,18 @@ import {
 } from "../types/documents/document.type.ts";
 
 import DocumentTable from "../components/documents/DocumentTable.tsx";
-import { DocumentShow } from "../components/documents/DocumentShow.tsx";
 import { DocumentFilter } from "../components/documents/DocumentFilter.tsx";
 import ModalDelete from "../../modal/ModalDelete.tsx";
 import {Modal} from "../../ui/modal";
 import DocumentForm from "../components/documents/DocumentForm.tsx";
 import {getDocuments} from "../services/document.service.ts";
+import {DocumentDashboard} from "../components/documents/DocumentDashboard.tsx";
 
 export const DocumentPage = () => {
 
     const { can } = usePermissions();
     const { addNotification } = useNotifications();
-
+    const documentRef = useRef<HTMLDivElement | null>(null);
 
     const [documents, setDocuments] = useState<Document[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -73,7 +73,18 @@ export const DocumentPage = () => {
     };
 
     const handleView = (document: Document) => {
-        setSelected(document);
+        setSelected((prev) => {
+            const next = prev?.id === document.id ? null : document;
+            if (next) {
+                setTimeout(() => {
+                    documentRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    });
+                }, 50);
+            }
+            return next;
+        });
     };
 
     const [filters, setFilters] = useState<DocumentFilters>({
@@ -283,7 +294,7 @@ export const DocumentPage = () => {
 
                 </div>
                 {/* Content */}
-                <div className="grid grid-cols-1 gap-5 xl:grid-cols-[70%_30%]">
+                <div className="grid grid-cols-1 gap-5 xl:grid-cols-[75%_25%]">
                     <DocumentTable
                         documents={filteredDocuments}
                         isLoading={isLoading}
@@ -297,7 +308,7 @@ export const DocumentPage = () => {
                         onViewRoutes={handleViewRoutes}
                         onView={handleView}
                     />
-                    <DocumentShow document={selected} />
+                    <DocumentDashboard documents={documents} isLoading={isLoading} />
                 </div>
 
             </div>

@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { usePermissions } from "../../../../hooks/usePermissions.ts";
 import {
     ArchiveRestoreIcon, BadgeIcon,
     ChevronLeftIcon, ChevronRightIcon,
     ChevronsLeftIcon, ChevronsRightIcon,
-    CopyIcon, EyeIcon, FileIcon, FileInputIcon,
+    CopyIcon, EyeCloseIcon, EyeIcon, FileIcon, FileInputIcon,
     FileTextIcon, PencilIcon, RouteIcon,
     SendHorizontalIcon, TrashBinIcon,
 } from "../../../../icons";
@@ -12,6 +12,7 @@ import Tooltip from "../../../form/Tooltip.tsx";
 import Button from "../../../ui/button/Button.tsx";
 import { formatDateBo } from "../../../../utils/format.utils.ts";
 import { Document } from "../../types/documents/document.type.ts";
+import {DocumentShow} from "./DocumentShow.tsx";
 
 // ── Priority config ────────────────────────────────────────────────────────────
 const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
@@ -107,8 +108,6 @@ export default function DocumentTable({
     const [page, setPage]       = useState(1);
     const [perPage, setPerPage] = useState(10);
 
-    // ── Filtrado (viene desde DocumentFilter via props, ya filtrado) ───────────
-    // El filtrado se hace en DocumentPage, aquí solo paginamos
     const total      = documents.length;
     const totalPages = Math.max(1, Math.ceil(total / perPage));
     const safePage   = Math.min(page, totalPages);
@@ -177,7 +176,10 @@ export default function DocumentTable({
         return (
             <div
                 className={`rounded-xl border p-4 transition-all duration-200 hover:shadow-sm
-
+                ${isSelected
+                    ? `border-brand-300 ring-1 ring-brand-500/20 shadow-sm dark:border-brand-500/40 dark:ring-brand-500/30`
+                    : `border-gray-100 hover:border-gray-200 dark:border-white/[0.05] dark:hover:border-white/[0.08]`
+                }
                 ${
                     isDeleted
                         ? "border-red-100 bg-red-50/30 dark:border-red-900/20 dark:bg-red-900/5"
@@ -376,9 +378,15 @@ export default function DocumentTable({
                                     variant="icon"
                                     size="xs"
                                     onClick={() => onView(document)}
-                                    startIcon={<EyeIcon className="fill-gray-600 dark:fill-gray-300 size-3.5" />}
+                                    startIcon={
+                                        selectedDocumentId === document.id ? (
+                                            <EyeCloseIcon className="fill-white size-3.5" />
+                                        ) : (
+                                            <EyeIcon className="fill-gray-600 dark:fill-gray-300 size-3.5" />
+                                        )
+                                    }
                                 >
-                                    Ver
+                                    {selectedDocumentId === document.id  ? "Ocultar" : "Detalles"}
                                 </Button>
                             </Tooltip>
                         )}
@@ -430,11 +438,14 @@ export default function DocumentTable({
                     </div>
                 ) : (
                     paged.map((document) => (
-                        <div
-                            key={document.id}
-                            className={`transition-opacity duration-200 ${isLoading ? "pointer-events-none opacity-50" : ""}`}
+                        <div key={document.id} className={`transition-opacity duration-200 ${isLoading ? "pointer-events-none opacity-50": ""}`}
                         >
                             <DocumentCard document={document} />
+                            {selectedDocumentId === document.id && (
+                                <div className="mt-3 transition-all duration-300 ease-in-out">
+                                    <DocumentShow document={document} isSelected />
+                                </div>
+                            )}
                         </div>
                     ))
                 )}

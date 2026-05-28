@@ -52,6 +52,7 @@ export const DocumentFilter = ({
     };
 
     const clearFilters = () => {
+        console.log('limpiar')
         onFiltersChange({
             nro:      "",
             origin:   "",
