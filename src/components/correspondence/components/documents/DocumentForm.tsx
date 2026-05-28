@@ -81,39 +81,25 @@ export default function DocumentForm({
     const [loadingCatalogs, setLoadingCatalogs] = useState(false);
 
     const [docProcedencia, setDocProcedencia] = useState<"I" | "E">("I");
-    // const [docFechaOrigen, setDocFechaOrigen] = useState("");
-    const [createdDate, setCreatedDate] = useState(() =>
-                new Date()
-                    .toISOString()
-                    .split("T")[0]
-        );
+    const [createdDate, setCreatedDate] = useState("");
 
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     function resetForm() {
         setDocProcedencia("I");
-
         setValue('selectedProcedureType', "");
         setValue('selectedPriority', "");
         setValue('selectedDepartment', "");
         setValue('selectedTypeDocument', "");
-
         setValue('docFechaOrigen', "");
-
-        setCreatedDate(
-            new Date()
-                .toISOString()
-                .split("T")[0]
-        );
-
+        setCreatedDate(new Date().toISOString());
         setValue('docCite',"");
         setValue('docNumeroCite', "");
         setValue('docRemite', "");
         setValue('docReferencia', "");
         setValue('docAnexos',"");
         setValue('docFojas', "");
-
         setValue('file', null);
     }
 
@@ -182,7 +168,8 @@ export default function DocumentForm({
             return;
         }
         setDocProcedencia(document.doc_procedencia ?? "I");
-        setValue('docFechaOrigen', document.doc_fecha_origen ?? "");
+        setValue('docFechaOrigen', (document.doc_fecha_origen) ?? "");
+        setCreatedDate(document.created_at ?? "")
         setValue('docCite', document.doc_cite ?? "");
         setValue('docNumeroCite', document.doc_numero_cite ?? "");
         setValue('docRemite', document.doc_remite ?? "");
@@ -274,7 +261,7 @@ export default function DocumentForm({
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
                 <Label>
                     Origen Documento {' '}
@@ -383,11 +370,11 @@ export default function DocumentForm({
                             <InfoIcon className="size-4 text-gray-400 cursor-pointer" />
                         </Tooltip>
                     </Label>
-                    <InputField
-                        type="date"
+                    <DatePicker
+                        id="createdDate"
                         value={createdDate}
                         disabled
-                        onChange={() => {}}
+                        required={false}
                     />
                 </div>
             </div>

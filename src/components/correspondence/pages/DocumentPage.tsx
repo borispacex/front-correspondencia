@@ -72,6 +72,10 @@ export const DocumentPage = () => {
         console.log("Rutas:", document);
     };
 
+    const handleView = (document: Document) => {
+        setSelected(document);
+    };
+
     const [filters, setFilters] = useState<DocumentFilters>({
         nro: "",
         old: "",
@@ -278,10 +282,8 @@ export const DocumentPage = () => {
                     )}
 
                 </div>
-
                 {/* Content */}
-                <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_300px]">
-
+                <div className="grid grid-cols-1 gap-5 xl:grid-cols-[70%_30%]">
                     <DocumentTable
                         documents={filteredDocuments}
                         isLoading={isLoading}
@@ -292,9 +294,9 @@ export const DocumentPage = () => {
                         onViewHeader={handleViewHeader}
                         onViewSheet={handleViewSheet}
                         onViewRoutes={handleViewRoutes}
+                        onView={handleView}
                     />
-                    <DocumentShow />
-
+                    <DocumentShow document={selected} />
                 </div>
 
             </div>

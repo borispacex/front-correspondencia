@@ -75,13 +75,14 @@ function DeletedBanner({ onRestore, canRestore }: { onRestore: () => void; canRe
 interface DocumentTableProps {
     documents: Document[];
     isLoading?: boolean;
+    onToggleActive: (item: Document, active: boolean) => void;
+    onViewHeader?: (document: Document) => void;
+    onViewRoutes?: (document: Document) => void;
+    onDerive?: (document: Document) => void;
+    onViewSheet?: (document: Document) => void;
+    onView?: (document: Document) => void;
     onEdit: (document: Document) => void;
     onDelete: (id: number) => void;
-    onToggleActive: (item: Document, active: boolean) => void;
-    onDerive?: (document: Document) => void;
-    onViewHeader?: (document: Document) => void;
-    onViewSheet?: (document: Document) => void;
-    onViewRoutes?: (document: Document) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -96,6 +97,7 @@ export default function DocumentTable({
                                           onViewHeader,
                                           onViewSheet,
                                           onViewRoutes,
+                                          onView,
                                       }: DocumentTableProps) {
     const { can } = usePermissions();
 
@@ -137,11 +139,12 @@ export default function DocumentTable({
                         <div className="h-3 w-48 rounded bg-gray-200 dark:bg-gray-700" />
                         <div className="h-3 w-72 rounded bg-gray-200 dark:bg-gray-700" />
                         <div className="h-3 w-56 rounded bg-gray-200 dark:bg-gray-700" />
+                        <div className="h-3 w-220 rounded bg-gray-200 dark:bg-gray-700" />
                     </div>
                     <div className="h-3 w-28 rounded bg-gray-200 dark:bg-gray-700" />
                 </div>
                 <div className="mt-3 flex gap-2">
-                    {[...Array(4)].map((_, i) => (
+                    {[...Array(6)].map((_, i) => (
                         <div key={i} className="h-7 w-24 rounded-md bg-gray-200 dark:bg-gray-700" />
                     ))}
                 </div>
@@ -341,7 +344,7 @@ export default function DocumentTable({
                                 <Button
                                     variant="icon"
                                     size="xs"
-                                    onClick={() => onEdit(document)}
+                                    onClick={() => onView(document)}
                                     startIcon={<EyeIcon className="fill-gray-600 dark:fill-gray-300 size-3.5" />}
                                 >
                                     Ver
