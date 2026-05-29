@@ -1,4 +1,4 @@
-import type { PermissionGroup } from "../../types/admin/permissions/permission.types";
+import type { PermissionGroup } from '../../types/admin/permissions/permission.types';
 
 interface PermissionCheckboxGroupProps {
   groups: PermissionGroup[];
@@ -6,11 +6,7 @@ interface PermissionCheckboxGroupProps {
   onChange: (ids: number[]) => void;
 }
 
-export default function PermissionCheckboxGroup({
-  groups,
-  selected,
-  onChange,
-}: PermissionCheckboxGroupProps) {
+export default function PermissionCheckboxGroup({ groups, selected, onChange }: PermissionCheckboxGroupProps) {
   function toggle(id: number) {
     if (selected.includes(id)) {
       onChange(selected.filter((s) => s !== id));
@@ -41,7 +37,7 @@ export default function PermissionCheckboxGroup({
 
         return (
           <div key={group.group} className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-            <label className="flex items-center gap-2 mb-3 cursor-pointer">
+            <label className="mb-3 flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
                 checked={allChecked}
@@ -51,22 +47,18 @@ export default function PermissionCheckboxGroup({
                 onChange={() => toggleGroup(groupIds)}
                 className="rounded border-gray-300"
               />
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                {group.group}
-              </span>
+              <span className="text-sm font-semibold text-gray-700 uppercase dark:text-gray-300">{group.group}</span>
             </label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {group.permissions.map((perm) => (
-                <label key={perm.id} className="flex items-center gap-2 cursor-pointer">
+                <label key={perm.id} className="flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     checked={selected.includes(perm.id)}
                     onChange={() => toggle(perm.id)}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {perm.name}
-                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{perm.name}</span>
                 </label>
               ))}
             </div>

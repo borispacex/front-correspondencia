@@ -1,9 +1,9 @@
-import {Outlet} from "react-router";
+import { Outlet } from 'react-router';
 
 export const CorrespondenceLayout = () => {
-    return(
-        <div>
-            <Outlet />
-        </div>
-    )
-}
+  return (
+    <div>
+      <Outlet />
+    </div>
+  );
+};

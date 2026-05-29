@@ -1,4 +1,4 @@
-import type React from "react";
+import type React from 'react';
 
 interface CheckboxProps {
   label?: string;
@@ -7,7 +7,7 @@ interface CheckboxProps {
   id?: string;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -15,35 +15,32 @@ const Checkbox: React.FC<CheckboxProps> = ({
   checked,
   id,
   onChange,
-  className = "",
+  className = '',
   disabled = false,
-  size = "md",
+  size = 'md',
 }) => {
   const sizeMap = {
-    sm: { box: "w-4 h-4", icon: "w-3 h-3", },
-    md: { box: "w-5 h-5", icon: "w-3.5 h-3.5", },
-    lg: { box: "w-10 h-10", icon: "w-6 h-6", },
+    sm: { box: 'w-4 h-4', icon: 'w-3 h-3' },
+    md: { box: 'w-5 h-5', icon: 'w-3.5 h-3.5' },
+    lg: { box: 'w-10 h-10', icon: 'w-6 h-6' },
   };
   const currentSize = sizeMap[size];
   return (
     <label
-      className={`flex items-center space-x-3 group cursor-pointer ${
-        disabled ? "cursor-not-allowed opacity-60" : ""
-      }`}
+      className={`group flex cursor-pointer items-center space-x-3 ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
     >
       <div className={`relative ${currentSize.box}`}>
         <input
           id={id}
           type="checkbox"
-          className={`appearance-none cursor-pointer border border-gray-300 rounded-md checked:bg-brand-500 checked:border-transparent dark:border-gray-700 disabled:opacity-60 
-          ${currentSize.box} ${className}`}
+          className={`checked:bg-brand-500 cursor-pointer appearance-none rounded-md border border-gray-300 checked:border-transparent disabled:opacity-60 dark:border-gray-700 ${currentSize.box} ${className}`}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
           disabled={disabled}
         />
         {checked && (
           <svg
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none ${currentSize.icon}`}
+            className={`pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${currentSize.icon}`}
             viewBox="0 0 14 14"
             fill="none"
           >
@@ -58,7 +55,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
         )}
         {disabled && (
           <svg
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none ${currentSize.icon}`}
+            className={`pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${currentSize.icon}`}
             viewBox="0 0 14 14"
             fill="none"
           >
@@ -72,11 +69,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
           </svg>
         )}
       </div>
-      {label && (
-        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-          {label}
-        </span>
-      )}
+      {label && <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</span>}
     </label>
   );
 };

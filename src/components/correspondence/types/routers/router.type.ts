@@ -1,57 +1,56 @@
-import {Document} from "../documents/document.type.ts";
-
+import { Document } from '../documents/document.type.ts';
 
 export interface Router {
-    id: number;
+  id: number;
 
-    document_id: number;
+  document_id: number;
 
-    department_id_origen: number;
-    department_id_destino: number;
+  department_id_origen: number;
+  department_id_destino: number;
 
-    user_id_origen: number;
-    user_id_destino?: number;
+  user_id_origen: number;
+  user_id_destino?: number;
 
-    priority_id: number;
-    type_document_id: number;
-    state_document_id: number;
+  priority_id: number;
+  type_document_id: number;
+  state_document_id: number;
 
-    procedure_id?: number;
+  procedure_id?: number;
 
-    provided_id?: string;
+  provided_id?: string;
 
-    rout_aclaracion_proveido?: string;
-    rout_observacion?: string;
+  rout_aclaracion_proveido?: string;
+  rout_observacion?: string;
 
-    rout_cite_document: string;
-    rout_numero_cite?: string;
+  rout_cite_document: string;
+  rout_numero_cite?: string;
 
-    rout_remite_document: string;
-    rout_referencia_document: string;
+  rout_remite_document: string;
+  rout_referencia_document: string;
 
-    rout_anexos_document?: string;
-    rout_fojas_document?: number;
+  rout_anexos_document?: string;
+  rout_fojas_document?: number;
 
-    rout_url_document?: string;
+  rout_url_document?: string;
 
-    created_at: string;
-    updated_at: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateRouterRequest {
-    document_id: number;
+  document_id: number;
 
-    department_id_destino: number;
+  department_id_destino: number;
 
-    user_id_destino?: number;
+  user_id_destino?: number;
 
-    procedure_id?: number;
+  procedure_id?: number;
 
-    state_document_id: number;
+  state_document_id: number;
 
-    provided_ids: string[];
+  provided_ids: string[];
 
-    rout_aclaracion_proveido?: string;
+  rout_aclaracion_proveido?: string;
 
-    rout_observacion?: string;
+  rout_observacion?: string;
 }

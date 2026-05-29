@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface TextareaProps {
   id?: string;
@@ -26,33 +26,30 @@ interface TextareaProps {
 }
 
 const TextArea: React.FC<TextareaProps> = ({
-                                             id,
-                                             name,
+  id,
+  name,
 
-                                             placeholder = "Ingrese un texto",
+  placeholder = 'Ingrese un texto',
 
-                                             rows = 3,
+  rows = 3,
 
-                                             value = "",
+  value = '',
 
-                                             onChange,
+  onChange,
 
-                                             className = "",
+  className = '',
 
-                                             disabled = false,
+  disabled = false,
 
-                                             error = false,
+  error = false,
 
-                                             hint = "",
+  hint = '',
 
-                                             required = false,
+  required = false,
 
-                                             maxLength,
-                                           }) => {
-
-  const handleChange = (
-      e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  maxLength,
+}) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(e.target.value);
   };
 
@@ -74,7 +71,6 @@ const TextArea: React.FC<TextareaProps> = ({
     `;
 
   if (disabled) {
-
     textareaClasses += `
             cursor-not-allowed
 
@@ -89,9 +85,7 @@ const TextArea: React.FC<TextareaProps> = ({
             dark:bg-gray-800
             dark:text-gray-400
         `;
-
   } else if (error) {
-
     textareaClasses += `
             border-error-500
 
@@ -108,9 +102,7 @@ const TextArea: React.FC<TextareaProps> = ({
             dark:text-white/90
             dark:focus:border-error-400
         `;
-
   } else {
-
     textareaClasses += `
             border-gray-300
 
@@ -130,44 +122,24 @@ const TextArea: React.FC<TextareaProps> = ({
   }
 
   return (
-      <div className="relative">
+    <div className="relative">
+      <textarea
+        id={id}
+        name={name}
+        rows={rows}
+        value={value}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+        maxLength={maxLength}
+        onChange={handleChange}
+        className={textareaClasses}
+      />
 
-            <textarea
-                id={id}
-                name={name}
-
-                rows={rows}
-
-                value={value}
-
-                placeholder={placeholder}
-
-                disabled={disabled}
-
-                required={required}
-
-                maxLength={maxLength}
-
-                onChange={handleChange}
-
-                className={textareaClasses}
-            />
-
-        {hint && (
-
-            <p
-                className={`mt-2 text-sm ${
-                    error
-                        ? "text-error-500"
-                        : "text-gray-500 dark:text-gray-400"
-                }`}
-            >
-              {hint}
-            </p>
-
-        )}
-
-      </div>
+      {hint && (
+        <p className={`mt-2 text-sm ${error ? 'text-error-500' : 'text-gray-500 dark:text-gray-400'}`}>{hint}</p>
+      )}
+    </div>
   );
 };
 

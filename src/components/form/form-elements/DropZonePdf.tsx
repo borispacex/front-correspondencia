@@ -1,237 +1,175 @@
-import { useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import Button from "../../ui/button/Button.tsx";
-import {FileIcon, TrashBinIcon} from "../../../icons";
+import { useEffect, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import Button from '../../ui/button/Button.tsx';
+import { FileIcon, TrashBinIcon } from '../../../icons';
 
 interface DropZonePdfProps {
-    value?: File | null;
+  value?: File | null;
 
-    onChange: (file: File | null) => void;
+  onChange: (file: File | null) => void;
 
-    maxSizeMB?: number;
+  maxSizeMB?: number;
 
-    disabled?: boolean;
+  disabled?: boolean;
 
-    required?: boolean;
+  required?: boolean;
 
-    size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 
-    title?: string;
+  title?: string;
 
-    description?: string;
+  description?: string;
 
-    error?: boolean;
+  error?: boolean;
 
-    hint?: string;
+  hint?: string;
 }
 
 export default function DropZonePdf({
-                                        value,
-                                        onChange,
-                                        maxSizeMB = 10,
-                                        disabled = false,
-                                        required = false,
-                                        size = "md",
-                                        title = "Arrastra tu PDF aquí",
-                                        description = "Seleccione o arrastre un archivo PDF",
+  value,
+  onChange,
+  maxSizeMB = 10,
+  disabled = false,
+  required = false,
+  size = 'md',
+  title = 'Arrastra tu PDF aquí',
+  description = 'Seleccione o arrastre un archivo PDF',
 
-                                        error = false,
-                                        hint = "",
-                                    }: DropZonePdfProps) {
+  error = false,
+  hint = '',
+}: DropZonePdfProps) {
+  const [internalError, setInternalError] = useState<string | null>(null);
 
-    const [internalError, setInternalError] =
-        useState<string | null>(null);
+  const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
-    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  const sizeStyles = {
+    sm: {
+      container: 'p-3',
+      icon: 'h-10 w-10',
+      title: 'text-sm',
+      description: 'text-xs',
+    },
+    md: {
+      container: 'p-4',
+      icon: 'h-12 w-12',
+      title: 'text-base',
+      description: 'text-sm',
+    },
+    lg: {
+      container: 'p-6 lg:p-9',
+      icon: 'h-[68px] w-[68px]',
+      title: 'text-theme-xl',
+      description: 'text-sm',
+    },
+  };
 
-    const sizeStyles = {
-        sm: {
-            container: "p-3",
-            icon: "h-10 w-10",
-            title: "text-sm",
-            description: "text-xs",
-        },
-        md: {
-            container: "p-4",
-            icon: "h-12 w-12",
-            title: "text-base",
-            description: "text-sm",
-        },
-        lg: {
-            container: "p-6 lg:p-9",
-            icon: "h-[68px] w-[68px]",
-            title: "text-theme-xl",
-            description: "text-sm",
-        },
-    };
+  const styles = sizeStyles[size];
 
-    const styles = sizeStyles[size];
+  const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
+    multiple: false,
+    disabled,
+    maxFiles: 1,
+    maxSize: maxSizeBytes,
+    accept: {
+      'application/pdf': ['.pdf'],
+    },
 
-    const {
-        getRootProps,
-        getInputProps,
-        isDragActive,
-        fileRejections,
-    } = useDropzone({
-        multiple: false,
-        disabled,
-        maxFiles: 1,
-        maxSize: maxSizeBytes,
-        accept: {
-            "application/pdf": [".pdf"],
-        },
+    onDrop: (acceptedFiles) => {
+      setInternalError(null);
 
-        onDrop: (acceptedFiles) => {
-            setInternalError(null);
+      if (acceptedFiles.length > 0) {
+        onChange(acceptedFiles[0]);
+      }
+    },
+  });
 
-            if (acceptedFiles.length > 0) {
-                onChange(acceptedFiles[0]);
-            }
-        },
-    });
+  useEffect(() => {
+    if (fileRejections.length === 0) return;
 
-    useEffect(() => {
-        if (fileRejections.length === 0) return;
+    const firstError = fileRejections[0]?.errors?.[0];
+    if (!firstError) return;
 
-        const firstError = fileRejections[0]?.errors?.[0];
-        if (!firstError) return;
-
-        switch (firstError.code) {
-            case "file-invalid-type":
-                setInternalError("Solo se permiten archivos PDF");
-                break;
-            case "file-too-large":
-                setInternalError(`El archivo supera ${maxSizeMB}MB`);
-                break;
-            case "too-many-files":
-                setInternalError("Solo se permite un archivo");
-                break;
-            default:
-                setInternalError("Archivo no válido");
-        }
-    }, [fileRejections, maxSizeMB]);
-
-    function removeFile(e: React.MouseEvent<HTMLButtonElement>) {
-        e.stopPropagation();
-        onChange(null);
-        setInternalError(null);
+    switch (firstError.code) {
+      case 'file-invalid-type':
+        setInternalError('Solo se permiten archivos PDF');
+        break;
+      case 'file-too-large':
+        setInternalError(`El archivo supera ${maxSizeMB}MB`);
+        break;
+      case 'too-many-files':
+        setInternalError('Solo se permite un archivo');
+        break;
+      default:
+        setInternalError('Archivo no válido');
     }
+  }, [fileRejections, maxSizeMB]);
 
-    // 🔥 PRIORIDAD DE ERROR: externo > interno
-    const showError = error || !!internalError;
+  function removeFile(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    onChange(null);
+    setInternalError(null);
+  }
 
-    const message = hint || internalError;
+  // 🔥 PRIORIDAD DE ERROR: externo > interno
+  const showError = error || !!internalError;
 
-    return (
-        <div className="space-y-3">
+  const message = hint || internalError;
 
-            {/* DROPZONE */}
-            <div
-                {...getRootProps()}
-                className={`
-                    transition
-                    rounded-xl
-                    border
-                    border-dashed
-                    cursor-pointer
+  return (
+    <div className="space-y-3">
+      {/* DROPZONE */}
+      <div
+        {...getRootProps()}
+        className={`cursor-pointer rounded-xl border border-dashed transition ${styles.container} ${
+          isDragActive
+            ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10'
+            : 'border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900'
+        } ${disabled ? 'cursor-not-allowed opacity-50' : 'hover:border-brand-500'} ${
+          showError ? 'border-error-500' : ''
+        } `}
+      >
+        <input {...getInputProps()} />
 
-                    ${styles.container}
+        <div className="flex flex-col items-center text-center">
+          <div
+            className={`mb-2 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400 ${styles.icon} `}
+          >
+            <FileIcon className="fill-current" width="28" height="28" />
+          </div>
 
-                    ${
-                    isDragActive
-                        ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10"
-                        : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
-                }
+          <h4 className={`mb-1 font-semibold text-gray-800 dark:text-white/90 ${styles.title}`}>
+            {isDragActive ? 'Suelte el PDF aquí' : title}
+          </h4>
 
-                    ${
-                    disabled
-                        ? "cursor-not-allowed opacity-50"
-                        : "hover:border-brand-500"
-                }
+          <p className={`mb-2 max-w-[320px] text-gray-600 dark:text-gray-400 ${styles.description}`}>{description}</p>
 
-                    ${
-                    showError
-                        ? "border-error-500"
-                        : ""
-                }
-                `}
-            >
-                <input {...getInputProps()} />
-
-                <div className="flex flex-col items-center text-center">
-
-                    <div
-                        className={`
-                            mb-2
-                            flex
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-gray-200
-                            text-gray-700
-                            dark:bg-gray-800
-                            dark:text-gray-400
-                            ${styles.icon}
-                        `}
-                    >
-                        <FileIcon className="fill-current" width="28" height="28"/>
-                    </div>
-
-                    <h4 className={`mb-1 font-semibold text-gray-800 dark:text-white/90 ${styles.title}`}>
-                        {isDragActive ? "Suelte el PDF aquí" : title}
-                    </h4>
-
-                    <p className={`mb-2 max-w-[320px] text-gray-600 dark:text-gray-400 ${styles.description}`}>
-                        {description}
-                    </p>
-
-                    <p className="mb-4 text-xs text-gray-500 dark:text-gray-500">
-                        PDF • Máximo {maxSizeMB}MB
-                        {required && (
-                            <span className="ml-1 text-error-500">
-                                • Obligatorio
-                            </span>
-                        )}
-                    </p>
-
-                </div>
-            </div>
-
-            {/* ERROR / HINT */}
-            {message && (
-                <p className={`text-sm ${
-                    showError
-                        ? "text-error-500"
-                        : "text-gray-500 dark:text-gray-400"
-                }`}>
-                    {message}
-                </p>
-            )}
-
-            {/* FILE */}
-            {value && (
-                <div className={`flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-white px-4 py-3  dark:bg-gray-900`}>
-
-                    <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
-                            {value.name}
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                            {(value.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                    </div>
-                    <Button
-                        type="button"
-                        disabled={disabled}
-                        onClick={removeFile}
-                        variant="danger"
-                        size="sm"
-                    >
-                        <TrashBinIcon className="text-sm disabled:opacity-50" />
-                    </Button>
-                </div>
-            )}
+          <p className="mb-4 text-xs text-gray-500 dark:text-gray-500">
+            PDF • Máximo {maxSizeMB}MB
+            {required && <span className="text-error-500 ml-1">• Obligatorio</span>}
+          </p>
         </div>
-    );
+      </div>
+
+      {/* ERROR / HINT */}
+      {message && (
+        <p className={`text-sm ${showError ? 'text-error-500' : 'text-gray-500 dark:text-gray-400'}`}>{message}</p>
+      )}
+
+      {/* FILE */}
+      {value && (
+        <div
+          className={`flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900`}
+        >
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">{value.name}</p>
+
+            <p className="text-xs text-gray-500">{(value.size / 1024 / 1024).toFixed(2)} MB</p>
+          </div>
+          <Button type="button" disabled={disabled} onClick={removeFile} variant="danger" size="sm">
+            <TrashBinIcon className="text-sm disabled:opacity-50" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }

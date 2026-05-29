@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router";
-import {ROUTES} from "../constants/routes.constants.ts";
+import { useNavigate } from 'react-router';
+import { ROUTES } from '../constants/routes.constants.ts';
 
 const useGoBack = () => {
   const navigate = useNavigate();

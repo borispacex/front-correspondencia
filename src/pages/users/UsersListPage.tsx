@@ -1,30 +1,21 @@
-import { useState, useEffect, useCallback } from "react";
-import PageBreadCrumb from "../../components/common/PageBreadCrumb";
-import PageMeta from "../../components/common/PageMeta";
-import { Modal } from "../../components/ui/modal";
-import UserTable from "../../components/users/UserTable";
-import UserForm from "../../components/users/UserForm";
-import { PlusIcon } from "../../icons";
+import { useState, useEffect, useCallback } from 'react';
+import PageBreadCrumb from '../../components/common/PageBreadCrumb';
+import PageMeta from '../../components/common/PageMeta';
+import { Modal } from '../../components/ui/modal';
+import UserTable from '../../components/users/UserTable';
+import UserForm from '../../components/users/UserForm';
+import { PlusIcon } from '../../icons';
 
-import {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-} from "../../services/admin/users.service.ts";
+import { getUsers, createUser, updateUser, deleteUser } from '../../services/admin/users.service.ts';
 
-import type {
-  User,
-  CreateUserRequest,
-  UpdateUserRequest,
-} from "../../types/admin/users/user.types";
+import type { User, CreateUserRequest, UpdateUserRequest } from '../../types/admin/users/user.types';
 
-import { usePermissions } from "../../hooks/usePermissions";
-import { useNotifications } from "../../hooks/useNotification";
+import { usePermissions } from '../../hooks/usePermissions';
+import { useNotifications } from '../../hooks/useNotification';
 
-import Button from "../../components/ui/button/Button.tsx";
-import ModalDelete from "../../components/modal/ModalDelete.tsx";
-import ModalStatus from "../../components/modal/ModalStatus.tsx";
+import Button from '../../components/ui/button/Button.tsx';
+import ModalDelete from '../../components/modal/ModalDelete.tsx';
+import ModalStatus from '../../components/modal/ModalStatus.tsx';
 
 export default function UsersListPage() {
   const { can } = usePermissions();
@@ -76,20 +67,18 @@ export default function UsersListPage() {
       await deleteUser(confirmId);
 
       addNotification({
-        type: "success",
-        title: "Usuario eliminado",
-        message: "El usuario fue eliminado correctamente.",
+        type: 'success',
+        title: 'Usuario eliminado',
+        message: 'El usuario fue eliminado correctamente.',
       });
 
       setConfirmId(null);
       fetchUsers();
     } catch (err: any) {
       addNotification({
-        type: "error",
-        title: "Error",
-        message:
-            err?.response?.data?.message ??
-            "Error al eliminar el usuario",
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al eliminar el usuario',
       });
     }
   }
@@ -100,16 +89,16 @@ export default function UsersListPage() {
         await updateUser(selected.id, data as UpdateUserRequest);
 
         addNotification({
-          type: "info",
-          title: "Usuario actualizado",
+          type: 'info',
+          title: 'Usuario actualizado',
           message: `El usuario "${data.name}" fue actualizado correctamente.`,
         });
       } else {
         await createUser(data as CreateUserRequest);
 
         addNotification({
-          type: "success",
-          title: "Usuario creado",
+          type: 'success',
+          title: 'Usuario creado',
           message: `El usuario "${data.name}" fue creado correctamente.`,
         });
       }
@@ -118,11 +107,9 @@ export default function UsersListPage() {
       fetchUsers();
     } catch (err: any) {
       addNotification({
-        type: "error",
-        title: "Error",
-        message:
-            err?.response?.data?.message ??
-            "Error al guardar el usuario",
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al guardar el usuario',
       });
     }
   }
@@ -144,11 +131,9 @@ export default function UsersListPage() {
       });
 
       addNotification({
-        type: "success",
-        title: "Estado actualizado",
-        message: `El usuario fue ${
-            nextStatus ? "activado" : "desactivado"
-        } correctamente.`,
+        type: 'success',
+        title: 'Estado actualizado',
+        message: `El usuario fue ${nextStatus ? 'activado' : 'desactivado'} correctamente.`,
       });
 
       setOpenStatusModal(false);
@@ -156,11 +141,9 @@ export default function UsersListPage() {
       fetchUsers();
     } catch (err: any) {
       addNotification({
-        type: "error",
-        title: "Error",
-        message:
-            err?.response?.data?.message ??
-            "Error al cambiar el estado del usuario",
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al cambiar el estado del usuario',
       });
     } finally {
       setLoadingStatus(false);
@@ -168,72 +151,58 @@ export default function UsersListPage() {
   }
 
   return (
-      <>
-        <PageMeta title="Usuarios" description="Gestión de usuarios del sistema" />
-        <PageBreadCrumb pageTitle="Usuarios" />
+    <>
+      <PageMeta title="Usuarios" description="Gestión de usuarios del sistema" />
+      <PageBreadCrumb pageTitle="Usuarios" />
 
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Lista de Usuarios
-            </h2>
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">Lista de Usuarios</h2>
 
-            {can("users.create") && (
-                <Button
-                    size="sm"
-                    onClick={handleCreate}
-                    startIcon={<PlusIcon className="size-4 text-white" />}
-                >
-                  Nuevo Usuario
-                </Button>
-            )}
-          </div>
-
-          <UserTable
-              users={users}
-              isLoading={isLoading}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggleActive={handleToggleActive}
-          />
+          {can('users.create') && (
+            <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
+              Nuevo Usuario
+            </Button>
+          )}
         </div>
 
-        <Modal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            className="max-w-md p-6 sm:p-8"
-        >
-          <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
-            {selected ? "Editar Usuario" : "Nuevo Usuario"}
-          </h3>
-          <p className="mb-5 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-            Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
-          </p>
-          <UserForm
-              user={selected}
-              onSubmit={handleSubmit}
-              onCancel={() => setIsModalOpen(false)}
-          />
-        </Modal>
-
-        <ModalStatus
-            isOpen={openStatusModal}
-            active={nextStatus}
-            onClose={() => {
-              setOpenStatusModal(false);
-              setSelectedStatusItem(null);
-            }}
-            onConfirm={handleChangeStatus}
-            loading={loadingStatus}
+        <UserTable
+          users={users}
+          isLoading={isLoading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleActive={handleToggleActive}
         />
+      </div>
 
-        <ModalDelete
-            isOpen={confirmId !== null}
-            onClose={() => setConfirmId(null)}
-            onConfirm={handleConfirmDelete}
-            title="¿Eliminar este usuario?"
-            message="Esta acción no se puede deshacer."
-        />
-      </>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} className="max-w-md p-6 sm:p-8">
+        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+          {selected ? 'Editar Usuario' : 'Nuevo Usuario'}
+        </h3>
+        <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
+          Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+        </p>
+        <UserForm user={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
+      </Modal>
+
+      <ModalStatus
+        isOpen={openStatusModal}
+        active={nextStatus}
+        onClose={() => {
+          setOpenStatusModal(false);
+          setSelectedStatusItem(null);
+        }}
+        onConfirm={handleChangeStatus}
+        loading={loadingStatus}
+      />
+
+      <ModalDelete
+        isOpen={confirmId !== null}
+        onClose={() => setConfirmId(null)}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar este usuario?"
+        message="Esta acción no se puede deshacer."
+      />
+    </>
   );
 }

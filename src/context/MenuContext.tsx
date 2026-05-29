@@ -1,7 +1,7 @@
-import { createContext, useState, useCallback, useEffect, type ReactNode } from "react";
-import { getMenuItems } from "../services/admin/menu-items.service.ts";
-import type { MenuItem } from "../types/admin/menu-items/menu-item.types";
-import { useAuth } from "../hooks/auth/useAuth";
+import { createContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { getMenuItems } from '../services/admin/menu-items.service.ts';
+import type { MenuItem } from '../types/admin/menu-items/menu-item.types';
+import { useAuth } from '../hooks/auth/useAuth';
 
 interface MenuContextValue {
   menuItems: MenuItem[];
@@ -38,9 +38,5 @@ export function MenuProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, refreshMenu]);
 
-  return (
-    <MenuContext.Provider value={{ menuItems, isLoading, refreshMenu }}>
-      {children}
-    </MenuContext.Provider>
-  );
+  return <MenuContext.Provider value={{ menuItems, isLoading, refreshMenu }}>{children}</MenuContext.Provider>;
 }

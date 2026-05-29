@@ -1,129 +1,109 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import flatpickr from "flatpickr";
+import flatpickr from 'flatpickr';
 
-import { Spanish } from "flatpickr/dist/l10n/es.js";
+import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
-import "flatpickr/dist/flatpickr.css";
+import 'flatpickr/dist/flatpickr.css';
 
-import Label from "./Label";
+import Label from './Label';
 
-import {
-    CalenderIcon,
-    TimeIcon,
-} from "../../icons";
+import { CalenderIcon, TimeIcon } from '../../icons';
 
 interface DatePickerProps {
-    id: string;
+  id: string;
 
-    label?: string;
+  label?: string;
 
-    placeholder?: string;
+  placeholder?: string;
 
-    value?: string;
+  value?: string;
 
-    onChange?: (date: string) => void;
+  onChange?: (date: string) => void;
 
-    disabled?: boolean;
+  disabled?: boolean;
 
-    readOnly?: boolean;
+  readOnly?: boolean;
 
-    required?: boolean;
+  required?: boolean;
 
-    error?: boolean;
+  error?: boolean;
 
-    hint?: string;
+  hint?: string;
 
-    className?: string;
+  className?: string;
 
-    /*
-     * date      -> solo fecha
-     * datetime  -> fecha + hora
-     * time      -> solo hora
-     */
-    picker?: "date" | "datetime" | "time";
+  /*
+   * date      -> solo fecha
+   * datetime  -> fecha + hora
+   * time      -> solo hora
+   */
+  picker?: 'date' | 'datetime' | 'time';
 
-    mode?: "single" | "multiple" | "range";
+  mode?: 'single' | 'multiple' | 'range';
 }
 
 export default function DatePicker({
-                                       id,
-                                       label,
-                                       placeholder,
-                                       value,
-                                       onChange,
-                                       disabled = false,
-                                       readOnly = false,
-                                       required = false,
-                                       error = false,
-                                       hint = "",
-                                       className = "",
-                                       picker = "datetime",
-                                       mode = "single",
-                                   }: DatePickerProps) {
+  id,
+  label,
+  placeholder,
+  value,
+  onChange,
+  disabled = false,
+  readOnly = false,
+  required = false,
+  error = false,
+  hint = '',
+  className = '',
+  picker = 'datetime',
+  mode = 'single',
+}: DatePickerProps) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-    const inputRef =
-        useRef<HTMLInputElement | null>(null);
+  const flatpickrRef = useRef<flatpickr.Instance | null>(null);
 
-    const flatpickrRef =
-        useRef<flatpickr.Instance | null>(null);
+  /*
+   * Helpers
+   */
+  const isDateTime = picker === 'datetime';
 
-    /*
-     * Helpers
-     */
-    const isDateTime =
-        picker === "datetime";
+  const isTimeOnly = picker === 'time';
 
-    const isTimeOnly =
-        picker === "time";
+  const enableTime = isDateTime || isTimeOnly;
 
-    const enableTime =
-        isDateTime || isTimeOnly;
+  useEffect(() => {
+    if (!inputRef.current) return;
 
-    useEffect(() => {
+    flatpickrRef.current = flatpickr(inputRef.current, {
+      mode,
 
-        if (!inputRef.current) return;
+      static: true,
 
-        flatpickrRef.current = flatpickr(
-            inputRef.current,
-            {
-                mode,
+      monthSelectorType: 'static',
 
-                static: true,
+      locale: Spanish,
 
-                monthSelectorType: "static",
+      enableTime,
 
-                locale: Spanish,
+      noCalendar: isTimeOnly,
 
-                enableTime,
+      enableSeconds: false,
 
-                noCalendar: isTimeOnly,
+      time_24hr: true,
 
-                enableSeconds: false,
+      /*
+       * Backend / BD
+       */
+      dateFormat: isTimeOnly ? 'H:i' : isDateTime ? 'Y-m-d H:i' : 'Y-m-d',
 
-                time_24hr: true,
+      /*
+       * UI Usuario
+       */
+      altInput: true,
 
-                /*
-                 * Backend / BD
-                 */
-                dateFormat: isTimeOnly
-                    ? "H:i"
-                    : isDateTime
-                        ? "Y-m-d H:i"
-                        : "Y-m-d",
+      altFormat: isTimeOnly ? 'H:i' : isDateTime ? 'd/m/Y H:i' : 'd/m/Y',
 
-                /*
-                 * UI Usuario
-                 */
-                altInput: true,
-
-                altFormat: isTimeOnly
-                    ? "H:i"
-                    : isDateTime
-                        ? "d/m/Y H:i"
-                        : "d/m/Y",
-
-                altInputClass: `
+      altInputClass: `
                     h-11
                     w-full
 
@@ -158,7 +138,7 @@ export default function DatePicker({
                     dark:placeholder:text-white/30
 
                     ${
-                    error
+                      error
                         ? `
                                 border-error-500
                                 focus:border-error-500
@@ -175,10 +155,10 @@ export default function DatePicker({
                                 dark:border-gray-700
                                 dark:focus:border-brand-800
                               `
-                }
+                    }
 
                     ${
-                    disabled || readOnly
+                      disabled || readOnly
                         ? `
                                 cursor-not-allowed
                                 bg-gray-100
@@ -187,52 +167,40 @@ export default function DatePicker({
 
                                 opacity-60
                               `
-                        : ""
-                }
+                        : ''
+                    }
 
                     ${className}
                 `,
 
-                defaultDate: value || undefined,
+      defaultDate: value || undefined,
 
-                disableMobile: true,
+      disableMobile: true,
 
-                clickOpens: !readOnly,
+      clickOpens: !readOnly,
 
-                onChange: (
-                    _selectedDates,
-                    dateStr
-                ) => {
+      onChange: (_selectedDates, dateStr) => {
+        onChange?.(dateStr);
+      },
 
-                    onChange?.(dateStr);
-                },
+      onReady: (_selectedDates, _dateStr, instance) => {
+        /*
+         * Placeholder
+         */
+        if (instance.altInput) {
+          instance.altInput.placeholder = placeholder || '';
 
-                onReady: (
-                    _selectedDates,
-                    _dateStr,
-                    instance
-                ) => {
+          if (readOnly) {
+            instance.altInput.readOnly = true;
+          }
+        }
 
-                    /*
-                     * Placeholder
-                     */
-                    if (instance.altInput) {
+        /*
+         * Footer
+         */
+        const footer = document.createElement('div');
 
-                        instance.altInput.placeholder =
-                            placeholder || "";
-
-                        if (readOnly) {
-                            instance.altInput.readOnly = true;
-                        }
-                    }
-
-                    /*
-                     * Footer
-                     */
-                    const footer =
-                        document.createElement("div");
-
-                    footer.className = `
+        footer.className = `
                         flex
                         items-center
                         justify-between
@@ -245,18 +213,16 @@ export default function DatePicker({
                         p-2
                     `;
 
-                    /*
-                     * Limpiar
-                     */
-                    const clearButton =
-                        document.createElement("button");
+        /*
+         * Limpiar
+         */
+        const clearButton = document.createElement('button');
 
-                    clearButton.type = "button";
+        clearButton.type = 'button';
 
-                    clearButton.textContent =
-                        "Limpiar";
+        clearButton.textContent = 'Limpiar';
 
-                    clearButton.className = `
+        clearButton.className = `
                         rounded-md
 
                         border
@@ -278,32 +244,22 @@ export default function DatePicker({
                         dark:hover:bg-white/[0.08]
                     `;
 
-                    clearButton.addEventListener(
-                        "click",
-                        () => {
+        clearButton.addEventListener('click', () => {
+          instance.clear();
 
-                            instance.clear();
+          onChange?.('');
+        });
 
-                            onChange?.("");
-                        }
-                    );
+        /*
+         * Ahora / Hoy
+         */
+        const nowButton = document.createElement('button');
 
-                    /*
-                     * Ahora / Hoy
-                     */
-                    const nowButton =
-                        document.createElement("button");
+        nowButton.type = 'button';
 
-                    nowButton.type = "button";
+        nowButton.textContent = isTimeOnly ? 'Ahora' : enableTime ? 'Ahora' : 'Hoy';
 
-                    nowButton.textContent =
-                        isTimeOnly
-                            ? "Ahora"
-                            : enableTime
-                                ? "Ahora"
-                                : "Hoy";
-
-                    nowButton.className = `
+        nowButton.className = `
                         rounded-md
 
                         bg-brand-500
@@ -321,177 +277,96 @@ export default function DatePicker({
                         hover:bg-brand-600
                     `;
 
-                    nowButton.addEventListener(
-                        "click",
-                        () => {
+        nowButton.addEventListener('click', () => {
+          instance.setDate(new Date(), true);
+        });
 
-                            instance.setDate(
-                                new Date(),
-                                true
-                            );
-                        }
-                    );
+        if (!readOnly) {
+          footer.appendChild(clearButton);
 
-                    if (!readOnly) {
+          footer.appendChild(nowButton);
 
-                        footer.appendChild(
-                            clearButton
-                        );
-
-                        footer.appendChild(
-                            nowButton
-                        );
-
-                        instance.calendarContainer.appendChild(
-                            footer
-                        );
-                    }
-                },
-            }
-        );
-
-        return () => {
-            flatpickrRef.current?.destroy();
-        };
-
-    }, []);
-
-    /*
-     * Sync externo
-     */
-    useEffect(() => {
-
-        if (!flatpickrRef.current) return;
-
-        if (!value) {
-
-            flatpickrRef.current.clear();
-
-            return;
+          instance.calendarContainer.appendChild(footer);
         }
+      },
+    });
 
-        flatpickrRef.current.setDate(
-            value,
-            false
-        );
+    return () => {
+      flatpickrRef.current?.destroy();
+    };
+  }, []);
 
-    }, [value]);
+  /*
+   * Sync externo
+   */
+  useEffect(() => {
+    if (!flatpickrRef.current) return;
 
-    /*
-     * Error dinámico
-     */
-    useEffect(() => {
+    if (!value) {
+      flatpickrRef.current.clear();
 
-        if (!flatpickrRef.current?.altInput) return;
+      return;
+    }
 
-        const input =
-            flatpickrRef.current.altInput;
+    flatpickrRef.current.setDate(value, false);
+  }, [value]);
 
-        const errorClasses = [
-            "border-error-500",
-            "focus:border-error-500",
-            "focus:ring-error-500/20",
-            "dark:border-error-500",
-            "dark:focus:border-error-400",
-        ];
+  /*
+   * Error dinámico
+   */
+  useEffect(() => {
+    if (!flatpickrRef.current?.altInput) return;
 
-        const normalClasses = [
-            "border-gray-300",
-            "focus:border-brand-300",
-            "focus:ring-brand-500/20",
-            "dark:border-gray-700",
-            "dark:focus:border-brand-800",
-        ];
+    const input = flatpickrRef.current.altInput;
 
-        if (error) {
+    const errorClasses = [
+      'border-error-500',
+      'focus:border-error-500',
+      'focus:ring-error-500/20',
+      'dark:border-error-500',
+      'dark:focus:border-error-400',
+    ];
 
-            input.classList.remove(
-                ...normalClasses
-            );
+    const normalClasses = [
+      'border-gray-300',
+      'focus:border-brand-300',
+      'focus:ring-brand-500/20',
+      'dark:border-gray-700',
+      'dark:focus:border-brand-800',
+    ];
 
-            input.classList.add(
-                ...errorClasses
-            );
+    if (error) {
+      input.classList.remove(...normalClasses);
 
-        } else {
+      input.classList.add(...errorClasses);
+    } else {
+      input.classList.remove(...errorClasses);
 
-            input.classList.remove(
-                ...errorClasses
-            );
+      input.classList.add(...normalClasses);
+    }
+  }, [error]);
 
-            input.classList.add(
-                ...normalClasses
-            );
-        }
+  return (
+    <div>
+      {label && (
+        <Label htmlFor={id}>
+          {label}
 
-    }, [error]);
+          {required && <span className="text-error-500"> *</span>}
+        </Label>
+      )}
 
-    return (
+      <div className="relative">
+        <input ref={inputRef} id={id} className="hidden" />
 
-        <div>
+        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+          {isTimeOnly ? <TimeIcon className="size-5" /> : <CalenderIcon className="size-5" />}
+        </span>
+      </div>
 
-            {label && (
-
-                <Label htmlFor={id}>
-
-                    {label}
-
-                    {required && (
-                        <span className="text-error-500">
-                            {" "}*
-                        </span>
-                    )}
-
-                </Label>
-
-            )}
-
-            <div className="relative">
-
-                <input
-                    ref={inputRef}
-                    id={id}
-                    className="hidden"
-                />
-
-                <span
-                    className="
-                        pointer-events-none
-
-                        absolute
-
-                        right-3
-                        top-1/2
-
-                        -translate-y-1/2
-
-                        text-gray-500
-                        dark:text-gray-400
-                    "
-                >
-                    {isTimeOnly ? (
-                        <TimeIcon className="size-5" />
-                    ) : (
-                        <CalenderIcon className="size-5" />
-                    )}
-                </span>
-
-            </div>
-
-            {hint && (
-
-                <p
-                    className={`mt-2 text-sm ${
-                        error
-                            ? "text-error-500"
-                            : "text-gray-500 dark:text-gray-400"
-                    }`}
-                >
-                    {hint}
-                </p>
-
-            )}
-
-        </div>
-    );
+      {hint && (
+        <p className={`mt-2 text-sm ${error ? 'text-error-500' : 'text-gray-500 dark:text-gray-400'}`}>{hint}</p>
+      )}
+    </div>
+  );
 }

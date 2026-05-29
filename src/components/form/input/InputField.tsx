@@ -1,24 +1,15 @@
-import type React from "react";
-import type { FC } from "react";
+import type React from 'react';
+import type { FC } from 'react';
 
 interface InputProps {
-  type?:
-      | "text"
-      | "number"
-      | "email"
-      | "password"
-      | "date"
-      | "time"
-      | string;
+  type?: 'text' | 'number' | 'email' | 'password' | 'date' | 'time' | string;
 
   id?: string;
   name?: string;
   placeholder?: string;
   value?: string | number;
 
-  onChange?: (
-      e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 
   className?: string;
 
@@ -33,31 +24,31 @@ interface InputProps {
 
   hint?: string;
 
-  size?: "xs" | "sm" | "md";
+  size?: 'xs' | 'sm' | 'md';
 }
 
 const InputField: FC<InputProps> = ({
-                                      type = "text",
-                                      id,
-                                      name,
-                                      placeholder,
-                                      value,
-                                      onChange,
-                                      className = "",
-                                      min,
-                                      max,
-                                      step,
-                                      disabled = false,
-                                      success = false,
-                                      error = false,
-                                      hint,
-                                      size = "md",
-                                    }) => {
+  type = 'text',
+  id,
+  name,
+  placeholder,
+  value,
+  onChange,
+  className = '',
+  min,
+  max,
+  step,
+  disabled = false,
+  success = false,
+  error = false,
+  hint,
+  size = 'md',
+}) => {
   // Sizes
   const sizeClasses = {
-    xs: "h-9 px-3 py-2 text-xs",
-    sm: "h-10 px-3.5 py-2 text-sm",
-    md: "h-11 px-4 py-2.5 text-sm",
+    xs: 'h-9 px-3 py-2 text-xs',
+    sm: 'h-10 px-3.5 py-2 text-sm',
+    md: 'h-11 px-4 py-2.5 text-sm',
   };
 
   let inputClasses = `
@@ -118,35 +109,27 @@ const InputField: FC<InputProps> = ({
   }
 
   return (
-      <div className="relative">
-        <input
-            type={type}
-            id={id}
-            name={name}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            min={min}
-            max={max}
-            step={step}
-            disabled={disabled}
-            className={inputClasses}
-        />
+    <div className="relative">
+      <input
+        type={type}
+        id={id}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        min={min}
+        max={max}
+        step={step}
+        disabled={disabled}
+        className={inputClasses}
+      />
 
-        {hint && (
-            <p
-                className={`mt-1.5 text-xs ${
-                    error
-                        ? "text-error-500"
-                        : success
-                            ? "text-success-500"
-                            : "text-gray-500"
-                }`}
-            >
-              {hint}
-            </p>
-        )}
-      </div>
+      {hint && (
+        <p className={`mt-1.5 text-xs ${error ? 'text-error-500' : success ? 'text-success-500' : 'text-gray-500'}`}>
+          {hint}
+        </p>
+      )}
+    </div>
   );
 };
 

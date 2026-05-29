@@ -1,6 +1,6 @@
-import { createContext } from "react";
-import type { AuthUser } from "../types/auth/auth.types";
-import type { LoginRequest } from "../types/auth/auth.types";
+import { createContext } from 'react';
+import type { AuthUser } from '../types/auth/auth.types';
+import type { LoginRequest } from '../types/auth/auth.types';
 
 export interface AuthContextValue {
   user: AuthUser | null;
@@ -9,7 +9,7 @@ export interface AuthContextValue {
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
-  resetPassword: (email: string ) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 
   refreshUser: () => Promise<void>;
   loginWithMicrosoft: () => Promise<void>;

@@ -1,4 +1,4 @@
-import { useAuth } from "./auth/useAuth";
+import { useAuth } from './auth/useAuth';
 
 /**
  * Returns a `can(permission)` helper.

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
-import { Link, useLocation } from "react-router";
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { Link, useLocation } from 'react-router';
 
 import {
   CalenderIcon,
@@ -12,54 +12,59 @@ import {
   PageIcon,
   TableIcon,
   UserIcon,
-  PieChartIcon as ChartIcon, HouseIcon, UserCogIcon, FolderIcon, FileTextIcon, FingerprintPatternIcon,
+  PieChartIcon as ChartIcon,
+  HouseIcon,
+  UserCogIcon,
+  FolderIcon,
+  FileTextIcon,
+  FingerprintPatternIcon,
   LockOpenIcon,
-} from "../icons";
-import { useSidebar } from "../context/SidebarContext";
-import type { MenuItem } from "../types/admin/menu-items/menu-item.types";
-import { useMenu } from "../hooks/useMenu";
-import { useAuth } from "../hooks/auth/useAuth";
-import {ROUTES} from "../constants/routes.constants.ts";
+} from '../icons';
+import { useSidebar } from '../context/SidebarContext';
+import type { MenuItem } from '../types/admin/menu-items/menu-item.types';
+import { useMenu } from '../hooks/useMenu';
+import { useAuth } from '../hooks/auth/useAuth';
+import { ROUTES } from '../constants/routes.constants.ts';
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean; permission?: string; }[];
+  subItems?: { name: string; path: string; pro?: boolean; new?: boolean; permission?: string }[];
   permission?: string;
 };
 
 function resolveIcon(iconName: string | null): React.ReactNode {
   switch (iconName?.toLowerCase()) {
-    case "home":
-    case "dashboard":
+    case 'home':
+    case 'dashboard':
       return <GridIcon />;
-    case "users":
-    case "user":
+    case 'users':
+    case 'user':
       return <UserIcon />;
-    case "group":
-    case "groups":
-    case "roles":
+    case 'group':
+    case 'groups':
+    case 'roles':
       return <GroupIcon />;
-    case "chart":
-    case "charts":
-    case "analytics":
-    case "reports":
+    case 'chart':
+    case 'charts':
+    case 'analytics':
+    case 'reports':
       return <ChartIcon />;
-    case "list":
-    case "menu":
+    case 'list':
+    case 'menu':
       return <ListIcon />;
-    case "table":
-    case "tables":
+    case 'table':
+    case 'tables':
       return <TableIcon />;
-    case "calendar":
+    case 'calendar':
       return <CalenderIcon />;
-    case "lock":
-    case "security":
-    case "permissions":
+    case 'lock':
+    case 'security':
+    case 'permissions':
       return <LockIcon />;
-    case "settings":
-    case "page":
+    case 'settings':
+    case 'page':
       return <PageIcon />;
     default:
       return <GridIcon />;
@@ -67,9 +72,7 @@ function resolveIcon(iconName: string | null): React.ReactNode {
 }
 
 // Flatten all active children into flat subItems (max 2 levels in sidebar)
-function flattenChildren(
-  children: MenuItem[]
-): { name: string; path: string }[] {
+function flattenChildren(children: MenuItem[]): { name: string; path: string }[] {
   const result: { name: string; path: string }[] = [];
   for (const child of children) {
     if (!child.active) continue;
@@ -111,35 +114,50 @@ function transformToNavItems(items: MenuItem[]): NavItem[] {
 
 // Principal section
 const principalItems: NavItem[] = [
-  { icon: <HouseIcon />, name: "Inicio", path: ROUTES.HOME },
-  { icon: <UserIcon />, name: "Perfil", path: ROUTES.PROFILE },
+  { icon: <HouseIcon />, name: 'Inicio', path: ROUTES.HOME },
+  { icon: <UserIcon />, name: 'Perfil', path: ROUTES.PROFILE },
 ];
 
 // Correspondencia section
-const CORRESPONDENCIA_ITEMS: (NavItem)[] = [
-  { icon: <FolderIcon />, name: "Hoja de Ruta", path: ROUTES.CORRESPONDENCE.ROUTE_SHEET, permission: "correspondencia_hojaruta.index" },
-  { icon: <FileTextIcon />, name: "Documentos", path: ROUTES.CORRESPONDENCE.DOCUMENTS, permission: "correspondencia_documentos.index" },
-  { icon: <FingerprintPatternIcon />, name: "Aprobar y firmar", path: ROUTES.CORRESPONDENCE.APPROVE_SIGN, permission: "correspondencia_aprobarfirmar.index" },
+const CORRESPONDENCIA_ITEMS: NavItem[] = [
+  {
+    icon: <FolderIcon />,
+    name: 'Hoja de Ruta',
+    path: ROUTES.CORRESPONDENCE.ROUTE_SHEET,
+    permission: 'correspondencia_hojaruta.index',
+  },
+  {
+    icon: <FileTextIcon />,
+    name: 'Documentos',
+    path: ROUTES.CORRESPONDENCE.DOCUMENTS,
+    permission: 'correspondencia_documentos.index',
+  },
+  {
+    icon: <FingerprintPatternIcon />,
+    name: 'Aprobar y firmar',
+    path: ROUTES.CORRESPONDENCE.APPROVE_SIGN,
+    permission: 'correspondencia_aprobarfirmar.index',
+  },
 ];
 
 // Static admin section items (permission key → path)
-const ALL_ADMIN_ITEMS: (NavItem)[] = [
+const ALL_ADMIN_ITEMS: NavItem[] = [
   // { icon: <LockIcon />, name: "Permisos", path: "/admin/permisos", permission: "permissions.index" },
   // { icon: <UsersIcon />, name: "Roles", path: "/admin/roles", permission: "roles.index" },
   // { icon: <ListIcon />, name: "Ítems de Menú", path: "/admin/menu", permission: "menu_items.index" },
   {
     icon: <LockOpenIcon />,
-    name: "Accesos",
+    name: 'Accesos',
     subItems: [
-      { name: "Permisos", path: ROUTES.PERMISSIONS.LIST, pro: false, permission: "permissions.index" },
-      { name: "Roles", path: ROUTES.ROLES.LIST, pro: false, permission: "roles.index" },
-      { name: "Ítems de Menú", path: ROUTES.MENU_ITEMS.LIST, pro: false, permission: "menu_items.index" },
+      { name: 'Permisos', path: ROUTES.PERMISSIONS.LIST, pro: false, permission: 'permissions.index' },
+      { name: 'Roles', path: ROUTES.ROLES.LIST, pro: false, permission: 'roles.index' },
+      { name: 'Ítems de Menú', path: ROUTES.MENU_ITEMS.LIST, pro: false, permission: 'menu_items.index' },
     ],
   },
-  { icon: <UserCogIcon />, name: "Usuarios", path: ROUTES.USERS.LIST, permission: "users.index" },
+  { icon: <UserCogIcon />, name: 'Usuarios', path: ROUTES.USERS.LIST, permission: 'users.index' },
 ];
 
-type MenuType = "dynamic" | "principal" | "admin" | "correspondencia";
+type MenuType = 'dynamic' | 'principal' | 'admin' | 'correspondencia';
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -147,35 +165,27 @@ const AppSidebar: React.FC = () => {
   const { menuItems } = useMenu();
   const { user } = useAuth();
 
-  const adminItems: NavItem[] = ALL_ADMIN_ITEMS
-      .map((item) => {
-        if (item.subItems) {
-          const filteredSubItems = item.subItems.filter(
-              (subItem) =>
-                  !user?.permissions?.length ||
-                  user.permissions.includes(subItem.permission)
-          );
-          if (filteredSubItems.length === 0) {
-            return null;
-          }
-          return {
-            ...item,
-            subItems: filteredSubItems,
-          };
-        }
-        if (
-            !item.permission ||
-            !user?.permissions?.length ||
-            user.permissions.includes(item.permission)
-        ) {
-          return item;
-        }
+  const adminItems: NavItem[] = ALL_ADMIN_ITEMS.map((item) => {
+    if (item.subItems) {
+      const filteredSubItems = item.subItems.filter(
+        (subItem) => !user?.permissions?.length || user.permissions.includes(subItem.permission),
+      );
+      if (filteredSubItems.length === 0) {
         return null;
-      })
-      .filter(Boolean) as NavItem[];
+      }
+      return {
+        ...item,
+        subItems: filteredSubItems,
+      };
+    }
+    if (!item.permission || !user?.permissions?.length || user.permissions.includes(item.permission)) {
+      return item;
+    }
+    return null;
+  }).filter(Boolean) as NavItem[];
 
   const correspondenciaItems: NavItem[] = CORRESPONDENCIA_ITEMS.filter(
-      (item) => !user?.permissions?.length || user.permissions.includes(item.permission)
+    (item) => !user?.permissions?.length || user.permissions.includes(item.permission),
   );
 
   const dynamicNavItems = useMemo(() => transformToNavItems(menuItems), [menuItems]);
@@ -184,23 +194,18 @@ const AppSidebar: React.FC = () => {
     type: MenuType;
     index: number;
   } | null>(null);
-  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
-    {}
-  );
+  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const isActive = useCallback(
-    (path: string) => location.pathname === path,
-    [location.pathname]
-  );
+  const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
 
   useEffect(() => {
     let submenuMatched = false;
     const sections: { type: MenuType; items: NavItem[] }[] = [
-      { type: "dynamic", items: dynamicNavItems },
-      { type: "principal", items: principalItems },
-      { type: "admin", items: adminItems },
-      { type: "correspondencia", items: correspondenciaItems },
+      { type: 'dynamic', items: dynamicNavItems },
+      { type: 'principal', items: principalItems },
+      { type: 'admin', items: adminItems },
+      { type: 'correspondencia', items: correspondenciaItems },
     ];
 
     sections.forEach(({ type, items }) => {
@@ -235,11 +240,7 @@ const AppSidebar: React.FC = () => {
 
   const handleSubmenuToggle = (index: number, menuType: MenuType) => {
     setOpenSubmenu((prevOpenSubmenu) => {
-      if (
-        prevOpenSubmenu &&
-        prevOpenSubmenu.type === menuType &&
-        prevOpenSubmenu.index === index
-      ) {
+      if (prevOpenSubmenu && prevOpenSubmenu.type === menuType && prevOpenSubmenu.index === index) {
         return null;
       }
       return { type: menuType, index };
@@ -255,33 +256,24 @@ const AppSidebar: React.FC = () => {
               onClick={() => handleSubmenuToggle(index, menuType)}
               className={`menu-item group ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
-              } cursor-pointer ${
-                !isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "lg:justify-start"
-              }`}
+                  ? 'menu-item-active'
+                  : 'menu-item-inactive'
+              } cursor-pointer ${!isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'}`}
             >
               <span
-                className={`menu-item-icon-size  ${
+                className={`menu-item-icon-size ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
+                    ? 'menu-item-icon-active'
+                    : 'menu-item-icon-inactive'
                 }`}
               >
                 {nav.icon}
               </span>
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
-              )}
+              {(isExpanded || isHovered || isMobileOpen) && <span className="menu-item-text">{nav.name}</span>}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${
-                    openSubmenu?.type === menuType &&
-                    openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
-                      : ""
+                  className={`ml-auto h-5 w-5 transition-transform duration-200 ${
+                    openSubmenu?.type === menuType && openSubmenu?.index === index ? 'text-brand-500 rotate-180' : ''
                   }`}
                 />
               )}
@@ -290,22 +282,16 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 to={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
+                className={`menu-item group ${isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'}`}
               >
                 <span
                   className={`menu-item-icon-size ${
-                    isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
+                    isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'
                   }`}
                 >
                   {nav.icon}
                 </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className="menu-item-text">{nav.name}</span>
-                )}
+                {(isExpanded || isHovered || isMobileOpen) && <span className="menu-item-text">{nav.name}</span>}
               </Link>
             )
           )}
@@ -319,28 +305,24 @@ const AppSidebar: React.FC = () => {
                 height:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
                     ? `${subMenuHeight[`${menuType}-${index}`]}px`
-                    : "0px",
+                    : '0px',
               }}
             >
-              <ul className="mt-2 space-y-1 ml-9">
+              <ul className="mt-2 ml-9 space-y-1">
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
                       className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
+                        isActive(subItem.path) ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'
                       }`}
                     >
                       {subItem.name}
-                      <span className="flex items-center gap-1 ml-auto">
+                      <span className="ml-auto flex items-center gap-1">
                         {subItem.new && (
                           <span
                             className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
+                              isActive(subItem.path) ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
                             } menu-dropdown-badge`}
                           >
                             new
@@ -349,9 +331,7 @@ const AppSidebar: React.FC = () => {
                         {subItem.pro && (
                           <span
                             className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
+                              isActive(subItem.path) ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
                             } menu-dropdown-badge`}
                           >
                             pro
@@ -371,39 +351,27 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
-        }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
+      className={`fixed top-0 left-0 z-50 mt-16 flex h-screen flex-col border-r border-gray-200 bg-white px-5 text-gray-900 transition-all duration-300 ease-in-out lg:mt-0 dark:border-gray-800 dark:bg-gray-900 ${
+        isExpanded || isMobileOpen ? 'w-[290px]' : isHovered ? 'w-[290px]' : 'w-[90px]'
+      } ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={isMobileOpen ? "py-2" : "py-8 flex justify-center"}>
+      <div className={isMobileOpen ? 'py-2' : 'flex justify-center py-8'}>
         {!isMobileOpen && (
-            <Link to={ROUTES.HOME}>
-              <img
-                  src={
-                    isExpanded || isHovered
-                        ? "/images/logo_emi/logo_sidebar.png"
-                        : "/images/logo_emi/emi_icono.png"
-                  }
-                  alt="Logo EMI"
-                  width={isExpanded || isHovered ? 150 : 32}
-                  height={isExpanded || isHovered ? 40 : 32}
-              />
-            </Link>
+          <Link to={ROUTES.HOME}>
+            <img
+              src={isExpanded || isHovered ? '/images/logo_emi/logo_sidebar.png' : '/images/logo_emi/emi_icono.png'}
+              alt="Logo EMI"
+              width={isExpanded || isHovered ? 150 : 32}
+              height={isExpanded || isHovered ? 40 : 32}
+            />
+          </Link>
         )}
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+      <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-
             {/* Dynamic menu from API */}
             {/*{dynamicNavItems.length > 0 && (*/}
             {/*  <div>*/}
@@ -427,55 +395,37 @@ const AppSidebar: React.FC = () => {
             {/* Principal section */}
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                className={`mb-4 flex text-xs leading-[20px] text-gray-400 uppercase ${
+                  !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Principal"
-                ) : (
-                  <HorizontaLDots className="size-6" />
-                )}
+                {isExpanded || isHovered || isMobileOpen ? 'Principal' : <HorizontaLDots className="size-6" />}
               </h2>
-              {renderMenuItems(principalItems, "principal")}
+              {renderMenuItems(principalItems, 'principal')}
             </div>
 
             {/* Static admin section */}
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                className={`mb-4 flex text-xs leading-[20px] text-gray-400 uppercase ${
+                  !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Administración"
-                ) : (
-                  <HorizontaLDots className="size-6" />
-                )}
+                {isExpanded || isHovered || isMobileOpen ? 'Administración' : <HorizontaLDots className="size-6" />}
               </h2>
-              {renderMenuItems(adminItems, "admin")}
+              {renderMenuItems(adminItems, 'admin')}
             </div>
 
             {/* Static correspondencia section */}
             <div>
               <h2
-                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                      !isExpanded && !isHovered
-                          ? "lg:justify-center"
-                          : "justify-start"
-                  }`}
+                className={`mb-4 flex text-xs leading-[20px] text-gray-400 uppercase ${
+                  !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
+                }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                    "Correspondencia"
-                ) : (
-                    <HorizontaLDots className="size-6" />
-                )}
+                {isExpanded || isHovered || isMobileOpen ? 'Correspondencia' : <HorizontaLDots className="size-6" />}
               </h2>
-              {renderMenuItems(correspondenciaItems, "correspondencia")}
+              {renderMenuItems(correspondenciaItems, 'correspondencia')}
             </div>
           </div>
         </nav>

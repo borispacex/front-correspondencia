@@ -1,4 +1,4 @@
-import type { ApiQueryParams } from "../types/common/api.types";
+import type { ApiQueryParams } from '../types/common/api.types';
 
 /**
  * Convierte ApiQueryParams al formato de query string que espera ApiTrait.
@@ -13,38 +13,34 @@ import type { ApiQueryParams } from "../types/common/api.types";
  *   page: "1",
  * }
  */
-export function buildQueryParams(
-  params: ApiQueryParams
-): Record<string, string> {
+export function buildQueryParams(params: ApiQueryParams): Record<string, string> {
   const query: Record<string, string> = {};
 
   // ?included=relation1,relation2
   if (params.included?.length) {
-    query["included"] = params.included.join(",");
+    query['included'] = params.included.join(',');
   }
 
   // ?filter[campo]=valor  (arrays → "1,2,3")
   if (params.filter) {
     for (const [key, value] of Object.entries(params.filter)) {
-      query[`filter[${key}]`] = Array.isArray(value)
-        ? value.join(",")
-        : String(value);
+      query[`filter[${key}]`] = Array.isArray(value) ? value.join(',') : String(value);
     }
   }
 
   // ?sort=campo,-otro_campo
   if (params.sort?.length) {
-    query["sort"] = params.sort.join(",");
+    query['sort'] = params.sort.join(',');
   }
 
   // ?perPage=15
   if (params.perPage !== undefined) {
-    query["perPage"] = String(params.perPage);
+    query['perPage'] = String(params.perPage);
   }
 
   // ?page=2
   if (params.page !== undefined) {
-    query["page"] = String(params.page);
+    query['page'] = String(params.page);
   }
 
   return query;

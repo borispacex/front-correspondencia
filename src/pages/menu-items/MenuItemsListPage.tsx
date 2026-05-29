@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import PageBreadCrumb from "../../components/common/PageBreadCrumb";
-import PageMeta from "../../components/common/PageMeta";
-import { Modal } from "../../components/ui/modal";
-import MenuItemTable from "../../components/menu-items/MenuItemTable";
-import MenuItemForm from "../../components/menu-items/MenuItemForm";
-import { PlusIcon } from "../../icons";
+import { useState, useEffect } from 'react';
+import PageBreadCrumb from '../../components/common/PageBreadCrumb';
+import PageMeta from '../../components/common/PageMeta';
+import { Modal } from '../../components/ui/modal';
+import MenuItemTable from '../../components/menu-items/MenuItemTable';
+import MenuItemForm from '../../components/menu-items/MenuItemForm';
+import { PlusIcon } from '../../icons';
 
 import {
   createMenuItem,
@@ -12,20 +12,17 @@ import {
   getMenuItemsAll,
   deleteMenuItem,
   getMenuItemById,
-} from "../../services/admin/menu-items.service.ts";
+} from '../../services/admin/menu-items.service.ts';
 
-import type {
-  MenuItem,
-  CreateMenuItemRequest,
-} from "../../types/admin/menu-items/menu-item.types";
+import type { MenuItem, CreateMenuItemRequest } from '../../types/admin/menu-items/menu-item.types';
 
-import { useMenu } from "../../hooks/useMenu";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useNotifications } from "../../hooks/useNotification";
+import { useMenu } from '../../hooks/useMenu';
+import { usePermissions } from '../../hooks/usePermissions';
+import { useNotifications } from '../../hooks/useNotification';
 
-import Button from "../../components/ui/button/Button.tsx";
-import ModalStatus from "../../components/modal/ModalStatus.tsx";
-import ModalDelete from "../../components/modal/ModalDelete.tsx";
+import Button from '../../components/ui/button/Button.tsx';
+import ModalStatus from '../../components/modal/ModalStatus.tsx';
+import ModalDelete from '../../components/modal/ModalDelete.tsx';
 
 function flattenMenuItems(items: MenuItem[]): MenuItem[] {
   const result: MenuItem[] = [];
@@ -108,11 +105,9 @@ export default function MenuItemsListPage() {
       });
 
       addNotification({
-        type: "success",
-        title: "Estado actualizado",
-        message: `El ítem fue ${
-            nextStatus ? "activado" : "desactivado"
-        } correctamente.`,
+        type: 'success',
+        title: 'Estado actualizado',
+        message: `El ítem fue ${nextStatus ? 'activado' : 'desactivado'} correctamente.`,
       });
 
       setOpenStatusModal(false);
@@ -122,11 +117,9 @@ export default function MenuItemsListPage() {
       await loadAll();
     } catch (err: any) {
       addNotification({
-        type: "error",
-        title: "Error",
-        message:
-            err?.response?.data?.message ??
-            "Error al cambiar el estado del ítem",
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al cambiar el estado del ítem',
       });
     } finally {
       setLoadingStatus(false);
@@ -144,9 +137,9 @@ export default function MenuItemsListPage() {
       await deleteMenuItem(confirmId);
 
       addNotification({
-        type: "success",
-        title: "Ítem eliminado",
-        message: "El ítem de menú fue eliminado correctamente.",
+        type: 'success',
+        title: 'Ítem eliminado',
+        message: 'El ítem de menú fue eliminado correctamente.',
       });
 
       setConfirmId(null);
@@ -154,11 +147,9 @@ export default function MenuItemsListPage() {
       await loadAll();
     } catch (err: any) {
       addNotification({
-        type: "error",
-        title: "Error",
-        message:
-            err?.response?.data?.message ??
-            "Error al eliminar el ítem de menú",
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al eliminar el ítem de menú',
       });
     }
   }
@@ -172,16 +163,16 @@ export default function MenuItemsListPage() {
         });
 
         addNotification({
-          type: "info",
-          title: "Ítem actualizado",
+          type: 'info',
+          title: 'Ítem actualizado',
           message: `El ítem "${data.label}" fue actualizado correctamente.`,
         });
       } else {
         await createMenuItem(data);
 
         addNotification({
-          type: "success",
-          title: "Ítem creado",
+          type: 'success',
+          title: 'Ítem creado',
           message: `El ítem "${data.label}" fue creado correctamente.`,
         });
       }
@@ -191,88 +182,73 @@ export default function MenuItemsListPage() {
       await loadAll();
     } catch (err: any) {
       addNotification({
-        type: "error",
-        title: "Error",
-        message:
-            err?.response?.data?.message ??
-            "Error al guardar el ítem de menú",
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al guardar el ítem de menú',
       });
     }
   }
 
   return (
-      <>
-        <PageMeta
-            title="Ítems de Menú"
-            description="Gestión de ítems del menú"
-        />
+    <>
+      <PageMeta title="Ítems de Menú" description="Gestión de ítems del menú" />
 
-        <PageBreadCrumb pageTitle="Ítems de Menú" />
+      <PageBreadCrumb pageTitle="Ítems de Menú" />
 
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Lista de Ítems de Menú
-            </h2>
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">Lista de Ítems de Menú</h2>
 
-            {can("menu_items.create") && (
-                <Button
-                    size="sm"
-                    onClick={handleCreate}
-                    startIcon={<PlusIcon className="size-4 text-white" />}
-                >
-                  Nuevo Ítem
-                </Button>
-            )}
-          </div>
-
-          <MenuItemTable
-              menuItems={menuItems}
-              isLoading={isLoading}
-              onEdit={handleEdit}
-              onToggleActive={handleToggleActive}
-              onDelete={handleDelete}
-          />
+          {can('menu_items.create') && (
+            <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
+              Nuevo Ítem
+            </Button>
+          )}
         </div>
 
-        <Modal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            className="max-w-lg p-6 sm:p-8"
-        >
-          <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
-            {selected ? "Editar Ítem de Menú" : "Nuevo Ítem de Menú"}
-          </h3>
-          <p className="mb-5 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-            Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
-          </p>
-
-          <MenuItemForm
-              item={selected}
-              allItems={menuItems}
-              onSubmit={handleSubmit}
-              onCancel={() => setIsModalOpen(false)}
-          />
-        </Modal>
-
-        <ModalStatus
-            isOpen={openStatusModal}
-            active={nextStatus}
-            onClose={() => {
-              setOpenStatusModal(false);
-              setSelectedStatusItem(null);
-            }}
-            onConfirm={handleChangeStatus}
-            loading={loadingStatus}
+        <MenuItemTable
+          menuItems={menuItems}
+          isLoading={isLoading}
+          onEdit={handleEdit}
+          onToggleActive={handleToggleActive}
+          onDelete={handleDelete}
         />
+      </div>
 
-        <ModalDelete
-            isOpen={confirmId !== null}
-            onClose={() => setConfirmId(null)}
-            onConfirm={handleConfirmDelete}
-            title="¿Eliminar este ítem de menú?"
-            message="Esta acción no se puede deshacer."
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} className="max-w-lg p-6 sm:p-8">
+        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+          {selected ? 'Editar Ítem de Menú' : 'Nuevo Ítem de Menú'}
+        </h3>
+        <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
+          Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+        </p>
+
+        <MenuItemForm
+          item={selected}
+          allItems={menuItems}
+          onSubmit={handleSubmit}
+          onCancel={() => setIsModalOpen(false)}
         />
-      </>
+      </Modal>
+
+      <ModalStatus
+        isOpen={openStatusModal}
+        active={nextStatus}
+        onClose={() => {
+          setOpenStatusModal(false);
+          setSelectedStatusItem(null);
+        }}
+        onConfirm={handleChangeStatus}
+        loading={loadingStatus}
+      />
+
+      <ModalDelete
+        isOpen={confirmId !== null}
+        onClose={() => setConfirmId(null)}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar este ítem de menú?"
+        message="Esta acción no se puede deshacer."
+      />
+    </>
   );
 }

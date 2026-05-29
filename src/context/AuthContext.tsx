@@ -1,11 +1,11 @@
-import { useState, useEffect, type ReactNode } from "react";
-import type { AuthUser, LoginRequest } from "../types/auth/auth.types";
-import { AuthContext } from "./auth-context";
-import { login as loginService, logout as logoutService, me as meService } from "../services/auth.service";
-import { loginWithMicrosoftToken } from "../services/social-auth.service";
-import { getToken, setToken, removeToken } from "../utils/token.utils";
-import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../config/msalConfig";
+import { useState, useEffect, type ReactNode } from 'react';
+import type { AuthUser, LoginRequest } from '../types/auth/auth.types';
+import { AuthContext } from './auth-context';
+import { login as loginService, logout as logoutService, me as meService } from '../services/auth.service';
+import { loginWithMicrosoftToken } from '../services/social-auth.service';
+import { getToken, setToken, removeToken } from '../utils/token.utils';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../config/msalConfig';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { instance } = useMsal();
@@ -19,8 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = getToken();
     if (stored) {
       setIsLoading(true);
-      refreshUser()
-          .finally(() => setIsLoading(false));
+      refreshUser().finally(() => setIsLoading(false));
     }
   }, []);
 
@@ -100,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }
-
 
   return (
     <AuthContext.Provider

@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import { Link } from "react-router";
-import { useSidebar } from "../context/SidebarContext";
-import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
-import NotificationDropdown from "../components/header/NotificationDropdown";
-import UserDropdown from "../components/header/UserDropdown";
-import {ROUTES} from "../constants/routes.constants.ts";
-import {MailIcon, SearchIcon} from "../icons";
+import { Link } from 'react-router';
+import { useSidebar } from '../context/SidebarContext';
+import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
+import NotificationDropdown from '../components/header/NotificationDropdown';
+import UserDropdown from '../components/header/UserDropdown';
+import { ROUTES } from '../constants/routes.constants.ts';
+import { MailIcon, SearchIcon } from '../icons';
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -29,36 +29,30 @@ const AppHeader: React.FC = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault();
         inputRef.current?.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
   return (
-      <header className="sticky top-0 flex w-full bg-white border-gray-200 z-50 overflow-visible dark:border-gray-800 dark:bg-gray-900 lg:border-b">
-      <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
-        <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
+    <header className="sticky top-0 z-50 flex w-full overflow-visible border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900">
+      <div className="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
+        <div className="flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4 dark:border-gray-800">
           <button
-            className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
+            className="z-99999 h-10 w-10 items-center justify-center rounded-lg border-gray-200 text-gray-500 lg:flex lg:h-11 lg:w-11 lg:border dark:border-gray-800 dark:text-gray-400"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
             {isMobileOpen ? (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
@@ -67,13 +61,7 @@ const AppHeader: React.FC = () => {
                 />
               </svg>
             ) : (
-              <svg
-                width="16"
-                height="12"
-                viewBox="0 0 16 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
@@ -86,29 +74,15 @@ const AppHeader: React.FC = () => {
           </button>
 
           <Link to={ROUTES.HOME} className="lg:hidden">
-            <img
-              className="h-8 w-auto dark:hidden"
-              src="/images/logo_emi/emi_icono.png"
-              alt="Logo"
-            />
-            <img
-              className="hidden h-8 w-auto dark:block"
-              src="/images/logo_emi/emi_icono.png"
-              alt="Logo"
-            />
+            <img className="h-8 w-auto dark:hidden" src="/images/logo_emi/emi_icono.png" alt="Logo" />
+            <img className="hidden h-8 w-auto dark:block" src="/images/logo_emi/emi_icono.png" alt="Logo" />
           </Link>
 
           <button
             onClick={toggleApplicationMenu}
-            className="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
+            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -118,31 +92,30 @@ const AppHeader: React.FC = () => {
             </svg>
           </button>
 
-          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-full max-w-[55vw] px-4 overflow-hidden pointer-events-none">
-            <div className="flex items-center gap-2 min-w-0 max-w-full">
-              <div className="hidden 2xl:block h-[2px] w-10 rounded-full bg-yellow-500 dark:bg-yellow-400 shrink-0" />
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="font-extrabold uppercase text-blue-900 dark:text-blue-100 leading-none tracking-[0.06em] whitespace-nowrap text-[clamp(0.7rem,1vw,1.4rem)]">
+          <div className="pointer-events-none absolute left-1/2 hidden w-full max-w-[55vw] -translate-x-1/2 items-center justify-center overflow-hidden px-4 lg:flex">
+            <div className="flex max-w-full min-w-0 items-center gap-2">
+              <div className="hidden h-[2px] w-10 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="text-[clamp(0.7rem,1vw,1.4rem)] leading-none font-extrabold tracking-[0.06em] whitespace-nowrap text-blue-900 uppercase dark:text-blue-100">
                   SISTEMA DE
                 </span>
-                <div className="flex items-center justify-center rounded-lg border border-yellow-500 bg-yellow-100 dark:bg-yellow-400 dark:border-yellow-300 shrink-0 h-4 w-5 xl:h-5 xl:w-6">
-                  <MailIcon className="h-4 w-4 xl:h-5 xl:w-5 text-blue-900" />
+                <div className="flex h-4 w-5 shrink-0 items-center justify-center rounded-lg border border-yellow-500 bg-yellow-100 xl:h-5 xl:w-6 dark:border-yellow-300 dark:bg-yellow-400">
+                  <MailIcon className="h-4 w-4 text-blue-900 xl:h-5 xl:w-5" />
                 </div>
-                <span className="font-extrabold uppercase text-blue-900 dark:text-blue-100 leading-none tracking-[0.06em] whitespace-nowrap text-[clamp(0.7rem,1vw,1.4rem)]">
+                <span className="text-[clamp(0.7rem,1vw,1.4rem)] leading-none font-extrabold tracking-[0.06em] whitespace-nowrap text-blue-900 uppercase dark:text-blue-100">
                   CORRESPONDENCIA
                 </span>
               </div>
-              <div className="hidden 2xl:block h-[2px] w-10 rounded-full bg-yellow-500 dark:bg-yellow-400 shrink-0" />
+              <div className="hidden h-[2px] w-10 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
             </div>
           </div>
-
         </div>
         <div
           className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
+            isApplicationMenuOpen ? 'flex' : 'hidden'
+          } shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
         >
-          <div className="flex items-center gap-2 2xsm:gap-3">
+          <div className="2xsm:gap-3 flex items-center gap-2">
             {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
             {/* <!-- Dark Mode Toggler --> */}

@@ -1,138 +1,107 @@
-import { useState } from "react";
-import type React from "react";
+import { useState } from 'react';
+import type React from 'react';
 
-import InputField from "./InputField.tsx";
+import InputField from './InputField.tsx';
 
-import {
-    EyeCloseIcon,
-    EyeIcon,
-} from "../../../icons";
+import { EyeCloseIcon, EyeIcon } from '../../../icons';
 
 interface InputFieldPasswordProps {
-    value?: string;
+  value?: string;
 
-    onChange?: (
-        e: React.ChangeEvent<HTMLInputElement>,
-    ) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 
-    id?: string;
+  id?: string;
 
-    name?: string;
+  name?: string;
 
-    placeholder?: string;
+  placeholder?: string;
 
-    disabled?: boolean;
+  disabled?: boolean;
 
-    required?: boolean;
+  required?: boolean;
 
-    autoComplete?: string;
+  autoComplete?: string;
 
-    error?: boolean;
+  error?: boolean;
 
-    success?: boolean;
+  success?: boolean;
 
-    hint?: string;
+  hint?: string;
 
-    className?: string;
+  className?: string;
 
-    size?: "xs" | "sm" | "md";
+  size?: 'xs' | 'sm' | 'md';
 }
 
 export const InputFieldPassword = ({
-                                       value,
-                                       onChange,
-                                       id,
-                                       name,
-                                       placeholder = "••••••••",
-                                       disabled = false,
-                                       required = false,
-                                       autoComplete = "current-password",
-                                       error = false,
-                                       success = false,
-                                       hint,
-                                       className = "",
-                                       size = "md",
-                                   }: InputFieldPasswordProps) => {
-    const [showPassword, setShowPassword] =
-        useState(false);
+  value,
+  onChange,
+  id,
+  name,
+  placeholder = '••••••••',
+  disabled = false,
+  required = false,
+  autoComplete = 'current-password',
+  error = false,
+  success = false,
+  hint,
+  className = '',
+  size = 'md',
+}: InputFieldPasswordProps) => {
+  const [showPassword, setShowPassword] = useState(false);
 
-    const sizeClasses = {
-        xs: {
-            button: "right-3",
-            icon: "size-4",
-            padding: "pr-9",
-        },
+  const sizeClasses = {
+    xs: {
+      button: 'right-3',
+      icon: 'size-4',
+      padding: 'pr-9',
+    },
 
-        sm: {
-            button: "right-3.5",
-            icon: "size-4.5",
-            padding: "pr-10",
-        },
+    sm: {
+      button: 'right-3.5',
+      icon: 'size-4.5',
+      padding: 'pr-10',
+    },
 
-        md: {
-            button: "right-4",
-            icon: "size-5",
-            padding: "pr-11",
-        },
-    };
+    md: {
+      button: 'right-4',
+      icon: 'size-5',
+      padding: 'pr-11',
+    },
+  };
 
-    return (
-        <div className="relative">
-            <InputField
-                type={
-                    showPassword
-                        ? "text"
-                        : "password"
-                }
-                value={value}
-                onChange={onChange}
-                id={id}
-                name={name}
-                placeholder={placeholder}
-                disabled={disabled}
-                required={required}
-                autoComplete={autoComplete}
-                error={error}
-                success={success}
-                hint={hint}
-                size={size}
-                className={`
-          ${sizeClasses[size].padding}
-          ${className}
-        `}
-            />
+  return (
+    <div className="relative">
+      <InputField
+        type={showPassword ? 'text' : 'password'}
+        value={value}
+        onChange={onChange}
+        id={id}
+        name={name}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+        autoComplete={autoComplete}
+        error={error}
+        success={success}
+        hint={hint}
+        size={size}
+        className={` ${sizeClasses[size].padding} ${className} `}
+      />
 
-            {!disabled && (
-                <button
-                    type="button"
-                    onClick={() =>
-                        setShowPassword(!showPassword)
-                    }
-                    className={`
-            absolute top-1/2 z-30
-            -translate-y-1/2
-            ${sizeClasses[size].button}
-          `}
-                >
-                    {showPassword ? (
-                        <EyeIcon
-                            className={`
-                fill-gray-500
-                dark:fill-gray-400
-                ${sizeClasses[size].icon}
-              `}
-                        />
-                    ) : (
-                        <EyeCloseIcon
-                            className={`
-                fill-gray-500
-                dark:fill-gray-400
-                ${sizeClasses[size].icon}
-              `}
-                        />
-                    )}
-                </button>
-            )}
-        </div>
-    );
+      {!disabled && (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className={`absolute top-1/2 z-30 -translate-y-1/2 ${sizeClasses[size].button} `}
+        >
+          {showPassword ? (
+            <EyeIcon className={`fill-gray-500 dark:fill-gray-400 ${sizeClasses[size].icon} `} />
+          ) : (
+            <EyeCloseIcon className={`fill-gray-500 dark:fill-gray-400 ${sizeClasses[size].icon} `} />
+          )}
+        </button>
+      )}
+    </div>
+  );
 };

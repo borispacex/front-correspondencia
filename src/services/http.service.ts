@@ -1,13 +1,13 @@
-import axios from "axios";
-import { BASE_URL } from "../constants/api.constants";
-import { getToken, removeToken } from "../utils/token.utils";
-import { ROUTES } from "../constants/routes.constants";
+import axios from 'axios';
+import { BASE_URL } from '../constants/api.constants';
+import { getToken, removeToken } from '../utils/token.utils';
+import { ROUTES } from '../constants/routes.constants';
 
 const http = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 });
 
@@ -20,7 +20,7 @@ http.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor: handle 401 Unauthorized
@@ -32,7 +32,7 @@ http.interceptors.response.use(
       window.location.href = ROUTES.SIGN_IN;
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default http;
