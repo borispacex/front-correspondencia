@@ -21,7 +21,14 @@ interface Props {
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
-export default function RouterTable({ documents, isLoading, onApprove, onView, onTraceability, onSelect }: Props) {
+export default function SignDocumentTable({
+  documents,
+  isLoading,
+  onApprove,
+  onView,
+  onTraceability,
+  onSelect,
+}: Props) {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);

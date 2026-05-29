@@ -25,6 +25,6 @@ export const ROUTES = {
   CORRESPONDENCE: {
     ROUTE_SHEET: '/correspondencia/hoja-ruta',
     DOCUMENTS: '/correspondencia/documentos',
-    APPROVE_SIGN: '/correspondencia/aprobar-firmar',
+    SIGN_DOCUMENT: '/correspondencia/firma-digital',
   },
 } as const;

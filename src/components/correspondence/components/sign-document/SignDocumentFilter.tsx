@@ -7,7 +7,7 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { BrushCleaningIcon } from '../../../../icons';
 
-interface RouterFilterProps {
+interface SignDocumentFilterProps {
   filters: SignDocumentFilters;
   sort: SignDocumentSortConfig;
   onFiltersChange: (filters: {
@@ -37,7 +37,7 @@ const SORT_OPTIONS: Option[] = [
   { value: 'subject:desc', label: 'Asunto Z → A' },
 ];
 
-export default function RouterFilter({ filters, sort, onFiltersChange, onSortChange }: RouterFilterProps) {
+export default function SignDocumentFilter({ filters, sort, onFiltersChange, onSortChange }: SignDocumentFilterProps) {
   const handleInputChange =
     (field: keyof SignDocumentFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onFiltersChange({

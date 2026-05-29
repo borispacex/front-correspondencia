@@ -83,6 +83,8 @@ import { ReactComponent as FileOutputIcon } from './file-output.svg?react';
 import { ReactComponent as FileInputIcon } from './file-input.svg?react';
 import { ReactComponent as BadgeIcon } from './badge.svg?react';
 import { ReactComponent as BrushCleaningIcon } from './brush-cleaning.svg?react';
+import { ReactComponent as RefreshCwIcon } from './refresh-cw.svg?react';
+import { ReactComponent as RefreshCcwIcon } from './refresh-ccw.svg?react';
 
 export {
   ErrorHexaIcon,
@@ -170,4 +172,6 @@ export {
   FileInputIcon,
   BadgeIcon,
   BrushCleaningIcon,
+  RefreshCwIcon,
+  RefreshCcwIcon,
 };

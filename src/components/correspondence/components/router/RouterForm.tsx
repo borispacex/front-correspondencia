@@ -25,6 +25,7 @@ import DropZonePdf from '../../../form/form-elements/DropZonePdf.tsx';
 import CheckboxSkeleton from '../../../animation/CheckboxSkeleton.tsx';
 import Checkbox from '../../../form/input/Checkbox.tsx';
 import MultiSelect from '../../../form/MultiSelect.tsx';
+import RichTextEditor from '../../../form/RichTextEditor.tsx';
 
 interface RouterFormProps {
   document: Document;
@@ -505,7 +506,14 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
             <InfoIcon className="size-4 cursor-pointer text-gray-400" />
           </Tooltip>
         </Label>
-        <div>aqui</div>
+        <RichTextEditor
+          label="Aclaración del Proveído"
+          name="routAclaracionProveido"
+          value={values.routAclaracionProveido}
+          // onChange={(html) => setFormData(p => ({ ...p, routAclaracionProveido: html }))}
+          onChange={(html) => setValue('routAclaracionProveido', html)}
+          minHeight={160}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">

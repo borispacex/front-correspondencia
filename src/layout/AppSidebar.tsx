@@ -134,9 +134,9 @@ const CORRESPONDENCIA_ITEMS: NavItem[] = [
   },
   {
     icon: <FingerprintPatternIcon />,
-    name: 'Aprobar y firmar',
-    path: ROUTES.CORRESPONDENCE.APPROVE_SIGN,
-    permission: 'correspondencia_aprobarfirmar.index',
+    name: 'Firma digital',
+    path: ROUTES.CORRESPONDENCE.SIGN_DOCUMENT,
+    permission: 'correspondencia_firmar.index',
   },
 ];
 
