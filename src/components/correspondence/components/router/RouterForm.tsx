@@ -21,6 +21,10 @@ import { getProvides } from '../../services/provided.service.ts';
 import { getUsersByDepartment } from '../../../../services/admin/users.service.ts';
 import { getTypeDocuments } from '../../services/type-document.service.ts';
 import { getPriorities } from '../../services/priority.service.ts';
+import DropZonePdf from '../../../form/form-elements/DropZonePdf.tsx';
+import CheckboxSkeleton from '../../../animation/CheckboxSkeleton.tsx';
+import Checkbox from '../../../form/input/Checkbox.tsx';
+import MultiSelect from '../../../form/MultiSelect.tsx';
 
 interface RouterFormProps {
   document: Document;
@@ -58,6 +62,8 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
     routObservacion: '',
 
     providedIds: [] as string[],
+
+    file: null as File | null,
   });
 
   const { addNotification } = useNotifications();
@@ -70,6 +76,8 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
   const [priorities, setPriorities] = useState<Option[]>([]);
 
   const [provides, setProvides] = useState<Option[]>([]);
+  const [selectedProvideIds, setSelectedProvideIds] = useState<string[]>([]);
+  const [selectedDepartmentsIds, setSelectedDepartmentsIds] = useState<string[]>([]);
   const [loadingCatalogs, setLoadingCatalogs] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -160,6 +168,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
     if (!values.selectedStateDocument) newErrors.selectedStateDocument = 'Debe seleccionar un estado';
     if (!values.selectedProcedureType) newErrors.selectedProcedureType = 'Debe seleccionar un trámite';
     if (values.providedIds.length === 0) newErrors.providedIds = 'Debe seleccionar al menos un proveído';
+    if (!values.file) newErrors.file = 'El archivo es requerido';
 
     setMultipleErrors(newErrors);
 
@@ -201,11 +210,25 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
     }
   }
 
+  function toggleProvide(id: string) {
+    setSelectedProvideIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       <div>
         <Label>
-          Departamento origen<span className="text-error-500">*</span>
+          Departamento origen<span className="text-error-500">*</span>{' '}
+          <Tooltip
+            content={
+              <div>
+                <p className="mb-2 font-bold">Departamento origen:</p>
+                <p className="mb-2 font-medium">Se debera seleccionar el area funcional a la que pertenece.</p>
+              </div>
+            }
+          >
+            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+          </Tooltip>
         </Label>
         <Select
           options={departments}
@@ -233,6 +256,20 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
             placeholder="Seleccione un trámite"
             error={!!errors.selectedProcedureType}
             hint={errors.selectedProcedureType}
+          />
+        </div>
+        <div>
+          <Label>
+            Estado del documento<span className="text-error-500">*</span>
+          </Label>
+          <Select
+            options={stateDocuments}
+            value={values.selectedStateDocument}
+            loading={loadingCatalogs}
+            onChange={(value) => setValue('selectedStateDocument', value)}
+            placeholder="Seleccione un estado"
+            error={!!errors.selectedStateDocument}
+            hint={errors.selectedStateDocument}
           />
         </div>
         <div>
@@ -291,164 +328,251 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
       </div>
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div>
-          <Label>Cite</Label>
-          <InputField value={values.docCite} disabled />
+          <Label>
+            Cite<span className="text-error-500">*</span>{' '}
+            <Tooltip
+              content={
+                <div>
+                  <p className="mb-2 font-bold">Cite:</p>
+                  <p className="mb-2 font-medium">
+                    Es la coficacion que genra la reparticion, division, areas funcionales, etc. para su control.
+                  </p>
+                </div>
+              }
+            >
+              <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+            </Tooltip>
+          </Label>
+          <InputField
+            value={values.docCite}
+            onChange={(e) => setValue('docCite', e.target.value)}
+            placeholder="Cite"
+            error={!!errors.docCite}
+            hint={errors.docCite}
+            disabled
+          />
         </div>
         <div>
-          <Label>Nro. Cite</Label>
-          <InputField value={values.docNumeroCite} disabled />
+          <Label>
+            Nro. Cite<span className="text-error-500">*</span>
+          </Label>
+          <InputField
+            value={values.docNumeroCite}
+            onChange={(e) => setValue('docNumeroCite', e.target.value)}
+            placeholder="Nro. Cite"
+            error={!!errors.docNumeroCite}
+            hint={errors.docNumeroCite}
+            disabled
+          />
         </div>
         <div>
-          <Label>Remite</Label>
-          <InputField value={values.docRemite} disabled />
-        </div>
-
-        <div>
-          <Label>Anexos</Label>
-          <InputField value={values.docAnexos} disabled />
-        </div>
-
-        <div>
-          <Label>Fojas</Label>
-          <InputField value={values.docFojas} disabled />
-        </div>
-
-        <div>
-          <Label>Fecha Documento</Label>
-          <InputField value={values.docFechaOrigen} disabled />
+          <Label>
+            Remite
+            <span className="text-error-500">*</span>{' '}
+            <Tooltip
+              content={
+                <div>
+                  <p className="mb-2 font-bold">Remite:</p>
+                  <p className="mb-2 font-medium">
+                    La persona encargada del área funcional quien está enviando la hoja de tramite.
+                  </p>
+                </div>
+              }
+            >
+              <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+            </Tooltip>
+          </Label>
+          <InputField
+            value={values.docRemite}
+            onChange={(e) => setValue('docRemite', e.target.value)}
+            placeholder="Remitente"
+            error={!!errors.docRemite}
+            hint={errors.docRemite}
+            disabled
+          />
         </div>
       </div>
 
-      <div className="mt-5">
-        <Label>Referencia</Label>
-        <TextArea rows={4} value={values.docReferencia} disabled />
-      </div>
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">Datos de Derivación</h3>
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <div>
-            <Label>
-              Estado Documento<span className="text-error-500">*</span>
-            </Label>
-            <Select
-              options={stateDocuments}
-              value={values.selectedStateDocument}
-              loading={loadingCatalogs}
-              onChange={(value) => setValue('selectedStateDocument', value)}
-              placeholder="Seleccione estado"
-              error={!!errors.selectedStateDocument}
-              hint={errors.selectedStateDocument}
-            />
-          </div>
-          <div>
-            <Label>
-              Departamento Destino<span className="text-error-500">*</span>
-            </Label>
-            <Select
-              options={departments}
-              value={values.selectedDepartmentDestino}
-              loading={loadingCatalogs}
-              onChange={(value) => {
-                setValue('selectedDepartmentDestino', value);
-                setValue('selectedUserDestino', '');
-              }}
-              placeholder="Seleccione departamento"
-              error={!!errors.selectedDepartmentDestino}
-              hint={errors.selectedDepartmentDestino}
-            />
-          </div>
-
-          <div>
-            <Label>
-              Usuario Destino<span className="text-error-500">*</span>
-            </Label>
-            <Select
-              options={users}
-              value={values.selectedUserDestino}
-              loading={loadingCatalogs}
-              onChange={(value) => setValue('selectedUserDestino', value)}
-              placeholder="Seleccione usuario"
-              error={!!errors.selectedUserDestino}
-              hint={errors.selectedUserDestino}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ========================= */}
-      {/* PROVEIDOS */}
-      {/* ========================= */}
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-        <div className="mb-4 flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Proveídos</h3>
-
-          <Tooltip content={<div>Seleccione las acciones correspondientes para la derivación.</div>}>
+      <div>
+        <Label>
+          Objeto / Referencia
+          <span className="text-error-500">*</span>{' '}
+          <Tooltip
+            content={
+              <div>
+                <p className="mb-2 font-bold">Objeto / Referencia:</p>
+                <p className="mb-2 font-medium">
+                  Se debe colocar el objeto del documento que se adjunta a la hoja de tramite.
+                </p>
+              </div>
+            }
+          >
             <InfoIcon className="size-4 cursor-pointer text-gray-400" />
           </Tooltip>
+        </Label>
+        <TextArea
+          rows={4}
+          value={values.docReferencia}
+          onChange={(value) => setValue('docReferencia', value)}
+          placeholder="Referencia"
+          error={!!errors.docReferencia}
+          hint={errors.docReferencia}
+        />
+      </div>
+      <div>
+        <Label>
+          Departamentos
+          <span className="text-error-500">*</span>{' '}
+          <Tooltip
+            content={
+              <div>
+                <p className="mb-2 font-bold">Departamentos:</p>
+                <p className="mb-2 font-medium">
+                  Se debe seleccionar una o mas departamentos a los que se derivara la hoja de tramite.
+                </p>
+              </div>
+            }
+          >
+            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+          </Tooltip>
+        </Label>
+        <div>
+          <MultiSelect
+            required
+            selectAll
+            searchable
+            value={selectedDepartmentsIds}
+            loading={loadingCatalogs}
+            rules={[
+              { type: 'required', message: 'Selecciona al menos una opción.' },
+              { type: 'min', value: 2, message: 'Mínimo 2 opciones.' },
+            ]}
+            options={departments}
+            onChange={(vals) => setSelectedDepartmentsIds(vals)}
+          />
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {provides.map((item) => {
-            const checked = values.providedIds.includes(item.value);
-
-            return (
-              <label
-                key={item.value}
-                className="hover:border-brand-300 dark:hover:border-brand-700 flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 p-3 transition-colors dark:border-gray-700"
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => handleProvidedChange(item.value)}
-                  className="text-brand-500 focus:ring-brand-500 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900"
+      <div>
+        <Label>
+          Proveidos
+          <span className="text-error-500">*</span>{' '}
+          <Tooltip
+            content={
+              <div>
+                <p className="mb-2 font-bold">Proveidos:</p>
+                <p className="mb-2 font-medium">Se debe seleccionar uno o mas proveidos a la hoja de tramite.</p>
+              </div>
+            }
+          >
+            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+          </Tooltip>
+        </Label>
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+          {loadingCatalogs ? (
+            <CheckboxSkeleton items={4} />
+          ) : provides.length === 0 ? (
+            <div className="px-5 py-10 text-center text-sm text-gray-400">No hay proveidos registrados</div>
+          ) : (
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {provides.map((provide) => (
+                <Checkbox
+                  key={provide.value}
+                  label={provide.label}
+                  checked={selectedProvideIds.includes(provide.value)}
+                  onChange={() => toggleProvide(provide.value)}
+                  size="md"
                 />
-
-                <span className="text-sm text-gray-700 dark:text-gray-300">{item.label}</span>
-              </label>
-            );
-          })}
-        </div>
-
-        {errors.providedIds && <p className="text-error-500 mt-2 text-sm">{errors.providedIds}</p>}
-      </div>
-
-      {/* ========================= */}
-      {/* OBSERVACIONES */}
-      {/* ========================= */}
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">Observaciones</h3>
-
-        <div className="space-y-5">
-          <div>
-            <Label>Aclaración del Proveído</Label>
-
-            <TextArea
-              rows={5}
-              value={values.routAclaracionProveido}
-              onChange={(value) => setValue('routAclaracionProveido', value)}
-              placeholder="Ingrese una aclaración"
-            />
-          </div>
-
-          <div>
-            <Label>Observación</Label>
-
-            <TextArea
-              rows={5}
-              value={values.routObservacion}
-              onChange={(value) => setValue('routObservacion', value)}
-              placeholder="Ingrese una observación"
-            />
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+      <div>
+        <Label>
+          Aclaracion del proveido
+          <span className="text-error-500">*</span>{' '}
+          <Tooltip
+            content={
+              <div>
+                <p className="mb-2 font-bold">Aclaracion del proveido:</p>
+                <p className="mb-2 font-medium">
+                  Se debera colocar una aclaracion al o los provedios que se marquen para su mejor comprension.
+                </p>
+              </div>
+            }
+          >
+            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+          </Tooltip>
+        </Label>
+        <div>aqui</div>
+      </div>
 
-      {/* ========================= */}
-      {/* ACTIONS */}
-      {/* ========================= */}
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div>
+          <Label>
+            Anexos
+            <span className="text-error-500">*</span>
+          </Label>
+          <InputField
+            value={values.docAnexos}
+            onChange={(e) => setValue('docAnexos', e.target.value)}
+            placeholder="Anexos"
+            error={!!errors.docAnexos}
+            hint={errors.docAnexos}
+          />
+        </div>
+        <div>
+          <Label>
+            Fojas
+            <span className="text-error-500">*</span>
+          </Label>
+          <InputField
+            type="number"
+            value={values.docFojas}
+            onChange={(e) => setValue('docFojas', e.target.value)}
+            placeholder="0"
+            min="0"
+            error={!!errors.docFojas}
+            hint={errors.docFojas}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label>
+          Archivo
+          <span className="text-error-500">*</span>{' '}
+          <Tooltip
+            content={
+              <div>
+                <p className="mb-2 font-bold">Archivo:</p>
+                <p className="mb-2 font-medium">Se debe adjuntar el archivo en formato PDF.</p>
+              </div>
+            }
+          >
+            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+          </Tooltip>
+        </Label>
+
+        <DropZonePdf
+          size="sm"
+          value={values.file}
+          onChange={(value) => setValue('file', value)}
+          maxSizeMB={10}
+          error={!!errors.file}
+          hint={errors.file}
+          required
+        />
+        {document?.doc_url && !values.file && (
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Archivo actual:{' '}
+            <a href={document.doc_url} target="_blank" rel="noopener noreferrer" className="text-brand-500 underline">
+              ver archivo
+            </a>
+          </p>
+        )}
+      </div>
 
       <div className="flex items-center justify-end gap-3">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
