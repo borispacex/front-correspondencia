@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { SignDocument, SignDocumentFilters, SignDocumentSortConfig } from '../types/sign-document.type.ts';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SignDocument } from '../types/sign-document.type.ts';
 import { usePermissions } from '../../../hooks/usePermissions.ts';
 import { useNotifications } from '../../../hooks/useNotification.tsx';
 import PageMeta from '../../common/PageMeta.tsx';
@@ -8,238 +8,208 @@ import Button from '../../ui/button/Button.tsx';
 import { PlusIcon } from '../../../icons';
 import { Modal } from '../../ui/modal';
 import RouterTable from '../components/router/RouterTable.tsx';
-import RouterFilter from '../components/router/RouterFilter.tsx';
-import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../types/documents/document.type.ts';
+import {
+  CreateDocumentRequest,
+  Document,
+  DocumentFilters,
+  SortConfig,
+  UpdateDocumentRequest,
+} from '../types/documents/document.type.ts';
 import DocumentForm from '../components/documents/DocumentForm.tsx';
 import RouterForm from '../components/router/RouterForm.tsx';
-
-const SIGN_DOCUMENTS: SignDocument[] = [
-  {
-    id: 11,
-    code: 'EMI/DGE/UGAT/AIT/001/2025',
-    subject: 'Solicitud de revisión técnica',
-    documentType: 'Nota externa ciudadana',
-    createdAt: '18/06/2025',
-    actionPerformed: 'Revisé como DE',
-    status: 'pending_approval',
-    route: {
-      id: 10,
-      code: 'HRD/EMI/00062/2025',
-      subject: 'Revisión hoja de ruta',
-    },
-    actions: [
-      {
-        type: 'approve',
-        enabled: true,
-      },
-      {
-        type: 'traceability',
-        enabled: true,
-      },
-    ],
-  },
-  {
-    id: 2,
-    code: 'EMI/DGE/UGAT/AIT/001/2025',
-    subject: 'Solicitud de revisión pago',
-    documentType: 'Nota interna',
-    createdAt: '15/01/2026',
-    actionPerformed: 'Revisé como Director',
-    status: 'pending_approval',
-    route: {
-      id: 11,
-      code: 'HRD/EMI/00062/2025',
-      subject: 'Revisión hoja de ruta',
-    },
-    actions: [
-      {
-        type: 'approve',
-        enabled: false,
-      },
-      {
-        type: 'traceability',
-        enabled: true,
-      },
-    ],
-  },
-];
+import { getDocuments } from '../services/document.service.ts';
+import ModalDelete from '../../modal/ModalDelete.tsx';
+import { RouterFilter } from '../components/router/RouterFilter.tsx';
+import DocumentStatusTabs, {
+  ARCHIVED_STATE_IDS,
+  ATTENDED_STATE_IDS,
+  DocumentStatusTab,
+  PENDING_STATE_IDS,
+} from '../components/documents/DocumentStatusTabs.tsx';
 
 export default function RouterPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
-  const [selected, setSelected] = useState<Document | null>(null);
 
-  const [documents, setDocuments] = useState<SignDocument[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRouterModalOpen, setIsRouterModalOpen] = useState(false);
+  const [selected, setSelected] = useState<Document | null>(null);
+  const [confirmId, setConfirmId] = useState<number | null>(null);
 
-  const [filters, setFilters] = useState<SignDocumentFilters>({
-    code: '',
-    route: '',
+  // ─────────────────────────────────────────────────────────────
+  // Filters, sort y status tab
+  // ─────────────────────────────────────────────────────────────
+  const [filters, setFilters] = useState<DocumentFilters>({
+    nro: '',
+    old: '',
+    origin: '',
     subject: '',
-    status: '',
-    createdAt: '',
+    priority: '',
   });
 
-  const [sort, setSort] = useState<SignDocumentSortConfig>({
-    field: 'created_at',
-    dir: 'desc',
-  });
+  const [sort, setSort] = useState<SortConfig>({ field: 'id', dir: 'desc' });
 
-  // ─────────────────────────────────────────────
-  // Load data
-  // ─────────────────────────────────────────────
+  const [statusTab, setStatusTab] = useState<DocumentStatusTab>('all');
 
-  async function loadDocuments() {
-    setIsLoading(true);
+  // ─────────────────────────────────────────────────────────────
+  // Conteos para los tabs (sobre documentos sin filtros de texto)
+  // ─────────────────────────────────────────────────────────────
+  const tabCounts = useMemo(
+    () => ({
+      all: documents.length,
+      pending: documents.filter((d) => PENDING_STATE_IDS.includes(d.state_document_id)).length,
+      attended: documents.filter((d) => ATTENDED_STATE_IDS.includes(d.state_document_id)).length,
+      archived: documents.filter((d) => ARCHIVED_STATE_IDS.includes(d.state_document_id)).length,
+    }),
+    [documents],
+  );
 
-    try {
-      // const data = await getPendingSignDocuments();
-      // setDocuments(data);
-      setDocuments(SIGN_DOCUMENTS);
-    } catch (err: any) {
-      addNotification({
-        type: 'error',
-        title: 'Error',
-        message: err?.response?.data?.message ?? 'Error al cargar documentos',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadDocuments();
-  }, []);
-
-  // ─────────────────────────────────────────────
-  // Filters + Sort
-  // ─────────────────────────────────────────────
-
+  // ─────────────────────────────────────────────────────────────
+  // Filtered data (tab + filtros de texto + sort)
+  // ─────────────────────────────────────────────────────────────
   const filteredDocuments = useMemo(() => {
     const filtered = documents.filter((document) => {
-      const codeMatch = !filters.code || String(document.code).toLowerCase().includes(filters.code.toLowerCase());
+      // ── Filtro por tab de estado ──────────────────────────────
+      if (statusTab === 'pending' && !PENDING_STATE_IDS.includes(document.state_document_id)) return false;
+      if (statusTab === 'attended' && !ATTENDED_STATE_IDS.includes(document.state_document_id)) return false;
+      if (statusTab === 'archived' && !ARCHIVED_STATE_IDS.includes(document.state_document_id)) return false;
 
-      const routeMatch = !filters.route || String(document.route).toLowerCase().includes(filters.route.toLowerCase());
+      // ── Filtros de texto ──────────────────────────────────────
+      const nroMatch =
+        !filters.nro ||
+        String(document.doc_contador ?? '')
+          .toLowerCase()
+          .includes(filters.nro.toLowerCase());
+
+      const oldMatch =
+        !filters.old ||
+        String(document.doc_cite ?? '')
+          .toLowerCase()
+          .includes(filters.old.toLowerCase());
+
+      const originMatch =
+        !filters.origin ||
+        String(document.doc_dep_name ?? '')
+          .toLowerCase()
+          .includes(filters.origin.toLowerCase());
 
       const subjectMatch =
-        !filters.subject || String(document.subject).toLowerCase().includes(filters.subject.toLowerCase());
+        !filters.subject ||
+        String(document.doc_referencia ?? '')
+          .toLowerCase()
+          .includes(filters.subject.toLowerCase());
 
-      const statusMatch =
-        !filters.status || String(document.status).toLowerCase().includes(filters.status.toLowerCase());
+      const priorityMatch =
+        !filters.priority ||
+        String(document.pri_name ?? '')
+          .toLowerCase()
+          .includes(filters.priority.toLowerCase());
 
-      const createdAtMatch = !filters.createdAt || String(document.createdAt).includes(filters.createdAt);
-
-      return codeMatch && routeMatch && subjectMatch && statusMatch && createdAtMatch;
+      return nroMatch && oldMatch && originMatch && subjectMatch && priorityMatch;
     });
 
     return [...filtered].sort((a, b) => {
-      const aVal = String(a[sort.field as keyof SignDocument] ?? '');
-
-      const bVal = String(b[sort.field as keyof SignDocument] ?? '');
-
-      const cmp = aVal.localeCompare(bVal, undefined, {
-        numeric: true,
-        sensitivity: 'base',
-      });
-
+      const aVal = String(a[sort.field as keyof Document] ?? '');
+      const bVal = String(b[sort.field as keyof Document] ?? '');
+      const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
       return sort.dir === 'asc' ? cmp : -cmp;
     });
-  }, [documents, filters, sort]);
+  }, [documents, filters, sort, statusTab]);
 
-  // ─────────────────────────────────────────────
-  // Actions
-  // ─────────────────────────────────────────────
-
-  async function handleApprove(document: SignDocument) {
-    setIsModalOpen(true);
-    // setSelecteds();
-  }
-
-  async function handleReject(document: SignDocument) {
+  // ─────────────────────────────────────────────────────────────
+  // Load data
+  // ─────────────────────────────────────────────────────────────
+  const fetchDocuments = useCallback(async () => {
+    setIsLoading(true);
     try {
-      // await rejectSignDocument(document.id);
-
-      addNotification({
-        type: 'warning',
-        title: 'Documento rechazado',
-        message: `El documento "${document.code}" fue rechazado.`,
-      });
-
-      await loadDocuments();
-    } catch (err: any) {
-      addNotification({
-        type: 'error',
-        title: 'Error',
-        message: err?.response?.data?.message ?? 'Error al rechazar documento',
-      });
+      const data = await getDocuments();
+      setDocuments(data);
+    } finally {
+      setIsLoading(false);
     }
-  }
+  }, []);
 
-  async function handleSign(document: SignDocument) {
-    try {
-      // await signDocument(document.id);
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
 
-      addNotification({
-        type: 'success',
-        title: 'Documento firmado',
-        message: `El documento "${document.code}" fue firmado digitalmente.`,
-      });
+  // ─────────────────────────────────────────────────────────────
+  // Handlers
+  // ─────────────────────────────────────────────────────────────
+  const handleToggleActive = (item: Document, active: boolean) => {
+    setDocuments((prev) =>
+      prev.map((doc) => (doc.id === item.id ? { ...doc, deleted_at: active ? null : new Date().toISOString() } : doc)),
+    );
+  };
 
-      await loadDocuments();
-    } catch (err: any) {
-      addNotification({
-        type: 'error',
-        title: 'Error',
-        message: err?.response?.data?.message ?? 'Error al firmar documento',
-      });
-    }
-  }
-
-  function handleView(document: SignDocument) {
+  const handleRouter = (document: Document) => {
+    setSelected(document);
+    setIsRouterModalOpen(true);
+  };
+  const handleViewHeader = (document: Document) => {
+    console.log('Cabecera:', document);
+  };
+  const handleViewSheet = (document: Document) => {
+    console.log('Hoja:', document);
+  };
+  const handleViewRoutes = (document: Document) => {
+    console.log('Rutas:', document);
+  };
+  const handleView = (document: SignDocument) => {
     console.log('Ver documento', document);
-  }
+  };
 
-  function handleViewRoute(document: SignDocument) {
-    console.log('Ver hoja de ruta', document);
-  }
-
-  function handleViewRoute(document: SignDocument) {
-    console.log('Ver hoja de ruta', document);
-  }
-
-  function handleApproveDocuments(document: SignDocument) {
-    console.log('Ver hoja de ruta', document);
-    // setSelecteds(documents);
+  function handleEdit(document: Document) {
+    setSelected(document);
     setIsModalOpen(true);
   }
-
+  function handleDelete(id: number) {
+    setConfirmId(id);
+  }
   function handleCreate() {
     setSelected(null);
     setIsModalOpen(true);
+  }
+  async function handleSubmitRouter(data: any) {
+    console.log('derive', data);
+  }
+
+  async function handleConfirmDelete() {
+    if (confirmId === null) return;
+    try {
+      addNotification({
+        type: 'success',
+        title: 'Documento eliminado',
+        message: 'El documento fue eliminado correctamente.',
+      });
+      setConfirmId(null);
+      fetchDocuments();
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al eliminar el documento',
+      });
+    }
   }
 
   async function handleSubmit(data: CreateDocumentRequest | UpdateDocumentRequest) {
     try {
       if (selected) {
-        // await updateDocument(selected.id, data as UpdateDocumentRequest);
-
         addNotification({
           type: 'info',
           title: 'Documento actualizado',
           message: `El documento "${data.doc_numero_cite}" fue actualizado correctamente.`,
         });
       } else {
-        // await createDocument(data as CreateDocumentRequest);
-
         addNotification({
           type: 'success',
           title: 'Documento creado',
           message: `El documento "${data.doc_numero_cite}" fue creado correctamente.`,
         });
       }
-
       setIsModalOpen(false);
       fetchDocuments();
     } catch (err: any) {
@@ -251,43 +221,45 @@ export default function RouterPage() {
     }
   }
 
-  async function handleSubmitRouter(data: any) {
-    console.log('derive', data);
-  }
-
-  // ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
   // Render
-  // ─────────────────────────────────────────────
-
+  // ─────────────────────────────────────────────────────────────
   return (
     <>
       <PageMeta title="Hoja de ruta" description="Gestión de creación de hoja de ruta" />
-
       <PageBreadCrumb pageTitle="Hoja de ruta" />
 
       <div className="space-y-5">
-        {/* Filters */}
+        {/* Tabs de estado */}
+        <DocumentStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
+
+        {/* Filtros + botón crear */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('documents.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
-              Nuevo Tramite
+              Nueva Hoja de ruta
             </Button>
           )}
         </div>
 
-        {/* Table */}
+        {/* Tabla */}
         <RouterTable
           documents={filteredDocuments}
           isLoading={isLoading}
-          onApprove={handleApprove}
-          onReject={handleReject}
-          onSign={handleSign}
+          selectedDocumentId={selected?.id}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleActive={handleToggleActive}
+          onDerive={handleRouter}
+          onViewHeader={handleViewHeader}
+          onViewSheet={handleViewSheet}
+          onViewRoutes={handleViewRoutes}
           onView={handleView}
-          onViewRoute={handleViewRoute}
         />
       </div>
 
+      {/********************************** MODALES ***********************************/}
       <Modal
         isOpen={isModalOpen}
         size="lg"
@@ -295,12 +267,11 @@ export default function RouterPage() {
         className="w-full max-w-6xl p-6 sm:p-8"
       >
         <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
-          {selected ? 'Editar Tramite' : 'Nuevo Tramite'}
+          {selected ? 'Editar Documento' : 'Nuevo Documento'}
         </h3>
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
         </p>
-
         <DocumentForm document={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
       </Modal>
 
@@ -316,9 +287,16 @@ export default function RouterPage() {
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
         </p>
-
         <RouterForm document={selected} onSubmit={handleSubmitRouter} onCancel={() => setIsRouterModalOpen(false)} />
       </Modal>
+
+      <ModalDelete
+        isOpen={confirmId !== null}
+        onClose={() => setConfirmId(null)}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar este Documento?"
+        message="Esta acción no se puede deshacer."
+      />
     </>
   );
 }

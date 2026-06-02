@@ -1,156 +1,134 @@
 import type { ChangeEvent } from 'react';
-import { SignDocumentFilters, SignDocumentSortConfig } from '../../types/sign-document.type.ts';
-import Select, { Option } from '../../../form/Select.tsx';
-import Label from '../../../form/Label.tsx';
-import InputField from '../../../form/input/InputField.tsx';
-import Tooltip from '../../../form/Tooltip.tsx';
-import Button from '../../../ui/button/Button.tsx';
-import { BrushCleaningIcon } from '../../../../icons';
 
-interface RouterFilterProps {
-  filters: SignDocumentFilters;
-  sort: SignDocumentSortConfig;
-  onFiltersChange: (filters: {
-    code: string;
-    route: string;
-    subject: string;
-    status: string;
-    createdAt: string;
-  }) => void;
-  onSortChange: (sort: SignDocumentSortConfig) => void;
+import Button from '../../../ui/button/Button.tsx';
+import Label from '../../../form/Label';
+import InputField from '../../../form/input/InputField';
+import Select, { Option } from '../../../form/Select.tsx';
+import { BrushCleaningIcon } from '../../../../icons';
+import Tooltip from '../../../form/Tooltip.tsx';
+
+export interface RouterFilters {
+  nro: string;
+  origin: string;
+  subject: string;
+  priority: string;
+  sender: string;
 }
 
-const STATUS_OPTIONS: Option[] = [
-  { value: '', label: 'Todos' },
-  { value: 'PENDING', label: 'Pendiente' },
-  { value: 'APPROVED', label: 'Aprobado' },
-  { value: 'REJECTED', label: 'Rechazado' },
-  { value: 'SIGNED', label: 'Firmado' },
-];
+export interface SortConfig {
+  field: string;
+  dir: 'asc' | 'desc';
+}
 
-const SORT_OPTIONS: Option[] = [
-  { value: 'created_at:desc', label: 'Más reciente' },
-  { value: 'created_at:asc', label: 'Más antiguo' },
-  { value: 'code:asc', label: 'Código A → Z' },
-  { value: 'code:desc', label: 'Código Z → A' },
-  { value: 'subject:asc', label: 'Asunto A → Z' },
-  { value: 'subject:desc', label: 'Asunto Z → A' },
-];
+interface RouterFilterProps {
+  filters: RouterFilters;
+  sort: SortConfig;
+  onFiltersChange: (filters: RouterFilters) => void;
+  onSortChange: (sort: SortConfig) => void;
+}
 
-export default function RouterFilter({ filters, sort, onFiltersChange, onSortChange }: RouterFilterProps) {
-  const handleInputChange =
-    (field: keyof SignDocumentFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      onFiltersChange({
-        ...filters,
-        [field]: e.target.value,
-      });
-    };
+export const RouterFilter = ({ filters, sort, onFiltersChange, onSortChange }: RouterFilterProps) => {
+  const handleInputChange = (field: keyof RouterFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    onFiltersChange({ ...filters, [field]: e.target.value });
+  };
 
-  const handleSelectChange = (field: keyof SignDocumentFilters) => (value: string) => {
-    onFiltersChange({
-      ...filters,
-      [field]: value,
-    });
+  const handleSelectChange = (field: keyof RouterFilters) => (value: string) => {
+    onFiltersChange({ ...filters, [field]: value });
   };
 
   const handleSortChange = (value: string) => {
     const [field, dir] = value.split(':');
-
-    onSortChange({
-      field,
-      dir: dir as 'asc' | 'desc',
-    });
+    onSortChange({ field, dir: dir as 'asc' | 'desc' });
   };
 
-  function clearFilters() {
-    onFiltersChange({
-      code: '',
-      route: '',
-      subject: '',
-      status: '',
-      createdAt: '',
-    });
+  const clearFilters = () => {
+    onFiltersChange({ nro: '', origin: '', subject: '', priority: '', sender: '' });
+    onSortChange({ field: 'id', dir: 'desc' });
+  };
 
-    onSortChange({
-      field: 'created_at',
-      dir: 'desc',
-    });
-  }
+  const PRIORITY_OPTIONS: Option[] = [
+    { value: '', label: 'Todas' },
+    { value: 'NORMAL', label: 'Normal' },
+    { value: 'URGENTE', label: 'Urgente' },
+    { value: 'ALTA', label: 'Alta' },
+  ];
+
+  const SORT_OPTIONS: Option[] = [
+    { value: 'id:desc', label: 'Más reciente' },
+    { value: 'id:asc', label: 'Más antiguo' },
+    { value: 'priority_id:asc', label: 'Prioridad A→Z' },
+    { value: 'doc_fecha_origen:desc', label: 'Fecha ↓' },
+    { value: 'doc_fecha_origen:asc', label: 'Fecha ↑' },
+  ];
 
   return (
     <div className="flex flex-wrap items-end gap-2">
-      {/* Código */}
-      <div className="flex min-w-[130px] flex-col gap-1">
+      {/* Nro */}
+      <div className="flex min-w-[100px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Código
+          Nro
         </Label>
+        <InputField size="xs" value={filters.nro} onChange={handleInputChange('nro')} placeholder="Buscar Nro…" />
+      </div>
 
+      {/* Procedencia */}
+      <div className="flex min-w-[160px] flex-1 flex-col gap-1">
+        <Label size="xs" className="tracking-wide uppercase">
+          Procedencia
+        </Label>
         <InputField
           size="xs"
-          value={filters.code}
-          onChange={handleInputChange('code')}
-          placeholder="Buscar código..."
+          value={filters.origin}
+          onChange={handleInputChange('origin')}
+          placeholder="Buscar procedencia…"
         />
       </div>
 
-      {/* Hoja de Ruta */}
+      {/* Remitente */}
       <div className="flex min-w-[140px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Hoja Ruta
+          Remitente
         </Label>
-
         <InputField
           size="xs"
-          value={filters.route}
-          onChange={handleInputChange('route')}
-          placeholder="Buscar ruta..."
+          value={filters.sender}
+          onChange={handleInputChange('sender')}
+          placeholder="Buscar remitente…"
         />
       </div>
 
-      {/* Asunto */}
-      <div className="flex min-w-[220px] flex-1 flex-col gap-1">
+      {/* Objeto / Referencia */}
+      <div className="flex min-w-[200px] flex-1 flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Asunto
+          Objeto / Referencia
         </Label>
-
         <InputField
           size="xs"
           value={filters.subject}
           onChange={handleInputChange('subject')}
-          placeholder="Buscar asunto..."
+          placeholder="Buscar asunto…"
         />
       </div>
 
-      {/* Estado */}
-      <div className="flex min-w-[140px] flex-col gap-1">
+      {/* Prioridad */}
+      <div className="flex min-w-[110px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Estado
+          Prioridad
         </Label>
-
         <Select
           size="xs"
-          options={STATUS_OPTIONS}
-          defaultValue={filters.status}
-          onChange={handleSelectChange('status')}
-          placeholder="Todos"
+          options={PRIORITY_OPTIONS}
+          defaultValue={filters.priority}
+          onChange={handleSelectChange('priority')}
+          placeholder="Todas"
         />
       </div>
 
-      {/* Fecha */}
-      <div className="flex min-w-[140px] flex-col gap-1">
-        <Label size="xs" className="tracking-wide uppercase">
-          Fecha
-        </Label>
-
-        <InputField size="xs" type="date" value={filters.createdAt} onChange={handleInputChange('createdAt')} />
-      </div>
-
-      {/* Orden */}
-      <div className="flex min-w-[180px] flex-col gap-1">
+      {/* Ordenar */}
+      <div className="flex min-w-[150px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
           Ordenar por
         </Label>
-
         <Select
           size="xs"
           options={SORT_OPTIONS}
@@ -161,11 +139,11 @@ export default function RouterFilter({ filters, sort, onFiltersChange, onSortCha
       </div>
 
       {/* Limpiar */}
-      <Tooltip content="Limpiar filtros">
+      <Tooltip content="Limpiar">
         <Button size="xs" variant="outline" onClick={clearFilters} className="h-[38px]">
-          <BrushCleaningIcon width="18" height="18" />
+          <BrushCleaningIcon width="20" height="20" />
         </Button>
       </Tooltip>
     </div>
   );
-}
+};

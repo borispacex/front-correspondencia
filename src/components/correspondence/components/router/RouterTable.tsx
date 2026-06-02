@@ -1,17 +1,23 @@
 import { useMemo, useState } from 'react';
 import {
+  BadgeIcon,
   CalenderIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  AngleUpIcon,
+  AngleDownIcon,
   CopyIcon,
   EyeIcon,
+  FileTextIcon,
   MailIcon,
   PencilIcon,
+  PrinterIcon,
   RouteIcon,
   SendHorizontalIcon,
   TrashBinIcon,
 } from '../../../../icons';
-import { SignDocument } from '../../types/sign-document.type.ts';
 import TableSkeleton from '../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
@@ -19,12 +25,12 @@ import { Document } from '../../types/documents/document.type.ts';
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 
 interface Props {
-  documents: SignDocument[] | Document[];
+  documents: Document[];
   isLoading?: boolean;
-  onTraceability?: (document: SignDocument) => void;
-  onSelect?: (ids: number[]) => void;
-
+  onViewHeader?: (document: Document) => void;
+  onViewRoutes?: (document: Document) => void;
   onDerive?: (document: Document) => void;
+  onViewSheet?: (document: Document) => void;
   onView?: (document: Document) => void;
   onEdit: (document: Document) => void;
   onDelete: (id: number) => void;
@@ -35,48 +41,108 @@ const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 export default function RouterTable({
   documents,
   isLoading,
-  onView,
-  onTraceability,
-  onSelect,
-
-  onDerive,
   onEdit,
   onDelete,
+  onDerive,
+  onViewHeader,
+  onViewSheet,
+  onViewRoutes,
+  onView,
 }: Props) {
   const { can } = usePermissions();
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [sortField, setSortField] = useState('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const sorted = useMemo(() => {
+    if (!sortField) return documents;
+    return [...documents].sort((a, b) => {
+      const aVal = String(a[sortField as keyof Document] ?? '');
+      const bVal = String(b[sortField as keyof Document] ?? '');
+      const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [documents, sortField, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(documents.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const total = documents.length;
+  const from = total === 0 ? 0 : (safePage - 1) * perPage + 1;
+  const to = Math.min(safePage * perPage, total);
 
   const paginated = useMemo(() => {
-    const start = (page - 1) * perPage;
+    const start = (safePage - 1) * perPage;
+    return sorted.slice(start, start + perPage);
+  }, [sorted, safePage, perPage]);
 
-    return documents.slice(start, start + perPage);
-  }, [documents, page, perPage]);
-
-  const total = documents.length;
-
-  const from = total === 0 ? 0 : (page - 1) * perPage + 1;
-  const to = Math.min(page * perPage, total);
-
-  function handleSelect(id: number, checked: boolean) {
-    const updated = checked ? [...selectedIds, id] : selectedIds.filter((item) => item !== id);
-
-    setSelectedIds(updated);
-    onSelect?.(updated);
+  function handlePerPageChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setPerPage(Number(e.target.value));
+    setPage(1);
   }
 
-  function handleSelectAll(checked: boolean) {
-    const updated = checked ? paginated.map((item) => item.id) : [];
-
-    setSelectedIds(updated);
-    onSelect?.(updated);
+  function handleSort(field: string) {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setPage(1);
   }
 
-  const allSelected = paginated.length > 0 && paginated.every((item) => selectedIds.includes(item.id));
+  function renderSortIcon(field: string) {
+    if (sortField !== field) return <AngleDownIcon className="size-3 opacity-30" />;
+    return sortDir === 'asc' ? <AngleUpIcon className="size-3" /> : <AngleDownIcon className="size-3" />;
+  }
+
+  function renderPageNumbers(): (number | '...')[] {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (safePage > 3) pages.push('...');
+    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
+      pages.push(i);
+    }
+    if (safePage < totalPages - 2) pages.push('...');
+    pages.push(totalPages);
+    return pages;
+  }
+
+  // ── Priority config ────────────────────────────────────────────────────────────
+  const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
+    NORMAL: { label: 'NORMAL', cls: 'bg-blue-100  text-blue-700  dark:bg-blue-900/40  dark:text-blue-300' },
+    URGENTE: { label: 'URGENTE', cls: 'bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300' },
+  };
+
+  function PriorityBadge({ priority }: { priority?: string }) {
+    const cfg = PRIORITY_CONFIG[priority ?? 'NORMAL'] ?? PRIORITY_CONFIG.NORMAL;
+    return (
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${cfg.cls}`}
+      >
+        <BadgeIcon />
+        {cfg.label}
+      </span>
+    );
+  }
+
+  // ── Copy ───────────────────────────────────────────────────────────────────
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  async function handleCopy(document: Document) {
+    try {
+      await navigator.clipboard.writeText(String(document.doc_contador ?? document.id));
+      setCopiedId(document.id);
+      setTimeout(() => setCopiedId(null), 1800);
+    } catch (error) {
+      console.error('Error copying', error);
+    }
+  }
+
+  const btnBase = 'inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition-colors';
+  const btnNormal = `${btnBase} border-gray-200 text-gray-500 hover:border-brand-400 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400 disabled:opacity-40`;
+  const btnActive = `${btnBase} border-brand-500 bg-brand-500 text-white`;
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -84,11 +150,17 @@ export default function RouterTable({
         <table className="w-full min-w-[1150px]">
           <thead>
             <tr className="border-b border-gray-100 dark:border-white/[0.05]">
-              <th className="w-16 cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <span className="flex items-center gap-1"># </span>
+              <th
+                onClick={() => handleSort('id')}
+                className="w-16 cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1"># {renderSortIcon('id')}</span>
               </th>
-              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Hoja de ruta
+              <th
+                onClick={() => handleSort('doc_contador')}
+                className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1">Hoja de ruta {renderSortIcon('doc_contador')}</span>
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Derivado por
@@ -99,12 +171,14 @@ export default function RouterTable({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {isLoading ? (
-              <TableSkeleton rows={6} cols={6} />
+          <tbody
+            className={`divide-y divide-gray-100 transition-opacity duration-200 dark:divide-white/[0.05] ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            {isLoading && documents.length === 0 ? (
+              <TableSkeleton rows={6} cols={4} />
             ) : paginated.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-14 text-center text-sm text-gray-400">
+                <td colSpan={4} className="px-5 py-14 text-center text-sm text-gray-400">
                   No hay documentos pendientes
                 </td>
               </tr>
@@ -117,36 +191,69 @@ export default function RouterTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400 rounded-full border px-3 py-1 text-xs font-medium">
-                          {document.code}
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:text-brand-400 dark:bg-brand-500/10 rounded-full border px-3 py-1 text-xs font-medium">
+                          {document.doc_contador ?? document.id}
                         </span>
-
-                        <button
-                          type="button"
-                          onClick={() => navigator.clipboard.writeText(document.code)}
-                          className="text-brand-600 hover:text-brand-700 dark:text-brand-400 transition-colors"
-                        >
-                          <CopyIcon className="size-4" />
-                        </button>
+                        <Tooltip content={copiedId === document.id ? 'Copiado' : 'Copiar'}>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(document)}
+                            className={`group text-brand-600 hover:text-brand-700 dark:text-brand-400 relative inline-flex items-center justify-center rounded-md pl-0.5 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                              copiedId === document.id
+                                ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 scale-110'
+                                : 'scale-100'
+                            }`}
+                          >
+                            <CopyIcon className={`size-4`} />
+                          </button>
+                        </Tooltip>
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
-                        <p>
-                          <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span>{' '}
-                          {document.subject}
-                        </p>
-                        <p>
-                          <span className="text-brand-600 dark:text-brand-400 font-semibold">Tipo:</span>{' '}
-                          {document.documentType}
-                        </p>
+                        {document.priority_id && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">PRIORIDAD:</span>{' '}
+                            <PriorityBadge priority={document.priority_id === 1 ? 'URGENTE' : 'NORMAL'} />
+                          </p>
+                        )}
+                        {document.doc_cite && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
+                            {document.doc_numero_cite}
+                          </p>
+                        )}
+                        {document.doc_dep_name && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">PROCEDENCIA:</span>{' '}
+                            {document.doc_dep_name}
+                          </p>
+                        )}
+                        {document.doc_remite && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITENTE:</span>{' '}
+                            {document.doc_remite}
+                          </p>
+                        )}
+                        {document.typ_name && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">TIPO:</span>{' '}
+                            {document.typ_name}
+                          </p>
+                        )}
+                        {document.doc_referencia && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">OBJETO/REFERENCIA:</span>{' '}
+                            {document.doc_referencia}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </td>
 
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
-                      {document.id === 11 ? (
+                      {document.id % 2 == 0 ? (
                         <div className="text-sm text-gray-700 dark:text-gray-300">
                           <p>CRISTIAN MACELO MAMANI VIDES</p>
                           <p>JEFE DE GESTON Y ASISTENCIA TECNOLOGICA</p>
@@ -173,7 +280,27 @@ export default function RouterTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
-                      {can('documents.derive') && (
+                      {can('documents.edit') && onViewHeader && (
+                        <Tooltip content="Cabecera de ruta">
+                          <Button
+                            variant="secondary-outline"
+                            size="xs"
+                            startIcon={<FileTextIcon className="size-3.5" />}
+                            onClick={() => onViewHeader(document)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.edit') && onViewSheet && (
+                        <Tooltip content="Hoja de ruta">
+                          <Button
+                            variant="secondary-outline"
+                            size="xs"
+                            startIcon={<PrinterIcon className="size-3.5" />}
+                            onClick={() => onViewSheet(document)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.derive') && onDerive && (
                         <Tooltip content="Derivar">
                           <Button
                             variant="success-outline"
@@ -188,7 +315,7 @@ export default function RouterTable({
                           <Button
                             variant="primary-outline"
                             size="xs"
-                            onClick={() => onTraceability?.(document)}
+                            onClick={() => onViewRoutes?.(document)}
                             startIcon={<RouteIcon className="size-3.5" />}
                           ></Button>
                         </Tooltip>
@@ -233,49 +360,62 @@ export default function RouterTable({
       </div>
 
       {!isLoading && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-5 py-4 dark:border-white/[0.05]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-5 py-3 dark:border-white/[0.05]">
           <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
             <span>Filas por página:</span>
-
             <select
               value={perPage}
-              onChange={(e) => {
-                setPerPage(Number(e.target.value));
-                setPage(1);
-              }}
-              className="focus:border-brand-400 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+              onChange={handlePerPageChange}
+              className="focus:border-brand-400 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
             >
-              {PER_PAGE_OPTIONS.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+              {PER_PAGE_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {n}
                 </option>
               ))}
             </select>
-
             <span>
               {from}–{to} de {total}
             </span>
           </div>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">
+              <ChevronsLeftIcon />
+            </button>
             <button
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page === 1}
-              className="hover:border-brand-500 hover:text-brand-500 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
+              onClick={() => setPage(safePage - 1)}
+              disabled={safePage === 1}
+              className={btnNormal}
+              title="Anterior"
             >
               <ChevronLeftIcon />
             </button>
-
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              Página {page} de {totalPages}
-            </span>
-
+            {renderPageNumbers().map((p, i) =>
+              p === '...' ? (
+                <span key={`e-${i}`} className="inline-flex h-8 w-8 items-center justify-center text-sm text-gray-400">
+                  …
+                </span>
+              ) : (
+                <button key={p} onClick={() => setPage(p as number)} className={p === safePage ? btnActive : btnNormal}>
+                  {p}
+                </button>
+              ),
+            )}
             <button
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={page === totalPages}
-              className="hover:border-brand-500 hover:text-brand-500 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
+              onClick={() => setPage(safePage + 1)}
+              disabled={safePage === totalPages}
+              className={btnNormal}
+              title="Siguiente"
             >
               <ChevronRightIcon />
+            </button>
+            <button
+              onClick={() => setPage(totalPages)}
+              disabled={safePage === totalPages}
+              className={btnNormal}
+              title="Última"
+            >
+              <ChevronsRightIcon />
             </button>
           </div>
         </div>

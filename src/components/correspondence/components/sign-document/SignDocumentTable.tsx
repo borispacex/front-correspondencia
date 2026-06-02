@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react';
 import {
+  AngleDownIcon,
+  AngleUpIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
   CopyIcon,
   EyeIcon,
   FingerprintPatternIcon,
@@ -37,35 +41,79 @@ export default function SignDocumentTable({
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [sortField, setSortField] = useState('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const sorted = useMemo(() => {
+    if (!sortField) return documents;
+    return [...documents].sort((a, b) => {
+      const aVal = String(a[sortField as keyof SignDocument] ?? '');
+      const bVal = String(b[sortField as keyof SignDocument] ?? '');
+      const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [documents, sortField, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(documents.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const total = documents.length;
+  const from = total === 0 ? 0 : (safePage - 1) * perPage + 1;
+  const to = Math.min(safePage * perPage, total);
 
   const paginated = useMemo(() => {
-    const start = (page - 1) * perPage;
+    const start = (safePage - 1) * perPage;
+    return sorted.slice(start, start + perPage);
+  }, [sorted, safePage, perPage]);
 
-    return documents.slice(start, start + perPage);
-  }, [documents, page, perPage]);
+  function handlePerPageChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setPerPage(Number(e.target.value));
+    setPage(1);
+  }
 
-  const total = documents.length;
+  function handleSort(field: string) {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setPage(1);
+  }
 
-  const from = total === 0 ? 0 : (page - 1) * perPage + 1;
-  const to = Math.min(page * perPage, total);
+  function renderSortIcon(field: string) {
+    if (sortField !== field) return <AngleDownIcon className="size-3 opacity-30" />;
+    return sortDir === 'asc' ? <AngleUpIcon className="size-3" /> : <AngleDownIcon className="size-3" />;
+  }
+
+  function renderPageNumbers(): (number | '...')[] {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (safePage > 3) pages.push('...');
+    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
+      pages.push(i);
+    }
+    if (safePage < totalPages - 2) pages.push('...');
+    pages.push(totalPages);
+    return pages;
+  }
 
   function handleSelect(id: number, checked: boolean) {
     const updated = checked ? [...selectedIds, id] : selectedIds.filter((item) => item !== id);
-
     setSelectedIds(updated);
     onSelect?.(updated);
   }
 
   function handleSelectAll(checked: boolean) {
     const updated = checked ? paginated.map((item) => item.id) : [];
-
     setSelectedIds(updated);
     onSelect?.(updated);
   }
 
   const allSelected = paginated.length > 0 && paginated.every((item) => selectedIds.includes(item.id));
+
+  const btnBase = 'inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition-colors';
+  const btnNormal = `${btnBase} border-gray-200 text-gray-500 hover:border-brand-400 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400 disabled:opacity-40`;
+  const btnActive = `${btnBase} border-brand-500 bg-brand-500 text-white`;
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -82,20 +130,32 @@ export default function SignDocumentTable({
                 />
               </th>
 
-              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Documento
+              <th
+                onClick={() => handleSort('code')}
+                className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1">Documento {renderSortIcon('code')}</span>
               </th>
 
-              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Hoja de ruta
+              <th
+                onClick={() => handleSort('route')}
+                className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1">Hoja de ruta {renderSortIcon('route')}</span>
               </th>
 
-              <th className="w-40 px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Fecha creación
+              <th
+                onClick={() => handleSort('createdAt')}
+                className="w-40 cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1">Fecha creación {renderSortIcon('createdAt')}</span>
               </th>
 
-              <th className="w-52 px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Acción realizada
+              <th
+                onClick={() => handleSort('actionPerformed')}
+                className="w-52 cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1">Acción realizada {renderSortIcon('actionPerformed')}</span>
               </th>
 
               <th className="w-40 px-5 py-4 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
@@ -104,8 +164,10 @@ export default function SignDocumentTable({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {isLoading ? (
+          <tbody
+            className={`divide-y divide-gray-100 transition-opacity duration-200 dark:divide-white/[0.05] ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            {isLoading && documents.length === 0 ? (
               <TableSkeleton rows={6} cols={6} />
             ) : paginated.length === 0 ? (
               <tr>
@@ -227,49 +289,62 @@ export default function SignDocumentTable({
       </div>
 
       {!isLoading && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-5 py-4 dark:border-white/[0.05]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-5 py-3 dark:border-white/[0.05]">
           <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
             <span>Filas por página:</span>
-
             <select
               value={perPage}
-              onChange={(e) => {
-                setPerPage(Number(e.target.value));
-                setPage(1);
-              }}
-              className="focus:border-brand-400 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+              onChange={handlePerPageChange}
+              className="focus:border-brand-400 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
             >
-              {PER_PAGE_OPTIONS.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+              {PER_PAGE_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {n}
                 </option>
               ))}
             </select>
-
             <span>
               {from}–{to} de {total}
             </span>
           </div>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(1)} disabled={safePage === 1} className={btnNormal} title="Primera">
+              <ChevronsLeftIcon />
+            </button>
             <button
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page === 1}
-              className="hover:border-brand-500 hover:text-brand-500 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
+              onClick={() => setPage(safePage - 1)}
+              disabled={safePage === 1}
+              className={btnNormal}
+              title="Anterior"
             >
               <ChevronLeftIcon />
             </button>
-
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              Página {page} de {totalPages}
-            </span>
-
+            {renderPageNumbers().map((p, i) =>
+              p === '...' ? (
+                <span key={`e-${i}`} className="inline-flex h-8 w-8 items-center justify-center text-sm text-gray-400">
+                  …
+                </span>
+              ) : (
+                <button key={p} onClick={() => setPage(p as number)} className={p === safePage ? btnActive : btnNormal}>
+                  {p}
+                </button>
+              ),
+            )}
             <button
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={page === totalPages}
-              className="hover:border-brand-500 hover:text-brand-500 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
+              onClick={() => setPage(safePage + 1)}
+              disabled={safePage === totalPages}
+              className={btnNormal}
+              title="Siguiente"
             >
               <ChevronRightIcon />
+            </button>
+            <button
+              onClick={() => setPage(totalPages)}
+              disabled={safePage === totalPages}
+              className={btnNormal}
+              title="Última"
+            >
+              <ChevronsRightIcon />
             </button>
           </div>
         </div>

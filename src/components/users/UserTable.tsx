@@ -126,52 +126,52 @@ export default function UserTable({ users, isLoading, onEdit, onDelete, onToggle
             <tr className="border-b border-gray-100 dark:border-white/[0.05]">
               <th
                 onClick={() => handleSort('id')}
-                className="w-16 cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="w-16 cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <span className="flex items-center gap-1"># {renderSortIcon('id')}</span>
               </th>
               <th
                 onClick={() => handleSort('ci')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <span className="flex items-center gap-1">Ci {renderSortIcon('ci')}</span>
               </th>
               <th
                 onClick={() => handleSort('name')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Nombre {renderSortIcon('name')}</span>
+                <span className="flex items-center gap-1">NOMBRE {renderSortIcon('name')}</span>
               </th>
               <th
                 onClick={() => handleSort('last_name')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Apellido paterno {renderSortIcon('last_name')}</span>
+                <span className="flex items-center gap-1">APELLIDO PATERNO {renderSortIcon('last_name')}</span>
               </th>
               <th
                 onClick={() => handleSort('mother_last_name')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Apellido materno {renderSortIcon('mother_last_name')}</span>
+                <span className="flex items-center gap-1">APELLIDO MATERNO {renderSortIcon('mother_last_name')}</span>
               </th>
               <th
                 onClick={() => handleSort('email')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Email {renderSortIcon('email')}</span>
+                <span className="flex items-center gap-1">EMAIL {renderSortIcon('email')}</span>
               </th>
               <th
                 onClick={() => handleSort('phone')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Teléfono {renderSortIcon('phone')}</span>
+                <span className="flex items-center gap-1">TELÉFONO {renderSortIcon('phone')}</span>
               </th>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+              <th className="px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Roles
               </th>
               {showActions && (
-                <th className="w-28 px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                  Acciones
+                <th className="w-28 px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                  ACCIONES
                 </th>
               )}
             </tr>

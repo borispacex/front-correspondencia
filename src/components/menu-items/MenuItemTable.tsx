@@ -123,24 +123,24 @@ export default function MenuItemTable({ menuItems, isLoading, onEdit, onDelete, 
               </th>
               <th
                 onClick={() => handleSort('label')}
-                className="cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <span className="flex items-center gap-1">Etiqueta {renderSortIcon('label')}</span>
               </th>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+              <th className="px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 URL
               </th>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+              <th className="px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Icono
               </th>
               <th
                 onClick={() => handleSort('order')}
-                className="w-16 cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="w-16 cursor-pointer px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <span className="flex items-center gap-1">Orden {renderSortIcon('order')}</span>
               </th>
               {showActions && (
-                <th className="w-28 px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                <th className="w-28 px-5 py-3 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                   Acciones
                 </th>
               )}
