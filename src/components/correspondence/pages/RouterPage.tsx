@@ -4,16 +4,18 @@ import { usePermissions } from '../../../hooks/usePermissions.ts';
 import { useNotifications } from '../../../hooks/useNotification.tsx';
 import PageMeta from '../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../common/PageBreadCrumb.tsx';
-import SignDocumentFilter from '../components/sign-document/SignDocumentFilter.tsx';
 import Button from '../../ui/button/Button.tsx';
-import { FingerprintPatternIcon } from '../../../icons';
-import SignDocumentTable from '../components/sign-document/SignDocumentTable.tsx';
+import { PlusIcon } from '../../../icons';
 import { Modal } from '../../ui/modal';
-import SignDocumentForm from '../components/sign-document/SignDocumentForm.tsx';
+import RouterTable from '../components/router/RouterTable.tsx';
+import RouterFilter from '../components/router/RouterFilter.tsx';
+import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../types/documents/document.type.ts';
+import DocumentForm from '../components/documents/DocumentForm.tsx';
+import RouterForm from '../components/router/RouterForm.tsx';
 
 const SIGN_DOCUMENTS: SignDocument[] = [
   {
-    id: 1,
+    id: 11,
     code: 'EMI/DGE/UGAT/AIT/001/2025',
     subject: 'Solicitud de revisión técnica',
     documentType: 'Nota externa ciudadana',
@@ -52,7 +54,7 @@ const SIGN_DOCUMENTS: SignDocument[] = [
     actions: [
       {
         type: 'approve',
-        enabled: true,
+        enabled: false,
       },
       {
         type: 'traceability',
@@ -65,11 +67,12 @@ const SIGN_DOCUMENTS: SignDocument[] = [
 export default function RouterPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
-  const [selecteds, setSelecteds] = useState<SignDocument | null>(null);
+  const [selected, setSelected] = useState<Document | null>(null);
 
   const [documents, setDocuments] = useState<SignDocument[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRouterModalOpen, setIsRouterModalOpen] = useState(false);
 
   const [filters, setFilters] = useState<SignDocumentFilters>({
     code: '',
@@ -212,33 +215,69 @@ export default function RouterPage() {
     setIsModalOpen(true);
   }
 
+  function handleCreate() {
+    setSelected(null);
+    setIsModalOpen(true);
+  }
+
+  async function handleSubmit(data: CreateDocumentRequest | UpdateDocumentRequest) {
+    try {
+      if (selected) {
+        // await updateDocument(selected.id, data as UpdateDocumentRequest);
+
+        addNotification({
+          type: 'info',
+          title: 'Documento actualizado',
+          message: `El documento "${data.doc_numero_cite}" fue actualizado correctamente.`,
+        });
+      } else {
+        // await createDocument(data as CreateDocumentRequest);
+
+        addNotification({
+          type: 'success',
+          title: 'Documento creado',
+          message: `El documento "${data.doc_numero_cite}" fue creado correctamente.`,
+        });
+      }
+
+      setIsModalOpen(false);
+      fetchDocuments();
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al guardar el usuario',
+      });
+    }
+  }
+
+  async function handleSubmitRouter(data: any) {
+    console.log('derive', data);
+  }
+
   // ─────────────────────────────────────────────
   // Render
   // ─────────────────────────────────────────────
 
   return (
     <>
-      <PageMeta title="Firmas Digitales" description="Gestión de aprobación y firma digital" />
+      <PageMeta title="Hoja de ruta" description="Gestión de creación de hoja de ruta" />
 
-      <PageBreadCrumb pageTitle="Firmas Digitales" />
+      <PageBreadCrumb pageTitle="Hoja de ruta" />
 
       <div className="space-y-5">
         {/* Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <SignDocumentFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('documents.create') && (
-            <Button
-              size="sm"
-              onClick={() => handleApproveDocuments(null)}
-              startIcon={<FingerprintPatternIcon className="size-4 text-white" />}
-            >
-              Firmar documentos
+            <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
+              Nuevo Tramite
             </Button>
           )}
         </div>
 
         {/* Table */}
-        <SignDocumentTable
+        <RouterTable
           documents={filteredDocuments}
           isLoading={isLoading}
           onApprove={handleApprove}
@@ -249,18 +288,36 @@ export default function RouterPage() {
         />
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} className="max-w-md p-6 sm:p-8">
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">Firmador AGETIC</h3>
+      <Modal
+        isOpen={isModalOpen}
+        size="lg"
+        onClose={() => setIsModalOpen(false)}
+        className="w-full max-w-6xl p-6 sm:p-8"
+      >
+        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+          {selected ? 'Editar Tramite' : 'Nuevo Tramite'}
+        </h3>
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
         </p>
-        <SignDocumentForm
-          signDocuments={selecteds}
-          onSuccess={() => {
-            setIsModalOpen(false);
-          }}
-          onCancel={() => setIsModalOpen(false)}
-        />
+
+        <DocumentForm document={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
+      </Modal>
+
+      <Modal
+        isOpen={isRouterModalOpen}
+        size="lg"
+        onClose={() => setIsRouterModalOpen(false)}
+        className="w-full max-w-6xl p-6 sm:p-8"
+      >
+        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+          {selected ? 'Editar documento derivado' : 'Derivar documento'}
+        </h3>
+        <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
+          Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+        </p>
+
+        <RouterForm document={selected} onSubmit={handleSubmitRouter} onCancel={() => setIsRouterModalOpen(false)} />
       </Modal>
     </>
   );

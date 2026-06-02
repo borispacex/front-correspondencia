@@ -1,27 +1,50 @@
 import { useMemo, useState } from 'react';
 import {
+  CalenderIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CopyIcon,
   EyeIcon,
-  FingerprintPatternIcon,
+  MailIcon,
+  PencilIcon,
   RouteIcon,
+  SendHorizontalIcon,
+  TrashBinIcon,
 } from '../../../../icons';
 import { SignDocument } from '../../types/sign-document.type.ts';
 import TableSkeleton from '../../../animation/TableSkeleton.tsx';
+import Tooltip from '../../../form/Tooltip.tsx';
+import Button from '../../../ui/button/Button.tsx';
+import { Document } from '../../types/documents/document.type.ts';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
 
 interface Props {
-  documents: SignDocument[];
+  documents: SignDocument[] | Document[];
   isLoading?: boolean;
-  onApprove?: (document: SignDocument) => void;
-  onView?: (document: SignDocument) => void;
   onTraceability?: (document: SignDocument) => void;
   onSelect?: (ids: number[]) => void;
+
+  onDerive?: (document: Document) => void;
+  onView?: (document: Document) => void;
+  onEdit: (document: Document) => void;
+  onDelete: (id: number) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
-export default function RouterTable({ documents, isLoading, onApprove, onView, onTraceability, onSelect }: Props) {
+export default function RouterTable({
+  documents,
+  isLoading,
+  onView,
+  onTraceability,
+  onSelect,
+
+  onDerive,
+  onEdit,
+  onDelete,
+}: Props) {
+  const { can } = usePermissions();
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -61,31 +84,15 @@ export default function RouterTable({ documents, isLoading, onApprove, onView, o
         <table className="w-full min-w-[1150px]">
           <thead>
             <tr className="border-b border-gray-100 dark:border-white/[0.05]">
-              <th className="w-14 px-5 py-4">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="text-brand-500 focus:ring-brand-500 h-4 w-4 rounded border-gray-300 dark:border-gray-700 dark:bg-gray-900"
-                />
+              <th className="w-16 cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <span className="flex items-center gap-1"># </span>
               </th>
-
-              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Documento
-              </th>
-
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Hoja de ruta
               </th>
-
-              <th className="w-40 px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Fecha creación
+              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                Derivado por
               </th>
-
-              <th className="w-52 px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Acción realizada
-              </th>
-
               <th className="w-40 px-5 py-4 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Acciones
               </th>
@@ -104,53 +111,20 @@ export default function RouterTable({ documents, isLoading, onApprove, onView, o
             ) : (
               paginated.map((document) => (
                 <tr key={document.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                  <td className="px-5 py-5 align-top">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(document.id)}
-                      onChange={(e) => handleSelect(document.id, e.target.checked)}
-                      className="text-brand-500 focus:ring-brand-500 h-4 w-4 rounded border-gray-300 dark:border-gray-700 dark:bg-gray-900"
-                    />
-                  </td>
-
-                  <td className="px-5 py-5 align-top">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <span className="border-success-200 bg-success-50 text-success-700 dark:border-success-500/20 dark:bg-success-500/10 dark:text-success-400 rounded-full border px-3 py-1 text-xs font-medium">
-                          {document.code}
-                        </span>
-
-                        <button
-                          type="button"
-                          onClick={() => navigator.clipboard.writeText(document.code)}
-                          className="text-success-600 hover:text-success-700 dark:text-success-400 transition-colors"
-                        >
-                          <CopyIcon className="size-4" />
-                        </button>
-                      </div>
-
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        <span className="text-success-600 dark:text-success-400 font-semibold">Asunto:</span>{' '}
-                        {document.subject}
-                      </div>
-
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        <span className="text-success-600 dark:text-success-400 font-semibold">Tipo:</span>{' '}
-                        {document.documentType}
-                      </div>
-                    </div>
+                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                    {document.id ?? '—'}
                   </td>
 
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400 rounded-full border px-3 py-1 text-xs font-medium">
-                          {document.route.code}
+                          {document.code}
                         </span>
 
                         <button
                           type="button"
-                          onClick={() => navigator.clipboard.writeText(document.route.code)}
+                          onClick={() => navigator.clipboard.writeText(document.code)}
                           className="text-brand-600 hover:text-brand-700 dark:text-brand-400 transition-colors"
                         >
                           <CopyIcon className="size-4" />
@@ -158,46 +132,97 @@ export default function RouterTable({ documents, isLoading, onApprove, onView, o
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
-                        <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span>{' '}
-                        {document.route.subject}
+                        <p>
+                          <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span>{' '}
+                          {document.subject}
+                        </p>
+                        <p>
+                          <span className="text-brand-600 dark:text-brand-400 font-semibold">Tipo:</span>{' '}
+                          {document.documentType}
+                        </p>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-5 py-5 align-top text-sm text-gray-600 dark:text-gray-400">{document.createdAt}</td>
-
-                  <td className="px-5 py-5 align-top text-sm text-gray-600 dark:text-gray-400">
-                    {document.actionPerformed}
+                  <td className="px-5 py-5 align-top">
+                    <div className="space-y-3">
+                      {document.id === 11 ? (
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                          <p>CRISTIAN MACELO MAMANI VIDES</p>
+                          <p>JEFE DE GESTON Y ASISTENCIA TECNOLOGICA</p>
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span> Para su
+                            atencion
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <CalenderIcon className="text-brand-600 dark:text-brand-400 size-4" />
+                            <span>01/05/2026</span>
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                          <p>Sin derivaciones.</p>
+                          <p className="flex items-center gap-2">
+                            <MailIcon className="text-brand-600 dark:text-brand-400 size-4" />
+                            <span>Tienes 1 documento pendiente.</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </td>
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
-                      <button
-                        type="button"
-                        title="Firmar digital"
-                        onClick={() => onApprove?.(document)}
-                        className="text-success-600 hover:text-success-700 dark:text-success-400 transition-colors"
-                      >
-                        <FingerprintPatternIcon className="size-5" />
-                      </button>
-
-                      <button
-                        type="button"
-                        title="Rutas"
-                        onClick={() => onTraceability?.(document)}
-                        className="text-brand-600 hover:text-brand-700 dark:text-brand-400 transition-colors"
-                      >
-                        <RouteIcon className="size-5" />
-                      </button>
-
-                      <button
-                        type="button"
-                        title="Ver documento"
-                        onClick={() => onView?.(document)}
-                        className="text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
-                      >
-                        <EyeIcon className="size-5" />
-                      </button>
+                      {can('documents.derive') && (
+                        <Tooltip content="Derivar">
+                          <Button
+                            variant="success-outline"
+                            size="xs"
+                            startIcon={<SendHorizontalIcon className="size-3.5" />}
+                            onClick={() => onDerive(document)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.routes') && (
+                        <Tooltip content="Ver rutas">
+                          <Button
+                            variant="primary-outline"
+                            size="xs"
+                            onClick={() => onTraceability?.(document)}
+                            startIcon={<RouteIcon className="size-3.5" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.view') && (
+                        <Tooltip content="Ver documento">
+                          <Button
+                            variant="ghost-outline"
+                            size="xs"
+                            onClick={() => onView?.(document)}
+                            startIcon={<EyeIcon className="size-3.5 fill-gray-500 dark:fill-gray-400" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.edit') && (
+                        <Tooltip content="Editar">
+                          <Button
+                            variant="ghost-outline"
+                            size="xs"
+                            onClick={() => onEdit(document)}
+                            startIcon={<PencilIcon className="size-3.5" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.delete') && (
+                        <Tooltip content="Eliminar">
+                          <Button
+                            variant="danger-outline"
+                            size="xs"
+                            startIcon={<TrashBinIcon className="size-3.5" />}
+                            onClick={() => onDelete(document.id)}
+                          ></Button>
+                        </Tooltip>
+                      )}
                     </div>
                   </td>
                 </tr>

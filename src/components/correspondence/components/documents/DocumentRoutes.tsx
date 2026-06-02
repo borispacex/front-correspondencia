@@ -18,24 +18,24 @@ interface HistoryEvent {
 const orderHistory: HistoryEvent[] = [
   {
     icon: 'cart',
-    title: 'Checkout Started',
-    subtitle: 'via tailadmin.com',
+    title: 'CNL. DAEN. MARIO RAUL SANDOVAL NAVA ',
+    subtitle: 'UNIDAD DE TECNOLOGÍAS DE LA INFORMACIÓN Y COMUNICACIÓN',
     time: '12:54',
-    date: '12th Apr 28',
+    date: '10/01/2025',
   },
   {
     icon: 'card',
-    title: 'Purchased',
-    subtitle: 'for US$4,235 via PayPal',
+    title: 'CNL. DAEN. JUAN MANUEL MOLINA PATIÑO',
+    subtitle: 'Div. DE CUENTAS POR COBRAR',
     time: '12:58',
-    date: '12th Apr 28',
+    date: '01/02/2025',
   },
   {
     icon: 'mail',
-    title: 'Receipt Email Sent',
-    subtitle: 'Receipt #1734535',
+    title: 'CNL. DAEN. JESUS ARIEL ESPINOZA FERREL',
+    subtitle: 'Dir. Nal. de Asuntos Administrativos y Financieros',
     time: '12:58',
-    date: '12th Apr 28',
+    date: '15/03/2025',
   },
 ];
 
@@ -162,11 +162,11 @@ const DocumentHistoryCard = ({ isSelected }: { isSelected: boolean }) => {
       </div>
 
       <div className="mt-6 flex gap-2 border-t border-gray-200 pt-5 dark:border-white/[0.05]">
-        {(['Resend', 'Forward', 'Preview'] as const).map((label) => (
+        {(['Cancelar', 'Derivar', 'Ver'] as const).map((label) => (
           <button
             key={label}
             className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-all duration-150 ${
-              label === 'Preview'
+              label === 'Ver'
                 ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                 : 'border-gray-200 bg-transparent text-gray-600 hover:bg-gray-50 dark:border-white/[0.10] dark:text-gray-300 dark:hover:bg-white/[0.04]'
             }`}

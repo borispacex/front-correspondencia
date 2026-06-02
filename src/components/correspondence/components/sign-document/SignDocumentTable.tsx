@@ -9,6 +9,9 @@ import {
 } from '../../../../icons';
 import { SignDocument } from '../../types/sign-document.type.ts';
 import TableSkeleton from '../../../animation/TableSkeleton.tsx';
+import Tooltip from '../../../form/Tooltip.tsx';
+import Button from '../../../ui/button/Button.tsx';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
 
 interface Props {
   documents: SignDocument[];
@@ -29,6 +32,8 @@ export default function SignDocumentTable({
   onTraceability,
   onSelect,
 }: Props) {
+  const { can } = usePermissions();
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -123,27 +128,28 @@ export default function SignDocumentTable({
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <span className="border-success-200 bg-success-50 text-success-700 dark:border-success-500/20 dark:bg-success-500/10 dark:text-success-400 rounded-full border px-3 py-1 text-xs font-medium">
+                        <span className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-400">
                           {document.code}
                         </span>
 
                         <button
                           type="button"
                           onClick={() => navigator.clipboard.writeText(document.code)}
-                          className="text-success-600 hover:text-success-700 dark:text-success-400 transition-colors"
+                          className="text-teal-600 transition-colors hover:text-teal-700 dark:text-teal-400"
                         >
                           <CopyIcon className="size-4" />
                         </button>
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
-                        <span className="text-success-600 dark:text-success-400 font-semibold">Asunto:</span>{' '}
-                        {document.subject}
-                      </div>
-
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        <span className="text-success-600 dark:text-success-400 font-semibold">Tipo:</span>{' '}
-                        {document.documentType}
+                        <p>
+                          <span className="font-semibold text-teal-600 dark:text-teal-400">Asunto:</span>{' '}
+                          {document.subject}
+                        </p>
+                        <p>
+                          <span className="font-semibold text-teal-600 dark:text-teal-400">Tipo:</span>{' '}
+                          {document.documentType}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -179,32 +185,38 @@ export default function SignDocumentTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
-                      <button
-                        type="button"
-                        title="Firmar digital"
-                        onClick={() => onApprove?.(document)}
-                        className="text-success-600 hover:text-success-700 dark:text-success-400 transition-colors"
-                      >
-                        <FingerprintPatternIcon className="size-5" />
-                      </button>
+                      {can('documents.sign') && (
+                        <Tooltip content="Firmar">
+                          <Button
+                            variant="success-outline"
+                            size="xs"
+                            startIcon={<FingerprintPatternIcon className="size-3.5" />}
+                            onClick={() => onApprove?.(document)}
+                          ></Button>
+                        </Tooltip>
+                      )}
 
-                      <button
-                        type="button"
-                        title="Rutas"
-                        onClick={() => onTraceability?.(document)}
-                        className="text-brand-600 hover:text-brand-700 dark:text-brand-400 transition-colors"
-                      >
-                        <RouteIcon className="size-5" />
-                      </button>
+                      {can('documents.routes') && (
+                        <Tooltip content="Ver rutas">
+                          <Button
+                            variant="primary-outline"
+                            size="xs"
+                            onClick={() => onTraceability?.(document)}
+                            startIcon={<RouteIcon className="size-3.5" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
 
-                      <button
-                        type="button"
-                        title="Ver documento"
-                        onClick={() => onView?.(document)}
-                        className="text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
-                      >
-                        <EyeIcon className="size-5" />
-                      </button>
+                      {can('documents.view') && (
+                        <Tooltip content="Ver documento">
+                          <Button
+                            variant="ghost-outline"
+                            size="xs"
+                            onClick={() => onView?.(document)}
+                            startIcon={<EyeIcon className="size-3.5 fill-gray-500 dark:fill-gray-400" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -295,7 +295,7 @@ export const DocumentPage = () => {
         className="w-full max-w-6xl p-6 sm:p-8"
       >
         <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
-          {selected ? 'Editar Derivar Hoja de Tramite' : 'Derivar Hoja de Tramite'}
+          {selected ? 'Editar documento derivado' : 'Derivar documento'}
         </h3>
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios

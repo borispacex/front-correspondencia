@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-
 import { Link } from 'react-router';
 import { useSidebar } from '../context/SidebarContext';
 import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
 import NotificationDropdown from '../components/header/NotificationDropdown';
 import UserDropdown from '../components/header/UserDropdown';
 import { ROUTES } from '../constants/routes.constants.ts';
-import { MailIcon, SearchIcon } from '../icons';
+import { MailIcon } from '../icons';
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
-
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
   const handleToggle = () => {
@@ -34,20 +32,20 @@ const AppHeader: React.FC = () => {
         inputRef.current?.focus();
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 flex w-full overflow-visible border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900">
+    <header className="sticky top-0 z-50 flex w-full overflow-visible border-b border-gray-200 bg-white/90 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/90">
       <div className="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
-        <div className="flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4 dark:border-gray-800">
+        {/* ── Barra principal ── */}
+        <div className="relative flex w-full items-center justify-between gap-2 px-3 py-2.5 sm:gap-4 lg:px-0 lg:py-3">
+          {/* Botón sidebar */}
           <button
-            className="z-99999 h-10 w-10 items-center justify-center rounded-lg border-gray-200 text-gray-500 lg:flex lg:h-11 lg:w-11 lg:border dark:border-gray-800 dark:text-gray-400"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 lg:h-11 lg:w-11 lg:border lg:border-gray-200 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -70,17 +68,36 @@ const AppHeader: React.FC = () => {
                 />
               </svg>
             )}
-            {/* Cross Icon */}
           </button>
 
-          <Link to={ROUTES.HOME} className="lg:hidden">
-            <img className="h-8 w-auto dark:hidden" src="/images/logo_emi/emi_icono.png" alt="Logo" />
-            <img className="hidden h-8 w-auto dark:block" src="/images/logo_emi/emi_icono.png" alt="Logo" />
+          {/* Logo mobile */}
+          <Link to={ROUTES.HOME} className="absolute left-1/2 -translate-x-1/2 lg:hidden">
+            <img className="h-8 w-auto" src="/images/logo_emi/emi_icono.png" alt="Logo" />
           </Link>
 
+          {/* Badge centro — igual que AuthLayout */}
+          <div className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center lg:flex">
+            <div className="flex items-center gap-2.5 rounded-xl border border-blue-100 bg-white/70 px-4 py-1.5 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+              <div className="hidden h-[2px] w-8 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
+              <div className="flex items-center gap-2">
+                <span className="text-[clamp(0.65rem,0.85vw,1rem)] leading-none font-extrabold tracking-[0.08em] whitespace-nowrap text-blue-900 uppercase dark:text-blue-100">
+                  SISTEMA DE
+                </span>
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-yellow-500/70 bg-yellow-400/20 xl:h-7 xl:w-7 dark:border-yellow-400/60 dark:bg-yellow-400/15">
+                  <MailIcon className="h-3.5 w-3.5 text-blue-900 xl:h-4 xl:w-4 dark:text-yellow-300" />
+                </div>
+                <span className="text-[clamp(0.65rem,0.85vw,1rem)] leading-none font-extrabold tracking-[0.08em] whitespace-nowrap text-blue-900 uppercase dark:text-blue-100">
+                  CORRESPONDENCIA
+                </span>
+              </div>
+              <div className="hidden h-[2px] w-8 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
+            </div>
+          </div>
+
+          {/* Botón tres puntos mobile */}
           <button
             onClick={toggleApplicationMenu}
-            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -91,38 +108,27 @@ const AppHeader: React.FC = () => {
               />
             </svg>
           </button>
+        </div>
 
-          <div className="pointer-events-none absolute left-1/2 hidden w-full max-w-[55vw] -translate-x-1/2 items-center justify-center overflow-hidden px-4 lg:flex">
-            <div className="flex max-w-full min-w-0 items-center gap-2">
-              <div className="hidden h-[2px] w-10 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="text-[clamp(0.7rem,1vw,1.4rem)] leading-none font-extrabold tracking-[0.06em] whitespace-nowrap text-blue-900 uppercase dark:text-blue-100">
-                  SISTEMA DE
-                </span>
-                <div className="flex h-4 w-5 shrink-0 items-center justify-center rounded-lg border border-yellow-500 bg-yellow-100 xl:h-5 xl:w-6 dark:border-yellow-300 dark:bg-yellow-400">
-                  <MailIcon className="h-4 w-4 text-blue-900 xl:h-5 xl:w-5" />
-                </div>
-                <span className="text-[clamp(0.7rem,1vw,1.4rem)] leading-none font-extrabold tracking-[0.06em] whitespace-nowrap text-blue-900 uppercase dark:text-blue-100">
-                  CORRESPONDENCIA
-                </span>
-              </div>
-              <div className="hidden h-[2px] w-10 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
+        {/* ── Panel desplegable mobile con animación suave ── */}
+        <div
+          className={`overflow-hidden transition-all duration-200 ease-in-out lg:hidden ${
+            isApplicationMenuOpen ? 'max-h-20 border-t border-gray-100 dark:border-gray-800' : 'max-h-0'
+          }`}
+        >
+          <div className="flex items-center justify-between px-5 py-3">
+            <div className="flex items-center gap-3">
+              <ThemeToggleButton />
+              <NotificationDropdown />
             </div>
+            <UserDropdown />
           </div>
         </div>
-        <div
-          className={`${
-            isApplicationMenuOpen ? 'flex' : 'hidden'
-          } shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
-        >
-          <div className="2xsm:gap-3 flex items-center gap-2">
-            {/* <!-- Dark Mode Toggler --> */}
-            <ThemeToggleButton />
-            {/* <!-- Dark Mode Toggler --> */}
-            <NotificationDropdown />
-            {/* <!-- Notification Menu Area --> */}
-          </div>
-          {/* <!-- User Area --> */}
+
+        {/* ── Acciones desktop ── */}
+        <div className="hidden items-center gap-3 lg:flex lg:shrink-0">
+          <ThemeToggleButton />
+          <NotificationDropdown />
           <UserDropdown />
         </div>
       </div>

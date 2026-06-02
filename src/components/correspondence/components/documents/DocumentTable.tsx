@@ -28,7 +28,6 @@ import { DocumentShow } from './DocumentShow.tsx';
 const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
   NORMAL: { label: 'NORMAL', cls: 'bg-blue-100  text-blue-700  dark:bg-blue-900/40  dark:text-blue-300' },
   URGENTE: { label: 'URGENTE', cls: 'bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300' },
-  ALTA: { label: 'ALTA', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' },
 };
 
 function PriorityBadge({ priority }: { priority?: string }) {
@@ -205,7 +204,7 @@ export default function DocumentTable({
             <div className="min-w-0">
               {/* Nro contador + copy */}
               <div className="mb-1 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs font-semibold text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
+                <span className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-400">
                   {document.doc_contador ?? document.id}
                 </span>
 
@@ -213,33 +212,29 @@ export default function DocumentTable({
                   <button
                     type="button"
                     onClick={() => handleCopy(document)}
-                    className={`group relative inline-flex items-center justify-center rounded-md pl-0.5 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                      copiedId === document.id ? 'scale-110 bg-green-100 dark:bg-green-900/30' : 'scale-100'
+                    className={`group relative inline-flex items-center justify-center rounded-md pl-0.5 text-teal-600 transition-colors duration-200 hover:bg-gray-100 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-gray-800 ${
+                      copiedId === document.id
+                        ? 'scale-110 bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                        : 'scale-100'
                     }`}
                   >
-                    <CopyIcon
-                      className={`size-4 transition-all duration-200 ${
-                        copiedId === document.id
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300'
-                      }`}
-                    />
+                    <CopyIcon className={`size-4`} />
                   </button>
                 </Tooltip>
               </div>
 
               {/* Prioridad → pri_name (join) */}
-              {document.pri_name && (
+              {document.priority_id && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">PRIORIDAD:</span>{' '}
-                  <PriorityBadge priority={document.pri_name} />
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">PRIORIDAD:</span>{' '}
+                  <PriorityBadge priority={document.priority_id === 1 ? 'URGENTE' : 'NORMAL'} />
                 </p>
               )}
 
               {/* Cite */}
               {document.doc_cite && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">CITE:</span> {document.doc_cite}
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">CITE:</span> {document.doc_cite}
                   {document.doc_numero_cite && (
                     <span className="ml-1 text-gray-400">— Nro. {document.doc_numero_cite}</span>
                   )}
@@ -249,7 +244,7 @@ export default function DocumentTable({
               {/* Procedencia → doc_dep_name */}
               {document.doc_dep_name && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">PROCEDENCIA:</span>{' '}
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">PROCEDENCIA:</span>{' '}
                   {document.doc_dep_name}
                 </p>
               )}
@@ -257,21 +252,22 @@ export default function DocumentTable({
               {/* Remitente → doc_remite */}
               {document.doc_remite && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">REMITENTE:</span> {document.doc_remite}
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">REMITENTE:</span>{' '}
+                  {document.doc_remite}
                 </p>
               )}
 
               {/* Tipo documento → typ_name */}
               {document.typ_name && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">TIPO:</span> {document.typ_name}
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">TIPO:</span> {document.typ_name}
                 </p>
               )}
 
               {/* Objeto / Referencia → doc_referencia */}
               {document.doc_referencia && (
                 <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">OBJETO/REFERENCIA:</span>{' '}
+                  <span className="font-semibold text-teal-600 dark:text-teal-400">OBJETO/REFERENCIA:</span>{' '}
                   {document.doc_referencia}
                 </p>
               )}
@@ -354,7 +350,7 @@ export default function DocumentTable({
                   onClick={() => onView(document)}
                   startIcon={
                     selectedDocumentId === document.id ? (
-                      <EyeCloseIcon className="size-3.5 fill-white" />
+                      <EyeCloseIcon className="size-3.5 fill-gray-500 dark:fill-gray-400" />
                     ) : (
                       <EyeIcon className="size-3.5 fill-gray-600 dark:fill-gray-300" />
                     )

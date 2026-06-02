@@ -73,7 +73,10 @@ export default function SignInForm() {
                         Contraseña <span className="text-error-500">*</span>{' '}
                       </Label>
                     </div>
-                    <Link to="/restablecer" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 text-sm">
+                    <Link
+                      to={ROUTES.RESET_PASSWORD}
+                      className="text-brand-500 hover:text-brand-600 dark:text-brand-400 text-sm"
+                    >
                       ¿Olvidaste tu contraseña?
                     </Link>
                   </div>

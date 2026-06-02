@@ -85,6 +85,47 @@ import { ReactComponent as BadgeIcon } from './badge.svg?react';
 import { ReactComponent as BrushCleaningIcon } from './brush-cleaning.svg?react';
 import { ReactComponent as RefreshCwIcon } from './refresh-cw.svg?react';
 import { ReactComponent as RefreshCcwIcon } from './refresh-ccw.svg?react';
+import { ReactComponent as SendIcon } from './send.svg?react';
+import { ReactComponent as LayoutDashboardIcon } from './send.svg?react';
+import { ReactComponent as MailsIcon } from './mails.svg?react';
+import { ReactComponent as InboxIcon } from './inbox.svg?react';
+import { ReactComponent as FolderArchiveIcon } from './folder-archive.svg?react';
+import { ReactComponent as ShieldCheckIcon } from './shield-check.svg?react';
+import { ReactComponent as SettingsIcon } from './settings.svg?react';
+import { ReactComponent as ChartColumnIcon } from './chart-column.svg?react';
+import { ReactComponent as Trash2Icon } from './trash-2.svg?react';
+import { ReactComponent as UploadIcon } from './upload.svg?react';
+import { ReactComponent as PrinterIcon } from './printer.svg?react';
+import { ReactComponent as SignatureIcon } from './signature.svg?react';
+
+import { ReactComponent as MailOpenIcon } from './mail-open.svg?react';
+import { ReactComponent as MailCheckIcon } from './mail-check.svg?react';
+import { ReactComponent as MailWarningIcon } from './mail-warning.svg?react';
+
+import { ReactComponent as Clock3Icon } from './clock-3.svg?react';
+import { ReactComponent as CircleXIcon } from './circle-x.svg?react';
+import { ReactComponent as CheckCheckIcon } from './check-check.svg?react';
+
+import { ReactComponent as BuildingIcon } from './building.svg?react';
+import { ReactComponent as Building2Icon } from './building-2.svg?react';
+
+import { ReactComponent as HistoryIcon } from './history.svg?react';
+import { ReactComponent as WorkflowIcon } from './workflow.svg?react';
+import { ReactComponent as GitBranchIcon } from './git-branch.svg?react';
+
+import { ReactComponent as KeyRoundIcon } from './key-round.svg?react';
+
+import { ReactComponent as ScanSearchIcon } from './scan-search.svg?react';
+
+import { ReactComponent as FileCheckIcon } from './file-check.svg?react';
+import { ReactComponent as FileClockIcon } from './file-clock.svg?react';
+import { ReactComponent as FileSearchIcon } from './file-search.svg?react';
+
+import { ReactComponent as BadgeCheckIcon } from './badge-check.svg?react';
+
+import { ReactComponent as ArchiveIcon } from './archive.svg?react';
+
+import { ReactComponent as ReceiptTextIcon } from './receipt-text.svg?react';
 
 export {
   ErrorHexaIcon,
@@ -174,4 +215,35 @@ export {
   BrushCleaningIcon,
   RefreshCwIcon,
   RefreshCcwIcon,
+  SendIcon,
+  ChartColumnIcon,
+  SettingsIcon,
+  ShieldCheckIcon,
+  FolderArchiveIcon,
+  InboxIcon,
+  MailsIcon,
+  LayoutDashboardIcon,
+  Trash2Icon,
+  UploadIcon,
+  PrinterIcon,
+  SignatureIcon,
+  MailOpenIcon,
+  MailCheckIcon,
+  MailWarningIcon,
+  Clock3Icon,
+  CircleXIcon,
+  CheckCheckIcon,
+  BuildingIcon,
+  Building2Icon,
+  HistoryIcon,
+  WorkflowIcon,
+  GitBranchIcon,
+  KeyRoundIcon,
+  ScanSearchIcon,
+  FileCheckIcon,
+  FileClockIcon,
+  FileSearchIcon,
+  BadgeCheckIcon,
+  ArchiveIcon,
+  ReceiptTextIcon,
 };

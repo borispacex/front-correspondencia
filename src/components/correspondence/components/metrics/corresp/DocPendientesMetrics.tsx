@@ -6,7 +6,7 @@ export const DocPendientesMetrics = () => {
     <>
       <BasicMetrics
         icon={<GroupIcon className="size-6 text-gray-800 dark:text-white/90" />}
-        name="Documentos pendientes"
+        name="Documentos pendientes de firma"
         number="2"
       />
     </>

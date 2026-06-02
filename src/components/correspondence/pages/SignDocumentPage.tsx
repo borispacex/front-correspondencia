@@ -12,6 +12,7 @@ import PermissionForm from '../../permissions/PermissionForm.tsx';
 import { Modal } from '../../ui/modal';
 import SignDocumentForm from '../components/sign-document/SignDocumentForm.tsx';
 import type { Permission } from '../../../types/admin/permissions/permission.types.ts';
+import { DocumentRoutes } from '../components/documents/DocumentRoutes.tsx';
 
 const SIGN_DOCUMENTS: SignDocument[] = [
   {
@@ -72,6 +73,7 @@ export default function SignDocumentPage() {
   const [documents, setDocuments] = useState<SignDocument[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalRoutesOpen, setIsRoutesModalOpen] = useState(false);
 
   const [filters, setFilters] = useState<SignDocumentFilters>({
     code: '',
@@ -206,6 +208,7 @@ export default function SignDocumentPage() {
 
   function handleViewRoute(document: SignDocument) {
     console.log('Ver hoja de ruta', document);
+    setIsRoutesModalOpen(true);
   }
 
   function handleApproveDocuments(document: SignDocument) {
@@ -220,9 +223,9 @@ export default function SignDocumentPage() {
 
   return (
     <>
-      <PageMeta title="Firmas Digitales" description="Gestión de aprobación y firma digital" />
+      <PageMeta title="Firma Digital" description="Gestión de firma digital" />
 
-      <PageBreadCrumb pageTitle="Firmas Digitales" />
+      <PageBreadCrumb pageTitle="Firma Digital" />
 
       <div className="space-y-5">
         {/* Filters */}
@@ -263,6 +266,9 @@ export default function SignDocumentPage() {
           }}
           onCancel={() => setIsModalOpen(false)}
         />
+      </Modal>
+      <Modal isOpen={isModalRoutesOpen} onClose={() => setIsRoutesModalOpen(false)} className="max-w-md p-6 sm:p-8">
+        <DocumentRoutes document={document} isLoading={isLoading} />
       </Modal>
     </>
   );
