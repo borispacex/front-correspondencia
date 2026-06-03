@@ -24,11 +24,14 @@ export const ROUTES = {
   // Correspondencia
   CORRESPONDENCE: {
     ROUTE_SHEET: {
-      SHOW: '/correspondencia/tramite/:id',
       ALL: '/correspondencia/tramite',
+      SHOW: '/correspondencia/tramite/:id',
       PENDING: '/correspondencia/tramite/bandeja-entrada',
+      PENDING_SHOW: '/correspondencia/tramite/bandeja-entrada/:id',
       ATTENDED: '/correspondencia/tramite/bandeja-salida',
+      ATTENDED_SHOW: '/correspondencia/tramite/bandeja-salida/:id',
       ARCHIVED: '/correspondencia/tramite/archivados',
+      ARCHIVED_SHOW: '/correspondencia/tramite/archivados/:id',
     },
     DOCUMENTS: '/correspondencia/documentos',
     SIGN_DOCUMENT: '/correspondencia/firma-digital',

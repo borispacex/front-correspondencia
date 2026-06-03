@@ -25,12 +25,21 @@ import type { MenuItem } from '../types/admin/menu-items/menu-item.types';
 import { useMenu } from '../hooks/useMenu';
 import { useAuth } from '../hooks/auth/useAuth';
 import { ROUTES } from '../constants/routes.constants.ts';
+import { useDocumentCounts } from '../components/correspondence/context/DocumentCountContext.tsx';
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean; permission?: string }[];
+  subItems?: {
+    name: string;
+    path: string;
+    pro?: boolean;
+    new?: boolean;
+    permission?: string;
+    /** Clave del conteo a mostrar como badge numérico */
+    countKey?: 'all' | 'pending' | 'attended' | 'archived';
+  }[];
   permission?: string;
 };
 
@@ -71,32 +80,22 @@ function resolveIcon(iconName: string | null): React.ReactNode {
   }
 }
 
-// Flatten all active children into flat subItems (max 2 levels in sidebar)
 function flattenChildren(children: MenuItem[]): { name: string; path: string }[] {
   const result: { name: string; path: string }[] = [];
   for (const child of children) {
     if (!child.active) continue;
-    if (child.url) {
-      result.push({ name: child.label, path: child.url });
-    }
-    if (child.children?.length) {
-      result.push(...flattenChildren(child.children));
-    }
+    if (child.url) result.push({ name: child.label, path: child.url });
+    if (child.children?.length) result.push(...flattenChildren(child.children));
   }
   return result;
 }
 
-// Transform API MenuItem[] → sidebar NavItem[]
 function transformToNavItems(items: MenuItem[]): NavItem[] {
   return items
     .filter((item) => item.active)
     .sort((a, b) => a.order - b.order)
     .map((item) => {
-      const navItem: NavItem = {
-        name: item.label,
-        icon: resolveIcon(item.icon),
-      };
-
+      const navItem: NavItem = { name: item.label, icon: resolveIcon(item.icon) };
       if (item.children?.length) {
         const subItems = flattenChildren(item.children);
         if (subItems.length > 0) {
@@ -107,45 +106,44 @@ function transformToNavItems(items: MenuItem[]): NavItem[] {
       } else if (item.url) {
         navItem.path = item.url;
       }
-
       return navItem;
     });
 }
 
-// Principal section
+// ── Sección Principal ────────────────────────────────────────
 const principalItems: NavItem[] = [
   { icon: <HouseIcon />, name: 'Inicio', path: ROUTES.HOME },
   { icon: <UserIcon />, name: 'Perfil', path: ROUTES.PROFILE },
 ];
 
-// Correspondencia section
+// ── Sección Correspondencia (con countKey en sub-ítems) ──────
 const CORRESPONDENCIA_ITEMS: NavItem[] = [
   {
     icon: <FolderIcon />,
-    name: 'Tramites',
+    name: 'Trámites',
     subItems: [
       {
-        name: 'Tramites',
+        name: 'Trámites',
         path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL,
-        pro: false,
+        countKey: 'all',
         permission: 'correspondencia_tramite.all',
       },
       {
         name: 'Bandeja de Entrada',
         path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING,
-        pro: false,
+        countKey: 'pending',
         permission: 'correspondencia_tramite.pending',
       },
       {
         name: 'Bandeja de Salida',
         path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED,
-        pro: false,
+        countKey: 'attended',
         permission: 'correspondencia_tramite.attended',
       },
       {
         name: 'Archivados',
         path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED,
-        pro: false,
+        countKey: 'archived',
         permission: 'correspondencia_tramite.archived',
       },
     ],
@@ -164,18 +162,15 @@ const CORRESPONDENCIA_ITEMS: NavItem[] = [
   },
 ];
 
-// Static admin section items (permission key → path)
+// ── Sección Admin ────────────────────────────────────────────
 const ALL_ADMIN_ITEMS: NavItem[] = [
-  // { icon: <LockIcon />, name: "Permisos", path: "/admin/permisos", permission: "permissions.index" },
-  // { icon: <UsersIcon />, name: "Roles", path: "/admin/roles", permission: "roles.index" },
-  // { icon: <ListIcon />, name: "Ítems de Menú", path: "/admin/menu", permission: "menu_items.index" },
   {
     icon: <LockOpenIcon />,
     name: 'Accesos',
     subItems: [
-      { name: 'Permisos', path: ROUTES.PERMISSIONS.LIST, pro: false, permission: 'permissions.index' },
-      { name: 'Roles', path: ROUTES.ROLES.LIST, pro: false, permission: 'roles.index' },
-      { name: 'Ítems de Menú', path: ROUTES.MENU_ITEMS.LIST, pro: false, permission: 'menu_items.index' },
+      { name: 'Permisos', path: ROUTES.PERMISSIONS.LIST, permission: 'permissions.index' },
+      { name: 'Roles', path: ROUTES.ROLES.LIST, permission: 'roles.index' },
+      { name: 'Ítems de Menú', path: ROUTES.MENU_ITEMS.LIST, permission: 'menu_items.index' },
     ],
   },
   { icon: <UserCogIcon />, name: 'Usuarios', path: ROUTES.USERS.LIST, permission: 'users.index' },
@@ -183,24 +178,34 @@ const ALL_ADMIN_ITEMS: NavItem[] = [
 
 type MenuType = 'dynamic' | 'principal' | 'admin' | 'correspondencia';
 
+// ── Prefijo numérico  (31) antes del label ───────────────────
+function CountPrefix({ count, active }: { count: number; active: boolean }) {
+  return (
+    <span
+      className={`mr-1.5 inline-flex h-5 min-w-[22px] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 ${
+        active ? 'text-brand-500 dark:text-brand-400' : 'text-gray-400 dark:text-gray-500'
+      }`}
+    >
+      {count > 9999 ? '9999+' : count}
+    </span>
+  );
+}
+
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
   const { menuItems } = useMenu();
   const { user } = useAuth();
 
+  const counts = useDocumentCounts();
+
   const adminItems: NavItem[] = ALL_ADMIN_ITEMS.map((item) => {
     if (item.subItems) {
       const filteredSubItems = item.subItems.filter(
-        (subItem) => !user?.permissions?.length || user.permissions.includes(subItem.permission),
+        (sub) => !user?.permissions?.length || user.permissions.includes(sub.permission),
       );
-      if (filteredSubItems.length === 0) {
-        return null;
-      }
-      return {
-        ...item,
-        subItems: filteredSubItems,
-      };
+      if (filteredSubItems.length === 0) return null;
+      return { ...item, subItems: filteredSubItems };
     }
     if (!item.permission || !user?.permissions?.length || user.permissions.includes(item.permission)) {
       return item;
@@ -214,10 +219,7 @@ const AppSidebar: React.FC = () => {
 
   const dynamicNavItems = useMemo(() => transformToNavItems(menuItems), [menuItems]);
 
-  const [openSubmenu, setOpenSubmenu] = useState<{
-    type: MenuType;
-    index: number;
-  } | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<{ type: MenuType; index: number } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -231,7 +233,6 @@ const AppSidebar: React.FC = () => {
       { type: 'admin', items: adminItems },
       { type: 'correspondencia', items: correspondenciaItems },
     ];
-
     sections.forEach(({ type, items }) => {
       items.forEach((nav, index) => {
         if (nav.subItems) {
@@ -244,18 +245,15 @@ const AppSidebar: React.FC = () => {
         }
       });
     });
-
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
+    if (!submenuMatched) setOpenSubmenu(null);
   }, [location, isActive, dynamicNavItems]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
       if (subMenuRefs.current[key]) {
-        setSubMenuHeight((prevHeights) => ({
-          ...prevHeights,
+        setSubMenuHeight((prev) => ({
+          ...prev,
           [key]: subMenuRefs.current[key]?.scrollHeight || 0,
         }));
       }
@@ -263,10 +261,8 @@ const AppSidebar: React.FC = () => {
   }, [openSubmenu]);
 
   const handleSubmenuToggle = (index: number, menuType: MenuType) => {
-    setOpenSubmenu((prevOpenSubmenu) => {
-      if (prevOpenSubmenu && prevOpenSubmenu.type === menuType && prevOpenSubmenu.index === index) {
-        return null;
-      }
+    setOpenSubmenu((prev) => {
+      if (prev && prev.type === menuType && prev.index === index) return null;
       return { type: menuType, index };
     });
   };
@@ -319,6 +315,8 @@ const AppSidebar: React.FC = () => {
               </Link>
             )
           )}
+
+          {/* Sub-menú desplegable */}
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
               ref={(el) => {
@@ -333,38 +331,44 @@ const AppSidebar: React.FC = () => {
               }}
             >
               <ul className="mt-2 ml-9 space-y-1">
-                {nav.subItems.map((subItem) => (
-                  <li key={subItem.name}>
-                    <Link
-                      to={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path) ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'
-                      }`}
-                    >
-                      {subItem.name}
-                      <span className="ml-auto flex items-center gap-1">
-                        {subItem.new && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path) ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
-                            } menu-dropdown-badge`}
-                          >
-                            new
-                          </span>
-                        )}
-                        {subItem.pro && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path) ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
-                            } menu-dropdown-badge`}
-                          >
-                            pro
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                {nav.subItems.map((subItem) => {
+                  const active = isActive(subItem.path);
+                  const count = subItem.countKey ? counts[subItem.countKey] : 0;
+                  return (
+                    <li key={subItem.name}>
+                      <Link
+                        to={subItem.path}
+                        className={`menu-dropdown-item ${
+                          active ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'
+                        }`}
+                      >
+                        {subItem.countKey && <CountPrefix count={count} active={active} />}
+                        {subItem.name}
+                        <span className="ml-auto flex items-center gap-1">
+                          {/* trailing badges (new / pro) */}
+                          {subItem.new && (
+                            <span
+                              className={`ml-auto ${
+                                active ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
+                              } menu-dropdown-badge`}
+                            >
+                              new
+                            </span>
+                          )}
+                          {subItem.pro && (
+                            <span
+                              className={`ml-auto ${
+                                active ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
+                              } menu-dropdown-badge`}
+                            >
+                              pro
+                            </span>
+                          )}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
@@ -393,30 +397,11 @@ const AppSidebar: React.FC = () => {
           </Link>
         )}
       </div>
+
       <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            {/* Dynamic menu from API */}
-            {/*{dynamicNavItems.length > 0 && (*/}
-            {/*  <div>*/}
-            {/*    <h2*/}
-            {/*      className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${*/}
-            {/*        !isExpanded && !isHovered*/}
-            {/*          ? "lg:justify-center"*/}
-            {/*          : "justify-start"*/}
-            {/*      }`}*/}
-            {/*    >*/}
-            {/*      {isExpanded || isHovered || isMobileOpen ? (*/}
-            {/*        "Ítems de Menú"*/}
-            {/*      ) : (*/}
-            {/*        <HorizontaLDots className="size-6" />*/}
-            {/*      )}*/}
-            {/*    </h2>*/}
-            {/*    {renderMenuItems(dynamicNavItems, "dynamic")}*/}
-            {/*  </div>*/}
-            {/*)}*/}
-
-            {/* Principal section */}
+            {/* Principal */}
             <div>
               <h2
                 className={`mb-4 flex text-xs leading-[20px] text-gray-400 uppercase ${
@@ -428,7 +413,7 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(principalItems, 'principal')}
             </div>
 
-            {/* Static admin section */}
+            {/* Administración */}
             <div>
               <h2
                 className={`mb-4 flex text-xs leading-[20px] text-gray-400 uppercase ${
@@ -440,7 +425,7 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(adminItems, 'admin')}
             </div>
 
-            {/* Static correspondencia section */}
+            {/* Correspondencia */}
             <div>
               <h2
                 className={`mb-4 flex text-xs leading-[20px] text-gray-400 uppercase ${

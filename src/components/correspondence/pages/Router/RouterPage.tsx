@@ -1,37 +1,39 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SignDocument } from '../../types/sign-document.type.ts';
+// ─────────────────────────────────────────────────────────────
+// RouterPage.tsx  (modificado — agrega setCounts al contexto)
+// ─────────────────────────────────────────────────────────────
+
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  CreateDocumentRequest,
+  DocumentFilters,
+  UpdateDocumentRequest,
+  Document,
+} from '../../types/documents/document.type.ts';
+import { RouterFilter, SortConfig } from '../../components/router/RouterFilter.tsx';
+import RouterStatusTabs, {
+  ARCHIVED_STATE_IDS,
+  ATTENDED_STATE_IDS,
+  PENDING_STATE_IDS,
+  RouterStatusTab,
+} from '../../components/router/RouterStatusTabs.tsx';
+import { getDocuments } from '../../services/document.service.ts';
+import { SignDocument } from '../../types/sign-document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { PlusIcon } from '../../../../icons';
-import { Modal } from '../../../ui/modal';
 import RouterTable from '../../components/router/RouterTable.tsx';
-import {
-  CreateDocumentRequest,
-  Document,
-  DocumentFilters,
-  SortConfig,
-  UpdateDocumentRequest,
-} from '../../types/documents/document.type.ts';
+import { Modal } from '../../../ui/modal';
 import DocumentForm from '../../components/documents/DocumentForm.tsx';
 import RouterForm from '../../components/router/RouterForm.tsx';
-import { getDocuments } from '../../services/document.service.ts';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
-import { RouterFilter } from '../../components/router/RouterFilter.tsx';
-import RouterStatusTabs, {
-  ARCHIVED_STATE_IDS,
-  ATTENDED_STATE_IDS,
-  RouterStatusTab,
-  PENDING_STATE_IDS,
-} from '../../components/router/RouterStatusTabs.tsx';
-import { useNavigate } from 'react-router';
+import { DocumentStatusTab } from '../../components/documents/DocumentStatusTabs.tsx';
 
 export default function RouterPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
-  const navigate = useNavigate();
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,11 +54,10 @@ export default function RouterPage() {
   });
 
   const [sort, setSort] = useState<SortConfig>({ field: 'id', dir: 'desc' });
-
   const [statusTab, setStatusTab] = useState<RouterStatusTab>('all');
 
   // ─────────────────────────────────────────────────────────────
-  // Conteos para los tabs (sobre documentos sin filtros de texto)
+  // Conteos para los tabs + contexto global (sidebar)
   // ─────────────────────────────────────────────────────────────
   const tabCounts = useMemo(
     () => ({
@@ -69,40 +70,34 @@ export default function RouterPage() {
   );
 
   // ─────────────────────────────────────────────────────────────
-  // Filtered data (tab + filtros de texto + sort)
+  // Filtered data
   // ─────────────────────────────────────────────────────────────
   const filteredDocuments = useMemo(() => {
     const filtered = documents.filter((document) => {
-      // ── Filtro por tab de estado ──────────────────────────────
       if (statusTab === 'pending' && !PENDING_STATE_IDS.includes(document.state_document_id)) return false;
       if (statusTab === 'attended' && !ATTENDED_STATE_IDS.includes(document.state_document_id)) return false;
       if (statusTab === 'archived' && !ARCHIVED_STATE_IDS.includes(document.state_document_id)) return false;
 
-      // ── Filtros de texto ──────────────────────────────────────
       const nroMatch =
         !filters.nro ||
         String(document.doc_contador ?? '')
           .toLowerCase()
           .includes(filters.nro.toLowerCase());
-
       const oldMatch =
         !filters.old ||
         String(document.doc_cite ?? '')
           .toLowerCase()
           .includes(filters.old.toLowerCase());
-
       const originMatch =
         !filters.origin ||
         String(document.doc_dep_name ?? '')
           .toLowerCase()
           .includes(filters.origin.toLowerCase());
-
       const subjectMatch =
         !filters.subject ||
         String(document.doc_referencia ?? '')
           .toLowerCase()
           .includes(filters.subject.toLowerCase());
-
       const priorityMatch =
         !filters.priority ||
         String(document.pri_name ?? '')
@@ -150,19 +145,10 @@ export default function RouterPage() {
     setSelected(document);
     setIsRouterModalOpen(true);
   };
-  const handleViewHeader = (document: Document) => {
-    console.log('Cabecera:', document);
-  };
-  const handleViewSheet = (document: Document) => {
-    console.log('Hoja:', document);
-  };
-  const handleViewRoutes = (document: Document) => {
-    console.log('Rutas:', document);
-  };
-  const handleView = (document: SignDocument) => {
-    navigate(`/correspondencia/tramite/${document.id}`);
-    console.log('Ver tramite', document);
-  };
+  const handleViewHeader = (document: Document) => console.log('Cabecera:', document);
+  const handleViewSheet = (document: Document) => console.log('Hoja:', document);
+  const handleViewRoutes = (document: Document) => console.log('Rutas:', document);
+  const handleView = (document: SignDocument) => console.log('Ver documento', document);
 
   function handleEdit(document: Document) {
     setSelected(document);
@@ -229,24 +215,21 @@ export default function RouterPage() {
   // ─────────────────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Tramite" description="Gestión de creación de Tramite" />
-      <PageBreadCrumb pageTitle="Tramite" />
+      <PageMeta title="Hoja de ruta" description="Gestión de creación de hoja de ruta" />
+      <PageBreadCrumb pageTitle="Hoja de ruta" />
 
       <div className="space-y-5">
-        {/* Tabs de estado */}
         <RouterStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
 
-        {/* Filtros + botón crear */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('documents.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
-              Nuevo Tramite
+              Nueva Hoja de ruta
             </Button>
           )}
         </div>
 
-        {/* Tabla */}
         <RouterTable
           documents={filteredDocuments}
           isLoading={isLoading}

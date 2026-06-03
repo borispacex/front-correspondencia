@@ -3,6 +3,7 @@ import { Outlet } from 'react-router';
 import AppHeader from './AppHeader';
 import Backdrop from './Backdrop';
 import AppSidebar from './AppSidebar';
+import { DocumentCountProvider } from '../components/correspondence/context/DocumentCountContext.tsx';
 
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -30,7 +31,9 @@ const LayoutContent: React.FC = () => {
 const AppLayout: React.FC = () => {
   return (
     <SidebarProvider>
-      <LayoutContent />
+      <DocumentCountProvider>
+        <LayoutContent />
+      </DocumentCountProvider>
     </SidebarProvider>
   );
 };

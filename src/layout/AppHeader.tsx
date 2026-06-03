@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
+
 import { Link } from 'react-router';
 import { useSidebar } from '../context/SidebarContext';
 import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
 import NotificationDropdown from '../components/header/NotificationDropdown';
 import UserDropdown from '../components/header/UserDropdown';
 import { ROUTES } from '../constants/routes.constants.ts';
-import { MailIcon } from '../icons';
+import { MailIcon, SearchIcon } from '../icons';
+import { getDocuments } from '../components/correspondence/services/document.service.ts';
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
   const handleToggle = () => {
@@ -25,6 +28,18 @@ const AppHeader: React.FC = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      await getDocuments();
+    } catch (err) {
+      console.error('Error al actualizar conteos', err);
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 600);
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
@@ -32,20 +47,20 @@ const AppHeader: React.FC = () => {
         inputRef.current?.focus();
       }
     };
+
     document.addEventListener('keydown', handleKeyDown);
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 flex w-full overflow-visible border-b border-gray-200 bg-white/90 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/90">
+    <header className="sticky top-0 z-50 flex w-full overflow-visible border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900">
       <div className="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
-        {/* ── Barra principal ── */}
-        <div className="relative flex w-full items-center justify-between gap-2 px-3 py-2.5 sm:gap-4 lg:px-0 lg:py-3">
-          {/* Botón sidebar */}
+        <div className="flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4 dark:border-gray-800">
           <button
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 lg:h-11 lg:w-11 lg:border lg:border-gray-200 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+            className="z-99999 h-10 w-10 items-center justify-center rounded-lg border-gray-200 text-gray-500 lg:flex lg:h-11 lg:w-11 lg:border dark:border-gray-800 dark:text-gray-400"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -68,14 +83,28 @@ const AppHeader: React.FC = () => {
                 />
               </svg>
             )}
+            {/* Cross Icon */}
           </button>
 
-          {/* Logo mobile */}
-          <Link to={ROUTES.HOME} className="absolute left-1/2 -translate-x-1/2 lg:hidden">
-            <img className="h-8 w-auto" src="/images/logo_emi/emi_icono.png" alt="Logo" />
+          <Link to={ROUTES.HOME} className="lg:hidden">
+            <img className="h-8 w-auto dark:hidden" src="/images/logo_emi/emi_icono.png" alt="Logo" />
+            <img className="hidden h-8 w-auto dark:block" src="/images/logo_emi/emi_icono.png" alt="Logo" />
           </Link>
 
-          {/* Badge centro — igual que AuthLayout */}
+          <button
+            onClick={toggleApplicationMenu}
+            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M5.99902 10.4951C6.82745 10.4951 7.49902 11.1667 7.49902 11.9951V12.0051C7.49902 12.8335 6.82745 13.5051 5.99902 13.5051C5.1706 13.5051 4.49902 12.8335 4.49902 12.0051V11.9951C4.49902 11.1667 5.1706 10.4951 5.99902 10.4951ZM17.999 10.4951C18.8275 10.4951 19.499 11.1667 19.499 11.9951V12.0051C19.499 12.8335 18.8275 13.5051 17.999 13.5051C17.1706 13.5051 16.499 12.8335 16.499 12.0051V11.9951C16.499 11.1667 17.1706 10.4951 17.999 10.4951ZM13.499 11.9951C13.499 11.1667 12.8275 10.4951 11.999 10.4951C11.1706 10.4951 10.499 11.1667 10.499 11.9951V12.0051C10.499 12.8335 11.1706 13.5051 11.999 13.5051C12.8275 13.5051 13.499 12.8335 13.499 12.0051V11.9951Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+
           <div className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center lg:flex">
             <div className="flex items-center gap-2.5 rounded-xl border border-blue-100 bg-white/70 px-4 py-1.5 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
               <div className="hidden h-[2px] w-8 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
@@ -93,47 +122,55 @@ const AppHeader: React.FC = () => {
               <div className="hidden h-[2px] w-8 shrink-0 rounded-full bg-yellow-500 2xl:block dark:bg-yellow-400" />
             </div>
           </div>
-
-          {/* Botón tres puntos mobile */}
-          <button
-            onClick={toggleApplicationMenu}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M5.99902 10.4951C6.82745 10.4951 7.49902 11.1667 7.49902 11.9951V12.0051C7.49902 12.8335 6.82745 13.5051 5.99902 13.5051C5.1706 13.5051 4.49902 12.8335 4.49902 12.0051V11.9951C4.49902 11.1667 5.1706 10.4951 5.99902 10.4951ZM17.999 10.4951C18.8275 10.4951 19.499 11.1667 19.499 11.9951V12.0051C19.499 12.8335 18.8275 13.5051 17.999 13.5051C17.1706 13.5051 16.499 12.8335 16.499 12.0051V11.9951C16.499 11.1667 17.1706 10.4951 17.999 10.4951ZM13.499 11.9951C13.499 11.1667 12.8275 10.4951 11.999 10.4951C11.1706 10.4951 10.499 11.1667 10.499 11.9951V12.0051C10.499 12.8335 11.1706 13.5051 11.999 13.5051C12.8275 13.5051 13.499 12.8335 13.499 12.0051V11.9951Z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
         </div>
-
-        {/* ── Panel desplegable mobile con animación suave ── */}
         <div
-          className={`overflow-hidden transition-all duration-200 ease-in-out lg:hidden ${
-            isApplicationMenuOpen ? 'max-h-20 border-t border-gray-100 dark:border-gray-800' : 'max-h-0'
-          }`}
+          className={`${
+            isApplicationMenuOpen ? 'flex' : 'hidden'
+          } shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
         >
-          <div className="flex items-center justify-between px-5 py-3">
-            <div className="flex items-center gap-3">
-              <ThemeToggleButton />
-              <NotificationDropdown />
-            </div>
-            <UserDropdown />
+          <div className="2xsm:gap-3 flex items-center gap-2">
+            {/* <!-- Dark Mode Toggler --> */}
+            <ThemeToggleButton />
+            {/* <!-- Dark Mode Toggler --> */}
+            <NotificationDropdown />
+            {/* <!-- Notification Menu Area --> */}
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              aria-label="Actualizar conteos"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+            >
+              <RefreshIcon spinning={isRefreshing} />
+            </button>
           </div>
-        </div>
-
-        {/* ── Acciones desktop ── */}
-        <div className="hidden items-center gap-3 lg:flex lg:shrink-0">
-          <ThemeToggleButton />
-          <NotificationDropdown />
+          {/* <!-- User Area --> */}
           <UserDropdown />
         </div>
       </div>
     </header>
   );
 };
+
+function RefreshIcon({ spinning }: { spinning: boolean }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`transition-transform duration-300 ${spinning ? 'animate-spin' : ''}`}
+    >
+      <path
+        d="M4 12C4 7.58172 7.58172 4 12 4C14.8786 4 17.4188 5.49251 18.9015 7.75M20 12C20 16.4183 16.4183 20 12 20C9.12144 20 6.58116 18.5075 5.09853 16.25"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path d="M19 4.5V8H15.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 19.5V16H8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export default AppHeader;
