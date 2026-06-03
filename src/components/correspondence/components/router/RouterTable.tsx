@@ -160,7 +160,7 @@ export default function RouterTable({
                 onClick={() => handleSort('doc_contador')}
                 className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Hoja de ruta {renderSortIcon('doc_contador')}</span>
+                <span className="flex items-center gap-1">Tramite {renderSortIcon('doc_contador')}</span>
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Derivado por
@@ -291,7 +291,7 @@ export default function RouterTable({
                         </Tooltip>
                       )}
                       {can('documents.edit') && onViewSheet && (
-                        <Tooltip content="Hoja de ruta">
+                        <Tooltip content="Tramite">
                           <Button
                             variant="secondary-outline"
                             size="xs"

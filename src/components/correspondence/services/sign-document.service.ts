@@ -13,7 +13,7 @@ export async function getSignDocuments(): Promise<SignDocument[]> {
       route: {
         id: 10,
         code: 'HRD/AGETIC/00062/2025',
-        subject: 'Revisión hoja de ruta',
+        subject: 'Revisión tramite',
       },
       actions: [
         {

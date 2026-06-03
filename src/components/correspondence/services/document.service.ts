@@ -10,3 +10,9 @@ export async function getDocuments(params?: ApiQueryParams): Promise<Document[]>
   });
   return data.data;
 }
+
+export async function getDocumentById(id: number): Promise<Document> {
+  const { data } = await http.get<ApiResponse<Document>>(API_ENDPOINTS.CORRESPONDENCE.DOCUMENT.BY_ID(id));
+
+  return data.data;
+}

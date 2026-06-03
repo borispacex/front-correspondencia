@@ -97,35 +97,26 @@ import { ReactComponent as Trash2Icon } from './trash-2.svg?react';
 import { ReactComponent as UploadIcon } from './upload.svg?react';
 import { ReactComponent as PrinterIcon } from './printer.svg?react';
 import { ReactComponent as SignatureIcon } from './signature.svg?react';
-
 import { ReactComponent as MailOpenIcon } from './mail-open.svg?react';
 import { ReactComponent as MailCheckIcon } from './mail-check.svg?react';
 import { ReactComponent as MailWarningIcon } from './mail-warning.svg?react';
-
 import { ReactComponent as Clock3Icon } from './clock-3.svg?react';
 import { ReactComponent as CircleXIcon } from './circle-x.svg?react';
 import { ReactComponent as CheckCheckIcon } from './check-check.svg?react';
-
 import { ReactComponent as BuildingIcon } from './building.svg?react';
 import { ReactComponent as Building2Icon } from './building-2.svg?react';
-
 import { ReactComponent as HistoryIcon } from './history.svg?react';
 import { ReactComponent as WorkflowIcon } from './workflow.svg?react';
 import { ReactComponent as GitBranchIcon } from './git-branch.svg?react';
-
 import { ReactComponent as KeyRoundIcon } from './key-round.svg?react';
-
 import { ReactComponent as ScanSearchIcon } from './scan-search.svg?react';
-
 import { ReactComponent as FileCheckIcon } from './file-check.svg?react';
 import { ReactComponent as FileClockIcon } from './file-clock.svg?react';
 import { ReactComponent as FileSearchIcon } from './file-search.svg?react';
-
 import { ReactComponent as BadgeCheckIcon } from './badge-check.svg?react';
-
 import { ReactComponent as ArchiveIcon } from './archive.svg?react';
-
 import { ReactComponent as ReceiptTextIcon } from './receipt-text.svg?react';
+import { ReactComponent as ArrowLeftIcon } from './arrow-left.svg?react';
 
 export {
   ErrorHexaIcon,
@@ -246,4 +237,5 @@ export {
   BadgeCheckIcon,
   ArchiveIcon,
   ReceiptTextIcon,
+  ArrowLeftIcon,
 };

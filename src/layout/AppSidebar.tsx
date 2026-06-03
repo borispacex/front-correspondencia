@@ -122,9 +122,33 @@ const principalItems: NavItem[] = [
 const CORRESPONDENCIA_ITEMS: NavItem[] = [
   {
     icon: <FolderIcon />,
-    name: 'Hoja de Ruta',
-    path: ROUTES.CORRESPONDENCE.ROUTE_SHEET,
-    permission: 'correspondencia_hojaruta.index',
+    name: 'Tramites',
+    subItems: [
+      {
+        name: 'Tramites',
+        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL,
+        pro: false,
+        permission: 'correspondencia_tramite.all',
+      },
+      {
+        name: 'Bandeja de Entrada',
+        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING,
+        pro: false,
+        permission: 'correspondencia_tramite.pending',
+      },
+      {
+        name: 'Bandeja de Salida',
+        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED,
+        pro: false,
+        permission: 'correspondencia_tramite.attended',
+      },
+      {
+        name: 'Archivados',
+        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED,
+        pro: false,
+        permission: 'correspondencia_tramite.archived',
+      },
+    ],
   },
   {
     icon: <FileTextIcon />,

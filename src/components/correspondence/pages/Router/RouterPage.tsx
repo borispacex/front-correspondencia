@@ -1,35 +1,37 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SignDocument } from '../types/sign-document.type.ts';
-import { usePermissions } from '../../../hooks/usePermissions.ts';
-import { useNotifications } from '../../../hooks/useNotification.tsx';
-import PageMeta from '../../common/PageMeta.tsx';
-import PageBreadCrumb from '../../common/PageBreadCrumb.tsx';
-import Button from '../../ui/button/Button.tsx';
-import { PlusIcon } from '../../../icons';
-import { Modal } from '../../ui/modal';
-import RouterTable from '../components/router/RouterTable.tsx';
+import { SignDocument } from '../../types/sign-document.type.ts';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
+import PageMeta from '../../../common/PageMeta.tsx';
+import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
+import Button from '../../../ui/button/Button.tsx';
+import { PlusIcon } from '../../../../icons';
+import { Modal } from '../../../ui/modal';
+import RouterTable from '../../components/router/RouterTable.tsx';
 import {
   CreateDocumentRequest,
   Document,
   DocumentFilters,
   SortConfig,
   UpdateDocumentRequest,
-} from '../types/documents/document.type.ts';
-import DocumentForm from '../components/documents/DocumentForm.tsx';
-import RouterForm from '../components/router/RouterForm.tsx';
-import { getDocuments } from '../services/document.service.ts';
-import ModalDelete from '../../modal/ModalDelete.tsx';
-import { RouterFilter } from '../components/router/RouterFilter.tsx';
-import DocumentStatusTabs, {
+} from '../../types/documents/document.type.ts';
+import DocumentForm from '../../components/documents/DocumentForm.tsx';
+import RouterForm from '../../components/router/RouterForm.tsx';
+import { getDocuments } from '../../services/document.service.ts';
+import ModalDelete from '../../../modal/ModalDelete.tsx';
+import { RouterFilter } from '../../components/router/RouterFilter.tsx';
+import RouterStatusTabs, {
   ARCHIVED_STATE_IDS,
   ATTENDED_STATE_IDS,
-  DocumentStatusTab,
+  RouterStatusTab,
   PENDING_STATE_IDS,
-} from '../components/documents/DocumentStatusTabs.tsx';
+} from '../../components/router/RouterStatusTabs.tsx';
+import { useNavigate } from 'react-router';
 
 export default function RouterPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
+  const navigate = useNavigate();
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +53,7 @@ export default function RouterPage() {
 
   const [sort, setSort] = useState<SortConfig>({ field: 'id', dir: 'desc' });
 
-  const [statusTab, setStatusTab] = useState<DocumentStatusTab>('all');
+  const [statusTab, setStatusTab] = useState<RouterStatusTab>('all');
 
   // ─────────────────────────────────────────────────────────────
   // Conteos para los tabs (sobre documentos sin filtros de texto)
@@ -158,7 +160,8 @@ export default function RouterPage() {
     console.log('Rutas:', document);
   };
   const handleView = (document: SignDocument) => {
-    console.log('Ver documento', document);
+    navigate(`/correspondencia/tramite/${document.id}`);
+    console.log('Ver tramite', document);
   };
 
   function handleEdit(document: Document) {
@@ -226,19 +229,19 @@ export default function RouterPage() {
   // ─────────────────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Hoja de ruta" description="Gestión de creación de hoja de ruta" />
-      <PageBreadCrumb pageTitle="Hoja de ruta" />
+      <PageMeta title="Tramite" description="Gestión de creación de Tramite" />
+      <PageBreadCrumb pageTitle="Tramite" />
 
       <div className="space-y-5">
         {/* Tabs de estado */}
-        <DocumentStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
+        <RouterStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
 
         {/* Filtros + botón crear */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('documents.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
-              Nueva Hoja de ruta
+              Nuevo Tramite
             </Button>
           )}
         </div>

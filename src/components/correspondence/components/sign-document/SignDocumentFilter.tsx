@@ -93,10 +93,10 @@ export default function SignDocumentFilter({ filters, sort, onFiltersChange, onS
         />
       </div>
 
-      {/* Hoja de Ruta */}
+      {/* Tramite */}
       <div className="flex min-w-[140px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Hoja Ruta
+          Tramite
         </Label>
 
         <InputField

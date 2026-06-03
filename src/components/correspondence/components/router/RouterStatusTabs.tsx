@@ -1,28 +1,34 @@
-export type DocumentStatusTab = 'all' | 'mine' | 'signed';
-
-// Ajusta estos IDs según tu backend
-export const MY_DOCUMENT_STATE_IDS = [1, 2, 3];
-export const SIGNED_STATE_IDS = [4, 5];
-
 interface TabCounts {
   all: number;
-  mine: number;
-  signed: number;
+  pending: number;
+  attended: number;
+  archived: number;
 }
 
-interface Props {
-  active: DocumentStatusTab;
+export type RouterStatusTab = 'all' | 'pending' | 'attended' | 'archived';
+
+interface RouterStatusTabsProps {
+  active: RouterStatusTab;
   counts: TabCounts;
-  onChange: (tab: DocumentStatusTab) => void;
+  onChange: (tab: RouterStatusTab) => void;
 }
 
-const TABS: { key: DocumentStatusTab; label: string }[] = [
-  { key: 'mine', label: 'Mis documentos' },
-  { key: 'signed', label: 'Firmados' },
+// IDs de state_documents que corresponden a cada tab
+// Pendientes  → CREADO(1), En proceso(2)
+// Atendidas   → ENVIADO(3), DERIVADO(4), RECIBIDO(5)
+// Archivados  → ARCIVADO(6), ARCHIVADO(7), ELIMINADO(8)
+export const PENDING_STATE_IDS = [1, 2];
+export const ATTENDED_STATE_IDS = [3, 4, 5];
+export const ARCHIVED_STATE_IDS = [6, 7, 8];
+
+const TABS: { key: RouterStatusTab; label: string }[] = [
+  { key: 'pending', label: 'Pendientes' },
+  { key: 'attended', label: 'Atendidas' },
+  { key: 'archived', label: 'Archivados' },
   { key: 'all', label: 'Todos' },
 ];
 
-export default function DocumentStatusTabs({ active, counts, onChange }: Props) {
+export default function RouterStatusTabs({ active, counts, onChange }: RouterStatusTabsProps) {
   return (
     <div className="flex flex-wrap items-end gap-2">
       {TABS.map(({ key, label }) => {

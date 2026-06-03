@@ -23,7 +23,13 @@ export const ROUTES = {
   },
   // Correspondencia
   CORRESPONDENCE: {
-    ROUTE_SHEET: '/correspondencia/hoja-ruta',
+    ROUTE_SHEET: {
+      SHOW: '/correspondencia/tramite/:id',
+      ALL: '/correspondencia/tramite',
+      PENDING: '/correspondencia/tramite/bandeja-entrada',
+      ATTENDED: '/correspondencia/tramite/bandeja-salida',
+      ARCHIVED: '/correspondencia/tramite/archivados',
+    },
     DOCUMENTS: '/correspondencia/documentos',
     SIGN_DOCUMENT: '/correspondencia/firma-digital',
   },

@@ -8,10 +8,8 @@ import SignDocumentTable from '../components/sign-document/SignDocumentTable.tsx
 import { usePermissions } from '../../../hooks/usePermissions.ts';
 import Button from '../../ui/button/Button.tsx';
 import { FingerprintPatternIcon } from '../../../icons';
-import PermissionForm from '../../permissions/PermissionForm.tsx';
 import { Modal } from '../../ui/modal';
 import SignDocumentForm from '../components/sign-document/SignDocumentForm.tsx';
-import type { Permission } from '../../../types/admin/permissions/permission.types.ts';
 import { DocumentRoutes } from '../components/documents/DocumentRoutes.tsx';
 
 const SIGN_DOCUMENTS: SignDocument[] = [
@@ -26,7 +24,7 @@ const SIGN_DOCUMENTS: SignDocument[] = [
     route: {
       id: 10,
       code: 'HRD/EMI/00062/2025',
-      subject: 'Revisión hoja de ruta',
+      subject: 'Revisión tramite',
     },
     actions: [
       {
@@ -50,7 +48,7 @@ const SIGN_DOCUMENTS: SignDocument[] = [
     route: {
       id: 11,
       code: 'HRD/EMI/00062/2025',
-      subject: 'Revisión hoja de ruta',
+      subject: 'Revisión tramite',
     },
     actions: [
       {
@@ -203,16 +201,16 @@ export default function SignDocumentPage() {
   }
 
   function handleViewRoute(document: SignDocument) {
-    console.log('Ver hoja de ruta', document);
+    console.log('Ver tramite', document);
   }
 
   function handleViewRoute(document: SignDocument) {
-    console.log('Ver hoja de ruta', document);
+    console.log('Ver tramite', document);
     setIsRoutesModalOpen(true);
   }
 
   function handleApproveDocuments(document: SignDocument) {
-    console.log('Ver hoja de ruta', document);
+    console.log('Ver tramite', document);
     // setSelecteds(documents);
     setIsModalOpen(true);
   }

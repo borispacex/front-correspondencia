@@ -70,6 +70,7 @@ export const API_ENDPOINTS = {
     },
     DOCUMENT: {
       BASE: '/correspondencia/documents',
+      BY_ID: (id: number) => `/correspondencia/documents/${id}`,
     },
     ROUTER: {
       BASE: '/correspondencia/routers',
