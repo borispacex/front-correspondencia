@@ -44,10 +44,10 @@ export default function RouterArchivedShowPage() {
 
   return (
     <>
-      <PageMeta title={`Detalle Tramite | ${APP_NAME}`} description="Información detallada del tramite" />
+      <PageMeta title={`Detalle Trámite | ${APP_NAME}`} description="Información detallada del tramite" />
 
       <PageBreadCrumb
-        pageTitle="Tramite archivado"
+        pageTitle="Trámite archivado"
         items={[
           {
             label: 'Archivados',

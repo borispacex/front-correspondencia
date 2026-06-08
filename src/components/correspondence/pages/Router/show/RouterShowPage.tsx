@@ -45,13 +45,13 @@ export default function RouterShowPage() {
 
   return (
     <>
-      <PageMeta title={`Detalle Tramite | ${APP_NAME}`} description="Información detallada del tramite" />
+      <PageMeta title={`Detalle Trámite | ${APP_NAME}`} description="Información detallada del tramite" />
 
       <PageBreadCrumb
-        pageTitle="Tramite"
+        pageTitle="Trámite"
         items={[
           {
-            label: 'Tramite',
+            label: 'Trámite',
             path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL,
           },
           {

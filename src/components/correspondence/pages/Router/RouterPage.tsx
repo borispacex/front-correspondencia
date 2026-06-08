@@ -216,8 +216,8 @@ export default function RouterPage() {
   // ─────────────────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Tramites | ${APP_NAME}`} description="Gestión de creación de tramites" />
-      <PageBreadCrumb pageTitle="Tramites" />
+      <PageMeta title={`Trámites | ${APP_NAME}`} description="Gestión de creación de tramites" />
+      <PageBreadCrumb pageTitle="Trámites" />
 
       <div className="space-y-5">
         <RouterStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
@@ -226,7 +226,7 @@ export default function RouterPage() {
           <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('documents.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
-              Nuevo Tramite
+              Nuevo Trámite
             </Button>
           )}
         </div>

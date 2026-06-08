@@ -96,7 +96,7 @@ export default function SignDocumentFilter({ filters, sort, onFiltersChange, onS
       {/* Tramite */}
       <div className="flex min-w-[140px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Tramite
+          Trámite
         </Label>
 
         <InputField

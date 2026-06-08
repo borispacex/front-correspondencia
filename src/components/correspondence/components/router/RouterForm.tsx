@@ -281,7 +281,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
                 <div>
                   <p className="mb-2 font-bold">Tipo de Documento:</p>
                   <p className="mb-2 font-medium">
-                    Se debe seleccionar el tipo de documento que se adjunta a la hora de tramite.
+                    Se debe seleccionar el tipo de documento que se adjunta a la hora de trámite.
                   </p>
                 </div>
               }
@@ -375,7 +375,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
                 <div>
                   <p className="mb-2 font-bold">Remite:</p>
                   <p className="mb-2 font-medium">
-                    La persona encargada del área funcional quien está enviando la hoja de tramite.
+                    La persona encargada del área funcional quien está enviando la hoja de trámite.
                   </p>
                 </div>
               }
@@ -403,7 +403,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
               <div>
                 <p className="mb-2 font-bold">Objeto / Referencia:</p>
                 <p className="mb-2 font-medium">
-                  Se debe colocar el objeto del documento que se adjunta a la hoja de tramite.
+                  Se debe colocar el objeto del documento que se adjunta a la hoja de trámite.
                 </p>
               </div>
             }
@@ -429,7 +429,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
               <div>
                 <p className="mb-2 font-bold">Departamentos:</p>
                 <p className="mb-2 font-medium">
-                  Se debe seleccionar una o mas departamentos a los que se derivara la hoja de tramite.
+                  Se debe seleccionar una o mas departamentos a los que se derivara la hoja de trámite.
                 </p>
               </div>
             }
@@ -462,7 +462,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: RouterFormP
             content={
               <div>
                 <p className="mb-2 font-bold">Proveidos:</p>
-                <p className="mb-2 font-medium">Se debe seleccionar uno o mas proveidos a la hoja de tramite.</p>
+                <p className="mb-2 font-medium">Se debe seleccionar uno o mas proveidos a la hoja de trámite.</p>
               </div>
             }
           >

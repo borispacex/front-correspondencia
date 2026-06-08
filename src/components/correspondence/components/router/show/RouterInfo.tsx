@@ -30,7 +30,7 @@ export default function RouterInfo({ document, isLoading }: Props) {
   }
 
   const items = [
-    ['Tramite', document.doc_contador],
+    ['Trámite', document.doc_contador],
     ['Procedencia', document.doc_dep_name],
     ['Tipo', document.typ_name],
     ['Cite', document.doc_numero_cite],

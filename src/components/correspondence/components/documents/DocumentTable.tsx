@@ -139,7 +139,7 @@ export default function DocumentTable({ documents, isLoading, selectedDocumentId
                 onClick={() => handleSort('doc_contador')}
                 className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Tramite {renderSortIcon('doc_contador')}</span>
+                <span className="flex items-center gap-1">Trámite {renderSortIcon('doc_contador')}</span>
               </th>
 
               {/* Fecha de creación */}

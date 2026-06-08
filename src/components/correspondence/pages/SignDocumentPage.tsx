@@ -25,7 +25,7 @@ const SIGN_DOCUMENTS: SignDocument[] = [
     route: {
       id: 10,
       code: 'HRD/EMI/00062/2025',
-      subject: 'Revisión tramite',
+      subject: 'Revisión trámite',
     },
     actions: [
       {

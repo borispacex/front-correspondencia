@@ -46,12 +46,12 @@ export default function RouterPendingShowPage() {
   return (
     <>
       <PageMeta
-        title={`Detalle Tramite pendiente | ${APP_NAME}`}
-        description="Información detallada del tramite pendiente"
+        title={`Detalle Trámite pendiente | ${APP_NAME}`}
+        description="Información detallada del trámite pendiente"
       />
 
       <PageBreadCrumb
-        pageTitle="Tramite pendiente"
+        pageTitle="Trámite pendiente"
         items={[
           {
             label: 'Bandeja de Entrada',

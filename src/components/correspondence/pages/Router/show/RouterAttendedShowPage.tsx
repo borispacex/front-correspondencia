@@ -43,12 +43,12 @@ export default function RouterAttendedShowPage() {
   return (
     <>
       <PageMeta
-        title={`Detalle Tramite atendido | ${APP_NAME}`}
-        description="Información detallada del tramite atendido"
+        title={`Detalle Trámite atendido | ${APP_NAME}`}
+        description="Información detallada del trámite atendido"
       />
 
       <PageBreadCrumb
-        pageTitle="Tramite atendido"
+        pageTitle="Trámite atendido"
         items={[
           {
             label: 'Bandeja de Salida',
