@@ -15,6 +15,7 @@ import RouterTable from '../../components/router/RouterTable.tsx';
 import { Modal } from '../../../ui/modal';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
 
 const isAttended = (stateId: number) => ATTENDED_STATE_IDS.includes(stateId);
 
@@ -74,7 +75,7 @@ export default function RouterAttendedPage() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Bandeja de Salida" description="Documentos atendidos / derivados" />
+      <PageMeta title={`Bandeja de Salida | ${APP_NAME}`} description="Documentos atendidos / derivados" />
       <PageBreadCrumb pageTitle="Bandeja de Salida" />
 
       <div className="space-y-5">

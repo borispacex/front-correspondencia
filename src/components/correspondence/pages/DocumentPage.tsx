@@ -11,6 +11,7 @@ import DocumentStatusTabs, {
   MY_DOCUMENT_STATE_IDS,
   SIGNED_STATE_IDS,
 } from '../components/documents/DocumentStatusTabs.tsx';
+import { APP_NAME } from '../constants/correspondence.constants.ts';
 
 export default function DocumentPage() {
   const { addNotification } = useNotifications();
@@ -135,7 +136,7 @@ export default function DocumentPage() {
   // ─────────────────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Documentos" description="Gestión y visualización de documentos" />
+      <PageMeta title={`Documentos | ${APP_NAME}`} description="Gestión y visualización de documentos" />
       <PageBreadCrumb pageTitle="Documentos" />
 
       <div className="space-y-5">

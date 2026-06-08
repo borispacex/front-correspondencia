@@ -23,6 +23,7 @@ import { useNotifications } from '../../hooks/useNotification';
 import Button from '../../components/ui/button/Button.tsx';
 import ModalStatus from '../../components/modal/ModalStatus.tsx';
 import ModalDelete from '../../components/modal/ModalDelete.tsx';
+import { APP_NAME } from '../../components/correspondence/constants/correspondence.constants.ts';
 
 function flattenMenuItems(items: MenuItem[]): MenuItem[] {
   const result: MenuItem[] = [];
@@ -191,7 +192,7 @@ export default function MenuItemsListPage() {
 
   return (
     <>
-      <PageMeta title="Ítems de Menú" description="Gestión de ítems del menú" />
+      <PageMeta title={`Ítems de Menú | ${APP_NAME}`} description="Gestión de ítems del menú" />
 
       <PageBreadCrumb pageTitle="Ítems de Menú" />
 

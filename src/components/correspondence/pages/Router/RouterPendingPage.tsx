@@ -16,6 +16,7 @@ import RouterTable from '../../components/router/RouterTable.tsx';
 import { Modal } from '../../../ui/modal';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
 
 const isPending = (stateId: number) => PENDING_STATE_IDS.includes(stateId);
 
@@ -76,7 +77,7 @@ export default function RouterPendingPage() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Bandeja de Entrada" description="Documentos pendientes de atención" />
+      <PageMeta title={`Bandeja de Entrada | ${APP_NAME}`} description="Documentos pendientes de atención" />
       <PageBreadCrumb pageTitle="Bandeja de Entrada" />
 
       <div className="space-y-5">

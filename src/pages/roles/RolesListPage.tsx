@@ -17,6 +17,7 @@ import { useNotifications } from '../../hooks/useNotification.tsx';
 
 import Button from '../../components/ui/button/Button.tsx';
 import ModalDelete from '../../components/modal/ModalDelete.tsx';
+import { APP_NAME } from '../../components/correspondence/constants/correspondence.constants.ts';
 
 export default function RolesListPage() {
   const { can } = usePermissions();
@@ -197,8 +198,7 @@ export default function RolesListPage() {
 
   return (
     <>
-      <PageMeta title="Roles" description="Gestión de roles del sistema" />
-
+      <PageMeta title={`Roles | ${APP_NAME}`} description="Gestión de roles del sistema" />
       <PageBreadCrumb pageTitle="Roles" />
 
       <div className="space-y-5">

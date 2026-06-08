@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import 'flatpickr/dist/flatpickr.css';
@@ -16,20 +15,20 @@ const msalInstance = new PublicClientApplication(msalConfig);
 
 msalInstance.initialize().then(() => {
   createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <ThemeProvider>
-        <MsalProvider instance={msalInstance}>
-          <AuthProvider>
-            <MenuProvider>
-              <NotificationProvider>
-                <AppWrapper>
-                  <App />
-                </AppWrapper>
-              </NotificationProvider>
-            </MenuProvider>
-          </AuthProvider>
-        </MsalProvider>
-      </ThemeProvider>
-    </StrictMode>,
+    // <StrictMode>
+    <ThemeProvider>
+      <MsalProvider instance={msalInstance}>
+        <AuthProvider>
+          <MenuProvider>
+            <NotificationProvider>
+              <AppWrapper>
+                <App />
+              </AppWrapper>
+            </NotificationProvider>
+          </MenuProvider>
+        </AuthProvider>
+      </MsalProvider>
+    </ThemeProvider>,
+    // </StrictMode>,
   );
 });

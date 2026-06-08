@@ -10,6 +10,7 @@ import { getDocumentById } from '../../../services/document.service.ts';
 import RouterInfo from '../../../components/router/show/RouterInfo.tsx';
 import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
+import { APP_NAME } from '../../../constants/correspondence.constants.ts';
 
 export default function RouterPendingShowPage() {
   const { id } = useParams();
@@ -44,7 +45,10 @@ export default function RouterPendingShowPage() {
 
   return (
     <>
-      <PageMeta title="Detalle Tramite pendiente" description="Información detallada del tramite pendiente" />
+      <PageMeta
+        title={`Detalle Tramite pendiente | ${APP_NAME}`}
+        description="Información detallada del tramite pendiente"
+      />
 
       <PageBreadCrumb
         pageTitle="Tramite pendiente"

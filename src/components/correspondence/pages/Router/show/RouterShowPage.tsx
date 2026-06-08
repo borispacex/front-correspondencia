@@ -10,6 +10,7 @@ import { getDocumentById } from '../../../services/document.service.ts';
 import RouterInfo from '../../../components/router/show/RouterInfo.tsx';
 import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
+import { APP_NAME } from '../../../constants/correspondence.constants.ts';
 
 export default function RouterShowPage() {
   const { id } = useParams();
@@ -44,7 +45,7 @@ export default function RouterShowPage() {
 
   return (
     <>
-      <PageMeta title="Detalle Tramite" description="Información detallada del tramite" />
+      <PageMeta title={`Detalle Tramite | ${APP_NAME}`} description="Información detallada del tramite" />
 
       <PageBreadCrumb
         pageTitle="Tramite"

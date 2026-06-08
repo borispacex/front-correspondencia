@@ -30,6 +30,7 @@ import DocumentForm from '../../components/documents/DocumentForm.tsx';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
 import { DocumentStatusTab } from '../../components/documents/DocumentStatusTabs.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
 
 export default function RouterPage() {
   const { can } = usePermissions();
@@ -215,8 +216,8 @@ export default function RouterPage() {
   // ─────────────────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Hoja de ruta" description="Gestión de creación de hoja de ruta" />
-      <PageBreadCrumb pageTitle="Hoja de ruta" />
+      <PageMeta title={`Tramites | ${APP_NAME}`} description="Gestión de creación de tramites" />
+      <PageBreadCrumb pageTitle="Tramites" />
 
       <div className="space-y-5">
         <RouterStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
@@ -225,7 +226,7 @@ export default function RouterPage() {
           <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('documents.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
-              Nueva Hoja de ruta
+              Nuevo Tramite
             </Button>
           )}
         </div>

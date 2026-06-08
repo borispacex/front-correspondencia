@@ -9,6 +9,7 @@ import { getDocumentById } from '../../../services/document.service.ts';
 import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
 import RouterArchivedInfo from '../../../components/router/show/RouterArchivedInfo.tsx';
+import { APP_NAME } from '../../../constants/correspondence.constants.ts';
 
 export default function RouterArchivedShowPage() {
   const { id } = useParams();
@@ -43,7 +44,7 @@ export default function RouterArchivedShowPage() {
 
   return (
     <>
-      <PageMeta title="Detalle Tramite" description="Información detallada del tramite" />
+      <PageMeta title={`Detalle Tramite | ${APP_NAME}`} description="Información detallada del tramite" />
 
       <PageBreadCrumb
         pageTitle="Tramite archivado"

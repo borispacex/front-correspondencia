@@ -16,6 +16,7 @@ import { useNotifications } from '../../hooks/useNotification';
 import Button from '../../components/ui/button/Button.tsx';
 import ModalDelete from '../../components/modal/ModalDelete.tsx';
 import ModalStatus from '../../components/modal/ModalStatus.tsx';
+import { APP_NAME } from '../../components/correspondence/constants/correspondence.constants.ts';
 
 export default function UsersListPage() {
   const { can } = usePermissions();
@@ -152,7 +153,7 @@ export default function UsersListPage() {
 
   return (
     <>
-      <PageMeta title="Usuarios" description="Gestión de usuarios del sistema" />
+      <PageMeta title={`Usuarios | ${APP_NAME}`} description="Gestión de usuarios del sistema" />
       <PageBreadCrumb pageTitle="Usuarios" />
 
       <div className="space-y-5">

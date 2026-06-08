@@ -15,6 +15,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import Button from '../../components/ui/button/Button.tsx';
 import ModalDelete from '../../components/modal/ModalDelete.tsx';
 import { useNotifications } from '../../hooks/useNotification.tsx';
+import { APP_NAME } from '../../components/correspondence/constants/correspondence.constants.ts';
 
 export default function PermissionsListPage() {
   const { can } = usePermissions();
@@ -86,7 +87,7 @@ export default function PermissionsListPage() {
 
   return (
     <>
-      <PageMeta title="Permisos" description="Gestión de permisos del sistema" />
+      <PageMeta title={`Permisos | ${APP_NAME}`} description="Gestión de permisos del sistema" />
 
       <PageBreadCrumb pageTitle="Permisos" />
 

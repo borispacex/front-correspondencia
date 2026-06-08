@@ -11,6 +11,7 @@ import { FingerprintPatternIcon } from '../../../icons';
 import { Modal } from '../../ui/modal';
 import SignDocumentForm from '../components/sign-document/SignDocumentForm.tsx';
 import { DocumentRoutes } from '../components/documents/DocumentRoutes.tsx';
+import { APP_NAME } from '../constants/correspondence.constants.ts';
 
 const SIGN_DOCUMENTS: SignDocument[] = [
   {
@@ -221,7 +222,7 @@ export default function SignDocumentPage() {
 
   return (
     <>
-      <PageMeta title="Firma Digital" description="Gestión de firma digital" />
+      <PageMeta title={`Firma Digital | ${APP_NAME}`} description="Gestión de firma digital" />
 
       <PageBreadCrumb pageTitle="Firma Digital" />
 

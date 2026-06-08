@@ -16,6 +16,7 @@ import RouterTable from '../../components/router/RouterTable.tsx';
 import { Modal } from '../../../ui/modal';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
 
 const isArchived = (stateId: number) => ARCHIVED_STATE_IDS.includes(stateId);
 
@@ -75,7 +76,7 @@ export default function RouterArchivedPage() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title="Archivados" description="Documentos archivados" />
+      <PageMeta title={`Archivados | ${APP_NAME}`} description="Documentos archivados" />
       <PageBreadCrumb pageTitle="Archivados" />
 
       <div className="space-y-5">

@@ -7,6 +7,7 @@ import { getDocumentById } from '../../../services/document.service.ts';
 import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
 import RouterAttendedInfo from '../../../components/router/show/RouterAttendedInfo.tsx';
+import { APP_NAME } from '../../../constants/correspondence.constants.ts';
 
 export default function RouterAttendedShowPage() {
   const { id } = useParams();
@@ -41,7 +42,10 @@ export default function RouterAttendedShowPage() {
 
   return (
     <>
-      <PageMeta title="Detalle Tramite atendido" description="Información detallada del tramite atendido" />
+      <PageMeta
+        title={`Detalle Tramite atendido | ${APP_NAME}`}
+        description="Información detallada del tramite atendido"
+      />
 
       <PageBreadCrumb
         pageTitle="Tramite atendido"
