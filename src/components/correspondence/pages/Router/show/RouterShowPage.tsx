@@ -11,6 +11,17 @@ import RouterInfo from '../../../components/router/show/RouterInfo.tsx';
 import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
 import { APP_NAME } from '../../../constants/correspondence.constants.ts';
+import Tooltip from '../../../../form/Tooltip.tsx';
+import Button from '../../../../ui/button/Button.tsx';
+import {
+  FileTextIcon,
+  InboxIcon,
+  PencilIcon,
+  PrinterIcon,
+  RouteIcon,
+  SendHorizontalIcon,
+  TrashBinIcon,
+} from '../../../../../icons';
 
 export default function RouterShowPage() {
   const { id } = useParams();
@@ -43,6 +54,20 @@ export default function RouterShowPage() {
     fetchDocument();
   }, [fetchDocument]);
 
+  // ── Handlers ────────────────────────────────────────────────
+  const handleViewSheet = (document: Document) => {
+    console.log('Derivar', document);
+  };
+  const handleEdit = (document: Document) => {
+    console.log('Editar', document);
+  };
+  const handleDerive = (document: Document) => {
+    console.log('Derivar', document);
+  };
+  const handleDelete = (document_id: number) => {
+    console.log('Eliminar', document_id);
+  };
+
   return (
     <>
       <PageMeta title={`Detalle Trámite | ${APP_NAME}`} description="Información detallada del tramite" />
@@ -59,6 +84,56 @@ export default function RouterShowPage() {
           },
         ]}
       />
+
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div></div>
+        <div>
+          <Tooltip content="Hoja de ruta">
+            <Button
+              className="mr-3"
+              variant="secondary"
+              size="sm"
+              startIcon={<PrinterIcon className="size-3.5" />}
+              onClick={() => handleViewSheet(document)}
+            >
+              Hoja de ruta
+            </Button>
+          </Tooltip>
+
+          <Tooltip content="Editar">
+            <Button
+              className="mr-3"
+              variant="action"
+              size="sm"
+              startIcon={<PencilIcon className="size-3.5" />}
+              onClick={() => handleEdit(document)}
+            >
+              Editar
+            </Button>
+          </Tooltip>
+          <Tooltip content="Derivar">
+            <Button
+              className="mr-3"
+              variant="success"
+              size="sm"
+              startIcon={<SendHorizontalIcon className="size-3.5" />}
+              onClick={() => handleDerive(document)}
+            >
+              Derivar
+            </Button>
+          </Tooltip>
+          <Tooltip content="Eliminar">
+            <Button
+              variant="danger"
+              size="sm"
+              startIcon={<TrashBinIcon className="size-3.5" />}
+              onClick={() => handleDelete(document.id)}
+            >
+              Eliminar
+            </Button>
+          </Tooltip>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">

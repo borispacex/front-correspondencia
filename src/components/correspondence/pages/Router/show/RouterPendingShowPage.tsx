@@ -11,6 +11,9 @@ import RouterInfo from '../../../components/router/show/RouterInfo.tsx';
 import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
 import { APP_NAME } from '../../../constants/correspondence.constants.ts';
+import Tooltip from '../../../../form/Tooltip.tsx';
+import Button from '../../../../ui/button/Button.tsx';
+import { ForwardIcon, InboxIcon, PrinterIcon, RouteIcon, TrashBinIcon } from '../../../../../icons';
 
 export default function RouterPendingShowPage() {
   const { id } = useParams();
@@ -43,6 +46,19 @@ export default function RouterPendingShowPage() {
     fetchDocument();
   }, [fetchDocument]);
 
+  // ── Handlers ────────────────────────────────────────────────
+  const handleReceive = (document_id: number) => {
+    console.log('Recibir:', document_id);
+  };
+
+  const handleViewRoutes = (document: Document) => {
+    console.log('Ver rutas:', document);
+  };
+
+  const handleDelete = (document_id: number) => {
+    console.log('Eliminar:', document_id);
+  };
+
   return (
     <>
       <PageMeta
@@ -62,6 +78,44 @@ export default function RouterPendingShowPage() {
           },
         ]}
       />
+
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div></div>
+        <div>
+          <Tooltip content="Ver rutas">
+            <Button
+              className="mr-3"
+              variant="primary"
+              size="sm"
+              onClick={() => handleViewRoutes(document)}
+              startIcon={<RouteIcon className="size-3.5" />}
+            >
+              Ver rutas
+            </Button>
+          </Tooltip>
+          <Tooltip content="Recibir">
+            <Button
+              className="mr-3"
+              variant="info"
+              size="sm"
+              startIcon={<InboxIcon className="size-3.5" />}
+              onClick={() => handleReceive(document.id)}
+            >
+              Recibir
+            </Button>
+          </Tooltip>
+          <Tooltip content="Eliminar">
+            <Button
+              variant="danger"
+              size="sm"
+              startIcon={<TrashBinIcon className="size-3.5" />}
+              onClick={() => handleDelete(document.id)}
+            >
+              Eliminar
+            </Button>
+          </Tooltip>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">

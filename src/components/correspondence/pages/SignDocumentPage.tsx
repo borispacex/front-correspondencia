@@ -198,7 +198,7 @@ export default function SignDocumentPage() {
   }
 
   function handleView(document: SignDocument) {
-    console.log('Ver documento', document);
+    console.log('Ver firma digital', document);
   }
 
   function handleViewRoute(document: SignDocument) {

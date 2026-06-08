@@ -19,7 +19,6 @@ import RouterStatusTabs, {
   RouterStatusTab,
 } from '../../components/router/RouterStatusTabs.tsx';
 import { getDocuments } from '../../services/document.service.ts';
-import { SignDocument } from '../../types/sign-document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import Button from '../../../ui/button/Button.tsx';
@@ -29,12 +28,14 @@ import { Modal } from '../../../ui/modal';
 import DocumentForm from '../../components/documents/DocumentForm.tsx';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
-import { DocumentStatusTab } from '../../components/documents/DocumentStatusTabs.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
+import { useNavigate } from 'react-router';
+import { ROUTES } from '../../../../constants/routes.constants.ts';
 
 export default function RouterPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
+  const navigate = useNavigate();
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -136,20 +137,29 @@ export default function RouterPage() {
   // ─────────────────────────────────────────────────────────────
   // Handlers
   // ─────────────────────────────────────────────────────────────
-  const handleToggleActive = (item: Document, active: boolean) => {
-    setDocuments((prev) =>
-      prev.map((doc) => (doc.id === item.id ? { ...doc, deleted_at: active ? null : new Date().toISOString() } : doc)),
-    );
-  };
-
-  const handleRouter = (document: Document) => {
+  const handleDerive = (document: Document) => {
     setSelected(document);
     setIsRouterModalOpen(true);
   };
   const handleViewHeader = (document: Document) => console.log('Cabecera:', document);
   const handleViewSheet = (document: Document) => console.log('Hoja:', document);
-  const handleViewRoutes = (document: Document) => console.log('Rutas:', document);
-  const handleView = (document: SignDocument) => console.log('Ver documento', document);
+  const handleView = (document: Document) => {
+    console.log('Ver tramite', document);
+    switch (statusTab) {
+      case 'all':
+        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL}/${document.id}`);
+        return;
+      case 'pending':
+        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING}/${document.id}`);
+        return;
+      case 'attended':
+        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED}/${document.id}`);
+        return;
+      case 'archived':
+        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED}/${document.id}`);
+        return;
+    }
+  };
 
   function handleEdit(document: Document) {
     setSelected(document);
@@ -234,14 +244,11 @@ export default function RouterPage() {
         <RouterTable
           documents={filteredDocuments}
           isLoading={isLoading}
-          selectedDocumentId={selected?.id}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          onToggleActive={handleToggleActive}
-          onDerive={handleRouter}
+          onDerive={handleDerive}
           onViewHeader={handleViewHeader}
           onViewSheet={handleViewSheet}
-          onViewRoutes={handleViewRoutes}
           onView={handleView}
         />
       </div>

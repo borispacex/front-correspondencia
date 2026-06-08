@@ -247,17 +247,16 @@ export default function SignDocumentTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
-                      {can('documents.sign') && (
-                        <Tooltip content="Firmar">
+                      {can('documents.view') && (
+                        <Tooltip content="Ver firma digital">
                           <Button
-                            variant="success-outline"
+                            variant="ghost-outline"
                             size="xs"
-                            startIcon={<FingerprintPatternIcon className="size-3.5" />}
-                            onClick={() => onApprove?.(document)}
+                            onClick={() => onView?.(document)}
+                            startIcon={<EyeIcon className="size-3.5 fill-blue-500 dark:fill-blue-400" />}
                           ></Button>
                         </Tooltip>
                       )}
-
                       {can('documents.routes') && (
                         <Tooltip content="Ver rutas">
                           <Button
@@ -268,14 +267,13 @@ export default function SignDocumentTable({
                           ></Button>
                         </Tooltip>
                       )}
-
-                      {can('documents.view') && (
-                        <Tooltip content="Ver documento">
+                      {can('documents.sign') && (
+                        <Tooltip content="Firmar">
                           <Button
-                            variant="ghost-outline"
+                            variant="success-outline"
                             size="xs"
-                            onClick={() => onView?.(document)}
-                            startIcon={<EyeIcon className="size-3.5 fill-gray-500 dark:fill-gray-400" />}
+                            startIcon={<FingerprintPatternIcon className="size-3.5" />}
+                            onClick={() => onApprove?.(document)}
                           ></Button>
                         </Tooltip>
                       )}

@@ -10,6 +10,9 @@ import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
 import RouterArchivedInfo from '../../../components/router/show/RouterArchivedInfo.tsx';
 import { APP_NAME } from '../../../constants/correspondence.constants.ts';
+import Button from '../../../../ui/button/Button.tsx';
+import { ArchiveRestoreIcon, RouteIcon } from '../../../../../icons';
+import Tooltip from '../../../../form/Tooltip.tsx';
 
 export default function RouterArchivedShowPage() {
   const { id } = useParams();
@@ -42,10 +45,21 @@ export default function RouterArchivedShowPage() {
     fetchDocument();
   }, [fetchDocument]);
 
+  // ── Handlers ────────────────────────────────────────────────
+  const handleViewRoutes = (document: Document) => {
+    console.log('Rutas:', document);
+  };
+
+  const handleUnarchive = (document_id: number) => {
+    console.log('Desarchivar:', document_id);
+  };
+
   return (
     <>
-      <PageMeta title={`Detalle Trámite | ${APP_NAME}`} description="Información detallada del tramite" />
-
+      <PageMeta
+        title={`Detalle Trámite archivado | ${APP_NAME}`}
+        description="Información detallada del tramite archivado"
+      />
       <PageBreadCrumb
         pageTitle="Trámite archivado"
         items={[
@@ -58,6 +72,33 @@ export default function RouterArchivedShowPage() {
           },
         ]}
       />
+
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div></div>
+        <div>
+          <Tooltip content="Ver rutas">
+            <Button
+              className="mr-3"
+              variant="primary"
+              size="sm"
+              onClick={() => handleViewRoutes(document)}
+              startIcon={<RouteIcon className="size-3.5" />}
+            >
+              Ver rutas
+            </Button>
+          </Tooltip>
+          <Tooltip content="Desarchivar">
+            <Button
+              variant="info"
+              size="sm"
+              startIcon={<ArchiveRestoreIcon className="size-3.5" />}
+              onClick={() => handleUnarchive(document.id)}
+            >
+              Desarchivar
+            </Button>
+          </Tooltip>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">

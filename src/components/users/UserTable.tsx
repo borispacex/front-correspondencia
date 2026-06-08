@@ -281,7 +281,7 @@ export default function UserTable({ users, isLoading, onEdit, onDelete, onToggle
                           <Tooltip content="Editar">
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="action"
                               onClick={() => onEdit(user)}
                               className="h-8 w-8 p-0"
                               startIcon={<PencilIcon className="size-4" />}

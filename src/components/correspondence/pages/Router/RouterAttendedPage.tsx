@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// Bandeja de Salida (Atendidos)
-// ─────────────────────────────────────────────────────────────
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 import { ATTENDED_STATE_IDS } from '../../components/router/RouterStatusTabs.tsx';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
@@ -16,12 +13,15 @@ import { Modal } from '../../../ui/modal';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
+import { ROUTES } from '../../../../constants/routes.constants.ts';
+import { useNavigate } from 'react-router';
 
 const isAttended = (stateId: number) => ATTENDED_STATE_IDS.includes(stateId);
 
 export default function RouterAttendedPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
+  const navigate = useNavigate();
 
   const { documents, isLoading, filters, setFilters, sort, setSort, fetchDocuments } = useRouterPage(isAttended);
 
@@ -30,23 +30,12 @@ export default function RouterAttendedPage() {
   const [confirmId, setConfirmId] = useState<number | null>(null);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleRouter = (document: Document) => {
-    setSelected(document);
-    setIsRouterModalOpen(true);
+  const handleViewRoutes = (document: Document) => {
+    console.log('Rutas:', document);
   };
-  const handleViewHeader = (document: Document) => console.log('Cabecera:', document);
-  const handleViewSheet = (document: Document) => console.log('Hoja:', document);
-  const handleViewRoutes = (document: Document) => console.log('Rutas:', document);
-  const handleView = (document: SignDocument) => console.log('Ver documento', document);
-
-  function handleEdit(document: Document) {
-    setSelected(document);
-  }
-  function handleDelete(id: number) {
-    setConfirmId(id);
-  }
-  const handleToggleActive = (item: Document, active: boolean) => {
-    console.log('toggleActive', item, active);
+  const handleView = (document: Document) => {
+    console.log('Ver tramite', document);
+    navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED}/${document.id}`);
   };
 
   async function handleSubmitRouter(data: any) {
@@ -93,42 +82,8 @@ export default function RouterAttendedPage() {
         </div>
 
         {/* Tabla */}
-        <RouterTable
-          documents={documents}
-          isLoading={isLoading}
-          selectedDocumentId={selected?.id}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleActive={handleToggleActive}
-          onDerive={can('documents.derive') ? handleRouter : undefined}
-          onViewHeader={can('documents.edit') ? handleViewHeader : undefined}
-          onViewSheet={can('documents.edit') ? handleViewSheet : undefined}
-          onViewRoutes={can('documents.routes') ? handleViewRoutes : undefined}
-          onView={handleView}
-        />
+        <RouterTable documents={documents} isLoading={isLoading} onViewRoutes={handleViewRoutes} onView={handleView} />
       </div>
-
-      {/* Modal derivar */}
-      <Modal
-        isOpen={isRouterModalOpen}
-        size="lg"
-        onClose={() => setIsRouterModalOpen(false)}
-        className="w-full max-w-6xl p-6 sm:p-8"
-      >
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">Derivar documento</h3>
-        <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
-          Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
-        </p>
-        <RouterForm document={selected} onSubmit={handleSubmitRouter} onCancel={() => setIsRouterModalOpen(false)} />
-      </Modal>
-
-      <ModalDelete
-        isOpen={confirmId !== null}
-        onClose={() => setConfirmId(null)}
-        onConfirm={handleConfirmDelete}
-        title="¿Eliminar este Documento?"
-        message="Esta acción no se puede deshacer."
-      />
     </>
   );
 }

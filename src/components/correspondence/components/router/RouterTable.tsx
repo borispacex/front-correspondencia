@@ -17,6 +17,9 @@ import {
   RouteIcon,
   SendHorizontalIcon,
   TrashBinIcon,
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  InboxIcon,
 } from '../../../../icons';
 import TableSkeleton from '../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../form/Tooltip.tsx';
@@ -32,8 +35,11 @@ interface Props {
   onDerive?: (document: Document) => void;
   onViewSheet?: (document: Document) => void;
   onView?: (document: Document) => void;
-  onEdit: (document: Document) => void;
-  onDelete: (id: number) => void;
+  onEdit?: (document: Document) => void;
+  onDelete?: (id: number) => void;
+  onArchive?: (id: number) => void;
+  onUnarchive?: (id: number) => void;
+  onReceive?: (id: number) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -48,6 +54,9 @@ export default function RouterTable({
   onViewSheet,
   onViewRoutes,
   onView,
+  onArchive,
+  onUnarchive,
+  onReceive,
 }: Props) {
   const { can } = usePermissions();
 
@@ -280,6 +289,16 @@ export default function RouterTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
+                      {can('documents.view') && onView && (
+                        <Tooltip content="Ver tramite">
+                          <Button
+                            variant="ghost-outline"
+                            size="xs"
+                            onClick={() => onView(document)}
+                            startIcon={<EyeIcon className="size-3.5 fill-blue-500 dark:fill-blue-400" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
                       {can('documents.edit') && onViewHeader && (
                         <Tooltip content="Cabecera de ruta">
                           <Button
@@ -291,12 +310,34 @@ export default function RouterTable({
                         </Tooltip>
                       )}
                       {can('documents.edit') && onViewSheet && (
-                        <Tooltip content="Trámite">
+                        <Tooltip content="Hoja de ruta">
                           <Button
                             variant="secondary-outline"
                             size="xs"
                             startIcon={<PrinterIcon className="size-3.5" />}
                             onClick={() => onViewSheet(document)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+
+                      {can('documents.routes') && onViewRoutes && (
+                        <Tooltip content="Ver rutas">
+                          <Button
+                            variant="primary-outline"
+                            size="xs"
+                            onClick={() => onViewRoutes(document)}
+                            startIcon={<RouteIcon className="size-3.5" />}
+                          ></Button>
+                        </Tooltip>
+                      )}
+
+                      {can('documents.edit') && onEdit && (
+                        <Tooltip content="Editar">
+                          <Button
+                            variant="action-outline"
+                            size="xs"
+                            onClick={() => onEdit(document)}
+                            startIcon={<PencilIcon className="size-3.5" />}
                           ></Button>
                         </Tooltip>
                       )}
@@ -310,43 +351,43 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.routes') && (
-                        <Tooltip content="Ver rutas">
-                          <Button
-                            variant="primary-outline"
-                            size="xs"
-                            onClick={() => onViewRoutes?.(document)}
-                            startIcon={<RouteIcon className="size-3.5" />}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('documents.view') && (
-                        <Tooltip content="Ver documento">
-                          <Button
-                            variant="ghost-outline"
-                            size="xs"
-                            onClick={() => onView?.(document)}
-                            startIcon={<EyeIcon className="size-3.5 fill-gray-500 dark:fill-gray-400" />}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('documents.edit') && (
-                        <Tooltip content="Editar">
-                          <Button
-                            variant="ghost-outline"
-                            size="xs"
-                            onClick={() => onEdit(document)}
-                            startIcon={<PencilIcon className="size-3.5" />}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('documents.delete') && (
+                      {can('documents.delete') && onDelete && (
                         <Tooltip content="Eliminar">
                           <Button
                             variant="danger-outline"
                             size="xs"
                             startIcon={<TrashBinIcon className="size-3.5" />}
                             onClick={() => onDelete(document.id)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.archive') && onArchive && (
+                        <Tooltip content="Archivar">
+                          <Button
+                            variant="info-outline"
+                            size="xs"
+                            startIcon={<ArchiveIcon className="size-3.5" />}
+                            onClick={() => onArchive(document.id)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.unarchive') && onUnarchive && (
+                        <Tooltip content="Desarchivar">
+                          <Button
+                            variant="info-outline"
+                            size="xs"
+                            startIcon={<ArchiveRestoreIcon className="size-3.5" />}
+                            onClick={() => onUnarchive(document.id)}
+                          ></Button>
+                        </Tooltip>
+                      )}
+                      {can('documents.receive') && onReceive && (
+                        <Tooltip content="Recibir">
+                          <Button
+                            variant="info-outline"
+                            size="xs"
+                            startIcon={<InboxIcon className="size-3.5" />}
+                            onClick={() => onReceive(document.id)}
                           ></Button>
                         </Tooltip>
                       )}

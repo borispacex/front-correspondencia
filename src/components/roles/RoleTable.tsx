@@ -198,7 +198,7 @@ export default function RoleTable({
                           <Tooltip content="Editar">
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="action"
                               onClick={() => onEdit(role)}
                               className="h-8 w-8 p-0"
                               startIcon={<PencilIcon className="size-4" />}

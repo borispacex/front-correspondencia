@@ -216,7 +216,7 @@ export default function MenuItemTable({ menuItems, isLoading, onEdit, onDelete, 
                           <Tooltip content="Editar">
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="action"
                               onClick={() => onEdit(item)}
                               className="h-8 w-8 p-0"
                               startIcon={<PencilIcon className="size-4" />}

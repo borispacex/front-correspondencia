@@ -12,9 +12,11 @@ import DocumentStatusTabs, {
   SIGNED_STATE_IDS,
 } from '../components/documents/DocumentStatusTabs.tsx';
 import { APP_NAME } from '../constants/correspondence.constants.ts';
+import { useNavigate } from 'react-router';
 
 export default function DocumentPage() {
   const { addNotification } = useNotifications();
+  const navigate = useNavigate();
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);

@@ -117,6 +117,7 @@ import { ReactComponent as BadgeCheckIcon } from './badge-check.svg?react';
 import { ReactComponent as ArchiveIcon } from './archive.svg?react';
 import { ReactComponent as ReceiptTextIcon } from './receipt-text.svg?react';
 import { ReactComponent as ArrowLeftIcon } from './arrow-left.svg?react';
+import { ReactComponent as ForwardIcon } from './forward.svg?react';
 
 export {
   ErrorHexaIcon,
@@ -238,4 +239,5 @@ export {
   ArchiveIcon,
   ReceiptTextIcon,
   ArrowLeftIcon,
+  ForwardIcon,
 };

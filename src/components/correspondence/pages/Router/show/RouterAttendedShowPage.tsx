@@ -8,6 +8,9 @@ import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
 import { ROUTES } from '../../../../../constants/routes.constants.ts';
 import RouterAttendedInfo from '../../../components/router/show/RouterAttendedInfo.tsx';
 import { APP_NAME } from '../../../constants/correspondence.constants.ts';
+import Tooltip from '../../../../form/Tooltip.tsx';
+import Button from '../../../../ui/button/Button.tsx';
+import { ArchiveRestoreIcon, FileTextIcon, ForwardIcon, PrinterIcon, RouteIcon } from '../../../../../icons';
 
 export default function RouterAttendedShowPage() {
   const { id } = useParams();
@@ -40,6 +43,19 @@ export default function RouterAttendedShowPage() {
     fetchDocument();
   }, [fetchDocument]);
 
+  // ── Handlers ────────────────────────────────────────────────
+  const handleForward = (document_id: number) => {
+    console.log('Reenviar:', document_id);
+  };
+
+  const handleBackup = (document_id: number) => {
+    console.log('Respaldo:', document_id);
+  };
+
+  const handleViewRoutes = (document: Document) => {
+    console.log('Ver rutas:', document);
+  };
+
   return (
     <>
       <PageMeta
@@ -59,6 +75,44 @@ export default function RouterAttendedShowPage() {
           },
         ]}
       />
+
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+        <div></div>
+        <div>
+          <Tooltip content="Ver rutas">
+            <Button
+              className="mr-3"
+              variant="primary"
+              size="sm"
+              onClick={() => handleViewRoutes(document)}
+              startIcon={<RouteIcon className="size-3.5" />}
+            >
+              Ver rutas
+            </Button>
+          </Tooltip>
+          <Tooltip content="Respaldo">
+            <Button
+              className="mr-3"
+              variant="secondary"
+              size="sm"
+              startIcon={<PrinterIcon className="size-3.5" />}
+              onClick={() => handleBackup(document.id)}
+            >
+              Respaldo
+            </Button>
+          </Tooltip>
+          <Tooltip content="Reenviar">
+            <Button
+              variant="info"
+              size="sm"
+              startIcon={<ForwardIcon className="size-3.5" />}
+              onClick={() => handleForward(document.id)}
+            >
+              Reenviar
+            </Button>
+          </Tooltip>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">

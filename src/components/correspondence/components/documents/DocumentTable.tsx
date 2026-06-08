@@ -328,7 +328,7 @@ export default function DocumentTable({ documents, isLoading, selectedDocumentId
                             variant="ghost-outline"
                             size="xs"
                             onClick={() => onView(document)}
-                            startIcon={<EyeIcon className="size-3.5 fill-gray-500 dark:fill-gray-400" />}
+                            startIcon={<EyeIcon className="size-3.5 fill-blue-500 dark:fill-blue-400" />}
                           />
                         </Tooltip>
                       )}
