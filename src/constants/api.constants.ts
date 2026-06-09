@@ -31,6 +31,11 @@ export const API_ENDPOINTS = {
     BASE: '/admin/users',
     BY_ID: (id: number) => `/admin/users/${id}`,
   },
+  // Dashboard
+  DASHBOARD: {
+    ADMIN: '/admin/dashboard',
+    CORRESP: '/correspondencia/dashboard',
+  },
   // Profile
   PROFILE: {
     BASE: '/profile/users',

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
+import { useAdminDashboard } from '../../../hooks/useAdminDashboard.ts';
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
 
@@ -250,6 +251,10 @@ function MenuList() {
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
 export const AdminDashboard = () => {
+  const { data, loading, error, refetch } = useAdminDashboard();
+
+  console.log('data', data);
+
   const [tab, setTab] = useState<'general' | 'permisos' | 'menu'>('general');
 
   const totalUsers = USERS_BY_UNIT.reduce((s, u) => s + u.count, 0);
