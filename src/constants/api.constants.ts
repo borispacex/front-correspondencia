@@ -59,10 +59,10 @@ export const API_ENDPOINTS = {
       BASE: '/correspondencia/priorities',
     },
     TYPE_DOCUMENT: {
-      BASE: '/correspondencia/type-documents',
+      BASE: '/correspondencia/type-files',
     },
     STATE_DOCUMENT: {
-      BASE: '/correspondencia/state-documents',
+      BASE: '/correspondencia/state-files',
     },
     DEPARTMENT: {
       BASE: '/correspondencia/departments',

@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { SignDocumentFilters, SignDocumentSortConfig } from '../../types/sign-document.type.ts';
+import { SignFileFilters, SignFileSortConfig } from '../../types/sign-file.type.ts';
 import Select, { Option } from '../../../form/Select.tsx';
 import Label from '../../../form/Label.tsx';
 import InputField from '../../../form/input/InputField.tsx';
@@ -7,9 +7,9 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { BrushCleaningIcon } from '../../../../icons';
 
-interface SignDocumentFilterProps {
-  filters: SignDocumentFilters;
-  sort: SignDocumentSortConfig;
+interface SignFileFilterProps {
+  filters: SignFileFilters;
+  sort: SignFileSortConfig;
   onFiltersChange: (filters: {
     code: string;
     route: string;
@@ -17,7 +17,7 @@ interface SignDocumentFilterProps {
     status: string;
     createdAt: string;
   }) => void;
-  onSortChange: (sort: SignDocumentSortConfig) => void;
+  onSortChange: (sort: SignFileSortConfig) => void;
 }
 
 const STATUS_OPTIONS: Option[] = [
@@ -37,16 +37,16 @@ const SORT_OPTIONS: Option[] = [
   { value: 'subject:desc', label: 'Asunto Z → A' },
 ];
 
-export default function SignDocumentFilter({ filters, sort, onFiltersChange, onSortChange }: SignDocumentFilterProps) {
+export default function SignFileFilter({ filters, sort, onFiltersChange, onSortChange }: SignFileFilterProps) {
   const handleInputChange =
-    (field: keyof SignDocumentFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    (field: keyof SignFileFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onFiltersChange({
         ...filters,
         [field]: e.target.value,
       });
     };
 
-  const handleSelectChange = (field: keyof SignDocumentFilters) => (value: string) => {
+  const handleSelectChange = (field: keyof SignFileFilters) => (value: string) => {
     onFiltersChange({
       ...filters,
       [field]: value,

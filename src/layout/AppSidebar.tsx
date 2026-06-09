@@ -150,14 +150,14 @@ const CORRESPONDENCIA_ITEMS: NavItem[] = [
   },
   {
     icon: <FileTextIcon />,
-    name: 'Documentos',
-    path: ROUTES.CORRESPONDENCE.DOCUMENTS,
+    name: 'Archivos',
+    path: ROUTES.CORRESPONDENCE.FILE,
     permission: 'correspondencia_documentos.index',
   },
   {
     icon: <FingerprintPatternIcon />,
     name: 'Firma digital',
-    path: ROUTES.CORRESPONDENCE.SIGN_DOCUMENT,
+    path: ROUTES.CORRESPONDENCE.SIGN_FILE,
     permission: 'correspondencia_firmar.index',
   },
 ];

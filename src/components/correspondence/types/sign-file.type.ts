@@ -1,30 +1,30 @@
-export type SignDocumentTab = 'pending_approval' | 'pending_signature';
+export type SignFileTab = 'pending_approval' | 'pending_signature';
 
-export interface SignDocumentRoute {
+export interface SignFileRoute {
   id: number;
   code: string;
   subject: string;
 }
 
-export interface SignDocumentAction {
+export interface SignFileAction {
   type: 'approve' | 'sign' | 'traceability' | 'view';
   enabled: boolean;
 }
 
-export interface SignDocument {
+export interface SignFile {
   id: number;
   code: string;
   subject: string;
   documentType: string;
-  route: SignDocumentRoute;
+  route: SignFileRoute;
   createdAt: string;
   actionPerformed: string;
-  status: SignDocumentTab;
+  status: SignFileTab;
   selected?: boolean;
-  actions: SignDocumentAction[];
+  actions: SignFileAction[];
 }
 
-export interface SignDocumentFilters {
+export interface SignFileFilters {
   code: string;
   route: string;
   subject: string;
@@ -32,7 +32,7 @@ export interface SignDocumentFilters {
   createdAt: string;
 }
 
-export interface SignDocumentSortConfig {
+export interface SignFileSortConfig {
   field: string;
   dir: 'asc' | 'desc';
 }

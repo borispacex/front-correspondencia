@@ -25,7 +25,7 @@ import Button from '../../../ui/button/Button.tsx';
 import { PlusIcon } from '../../../../icons';
 import RouterTable from '../../components/router/RouterTable.tsx';
 import { Modal } from '../../../ui/modal';
-import DocumentForm from '../../components/documents/DocumentForm.tsx';
+import FileForm from '../../components/files/FileForm.tsx';
 import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
@@ -234,7 +234,7 @@ export default function RouterPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
-          {can('documents.create') && (
+          {can('files.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
               Nuevo Trámite
             </Button>
@@ -266,7 +266,7 @@ export default function RouterPage() {
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
         </p>
-        <DocumentForm document={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
+        <FileForm document={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
       </Modal>
 
       <Modal

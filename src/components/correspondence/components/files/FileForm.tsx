@@ -36,7 +36,7 @@ function mapToOptions<T>(items: T[], valueKey: keyof T, labelKey: keyof T): Opti
   }));
 }
 
-export default function DocumentForm({ document, onSubmit, onCancel }: DocumentFormProps) {
+export default function FileForm({ document, onSubmit, onCancel }: DocumentFormProps) {
   const { values, errors, setValue, setMultipleErrors } = useFormValidation({
     selectedProcedureType: '',
     docFechaOrigen: '',

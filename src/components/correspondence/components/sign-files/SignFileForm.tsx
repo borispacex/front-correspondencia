@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
-import { SignDocument } from '../../types/sign-document.type.ts';
+import { SignFile } from '../../types/sign-file.type.ts';
 import { useFormValidation } from '../../../../hooks/useFormValidation.ts';
 import Label from '../../../form/Label.tsx';
 import InputField from '../../../form/input/InputField.tsx';
 import Button from '../../../ui/button/Button.tsx';
 
 interface Props {
-  signDocuments?: SignDocument[] | null;
+  SignFiles?: SignFile[] | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export default function SignDocumentForm({ signDocuments, onSuccess, onCancel }: Props) {
+export default function SignFileForm({ SignFiles, onSuccess, onCancel }: Props) {
   const { values, errors, setValue, setMultipleErrors } = useFormValidation({
     token: 'Smartcard en terminal 0 FT ePass2003Auto 000',
     pin: '',
@@ -23,7 +23,7 @@ export default function SignDocumentForm({ signDocuments, onSuccess, onCancel }:
   useEffect(() => {
     setValue('token', '');
     setValue('pin', '');
-  }, [signDocuments]);
+  }, [SignFiles]);
 
   function validate() {
     const newErrors: any = {};
@@ -50,7 +50,7 @@ export default function SignDocumentForm({ signDocuments, onSuccess, onCancel }:
       };
       console.log(payload);
 
-      // await createSignDocument(payload);
+      // await createSignFile(payload);
 
       addNotification({
         type: 'success',

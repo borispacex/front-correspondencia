@@ -9,8 +9,8 @@ import RouterPendingShowPage from './pages/Router/show/RouterPendingShowPage.tsx
 import RouterAttendedShowPage from './pages/Router/show/RouterAttendedShowPage.tsx';
 import RouterArchivedShowPage from './pages/Router/show/RouterArchivedShowPage.tsx';
 import { ROUTES } from '../../constants/routes.constants.ts';
-import DocumentPage from './pages/DocumentPage.tsx';
-import SignDocumentPage from './pages/SignDocumentPage.tsx';
+import FilePage from './pages/files/FilePage.tsx';
+import SignFilePage from './pages/sign-files/SignFilePage.tsx';
 
 export const correspondenceRoutes: RouteObject[] = [
   {
@@ -33,8 +33,8 @@ export const correspondenceRoutes: RouteObject[] = [
       { path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED_SHOW, element: <RouterArchivedShowPage /> },
 
       // ── Otros ────────────────────────────────────────────────
-      { path: ROUTES.CORRESPONDENCE.DOCUMENTS, element: <DocumentPage /> },
-      { path: ROUTES.CORRESPONDENCE.SIGN_DOCUMENT, element: <SignDocumentPage /> },
+      { path: ROUTES.CORRESPONDENCE.FILE, element: <FilePage /> },
+      { path: ROUTES.CORRESPONDENCE.SIGN_FILE, element: <SignFilePage /> },
     ],
   },
 ];

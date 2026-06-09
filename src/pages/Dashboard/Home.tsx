@@ -1,4 +1,4 @@
-import { CorrespondenceDashboard } from '../../components/correspondence/components/CorrespondenceDashboard.tsx';
+import { HomeCorrespondence } from '../../components/correspondence/components/home/HomeCorrespondence.tsx';
 import { useAuth } from '../../hooks/auth/useAuth.ts';
 import PageMeta from '../../components/common/PageMeta.tsx';
 import { APP_NAME } from '../../components/correspondence/constants/correspondence.constants.ts';
@@ -22,7 +22,7 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <CorrespondenceDashboard />
+      <HomeCorrespondence />
     </>
   );
 }

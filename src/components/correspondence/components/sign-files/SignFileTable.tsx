@@ -11,31 +11,24 @@ import {
   FingerprintPatternIcon,
   RouteIcon,
 } from '../../../../icons';
-import { SignDocument } from '../../types/sign-document.type.ts';
+import { SignFile } from '../../types/sign-file.type.ts';
 import TableSkeleton from '../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 
 interface Props {
-  documents: SignDocument[];
+  documents: SignFile[];
   isLoading?: boolean;
-  onApprove?: (document: SignDocument) => void;
-  onView?: (document: SignDocument) => void;
-  onTraceability?: (document: SignDocument) => void;
+  onApprove?: (document: SignFile) => void;
+  onView?: (document: SignFile) => void;
+  onTraceability?: (document: SignFile) => void;
   onSelect?: (ids: number[]) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
-export default function SignDocumentTable({
-  documents,
-  isLoading,
-  onApprove,
-  onView,
-  onTraceability,
-  onSelect,
-}: Props) {
+export default function SignFileTable({ documents, isLoading, onApprove, onView, onTraceability, onSelect }: Props) {
   const { can } = usePermissions();
 
   const [page, setPage] = useState(1);
@@ -47,8 +40,8 @@ export default function SignDocumentTable({
   const sorted = useMemo(() => {
     if (!sortField) return documents;
     return [...documents].sort((a, b) => {
-      const aVal = String(a[sortField as keyof SignDocument] ?? '');
-      const bVal = String(b[sortField as keyof SignDocument] ?? '');
+      const aVal = String(a[sortField as keyof SignFile] ?? '');
+      const bVal = String(b[sortField as keyof SignFile] ?? '');
       const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
       return sortDir === 'asc' ? cmp : -cmp;
     });
@@ -247,7 +240,7 @@ export default function SignDocumentTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
-                      {can('documents.view') && (
+                      {can('files.view') && (
                         <Tooltip content="Ver firma digital">
                           <Button
                             variant="ghost-outline"
@@ -257,7 +250,7 @@ export default function SignDocumentTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.routes') && (
+                      {can('files.routes') && (
                         <Tooltip content="Ver rutas">
                           <Button
                             variant="primary-outline"
@@ -267,7 +260,7 @@ export default function SignDocumentTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.sign') && (
+                      {can('files.sign') && (
                         <Tooltip content="Firmar">
                           <Button
                             variant="success-outline"

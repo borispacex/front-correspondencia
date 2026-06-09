@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNotifications } from '../../../hooks/useNotification.tsx';
-import PageMeta from '../../common/PageMeta.tsx';
-import PageBreadCrumb from '../../common/PageBreadCrumb.tsx';
-import { Document, DocumentFilters, SortConfig } from '../types/documents/document.type.ts';
-import DocumentTable from '../components/documents/DocumentTable.tsx';
-import { getDocuments } from '../services/document.service.ts';
-import { RouterFilter } from '../components/router/RouterFilter.tsx';
-import DocumentStatusTabs, {
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
+import PageMeta from '../../../common/PageMeta.tsx';
+import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
+import { Document, DocumentFilters, SortConfig } from '../../types/documents/document.type.ts';
+import FileTable from '../../components/files/FileTable.tsx';
+import { getDocuments } from '../../services/document.service.ts';
+import { RouterFilter } from '../../components/router/RouterFilter.tsx';
+import FileStatusTabs, {
   DocumentStatusTab,
   MY_DOCUMENT_STATE_IDS,
   SIGNED_STATE_IDS,
-} from '../components/documents/DocumentStatusTabs.tsx';
-import { APP_NAME } from '../constants/correspondence.constants.ts';
+} from '../../components/files/FileStatusTabs.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import { useNavigate } from 'react-router';
 
-export default function DocumentPage() {
+export default function FilePage() {
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
 
@@ -143,7 +143,7 @@ export default function DocumentPage() {
 
       <div className="space-y-5">
         {/* Tabs de estado */}
-        <DocumentStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
+        <FileStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
 
         {/* Filtros */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -151,7 +151,7 @@ export default function DocumentPage() {
         </div>
 
         {/* Tabla */}
-        <DocumentTable
+        <FileTable
           documents={filteredDocuments}
           isLoading={isLoading}
           onView={handleView}

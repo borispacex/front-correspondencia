@@ -22,7 +22,7 @@ const TABS: { key: DocumentStatusTab; label: string }[] = [
   { key: 'all', label: 'Todos' },
 ];
 
-export default function DocumentStatusTabs({ active, counts, onChange }: Props) {
+export default function FileStatusTabs({ active, counts, onChange }: Props) {
   return (
     <div className="flex flex-wrap items-end gap-2">
       {TABS.map(({ key, label }) => {

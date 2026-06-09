@@ -27,7 +27,7 @@ interface DocumentFilterProps {
   onSortChange: (sort: SortConfig) => void;
 }
 
-export const DocumentFilter = ({ filters, sort, onFiltersChange, onSortChange }: DocumentFilterProps) => {
+export const FileFilter = ({ filters, sort, onFiltersChange, onSortChange }: DocumentFilterProps) => {
   const handleInputChange =
     (field: keyof DocumentFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onFiltersChange({ ...filters, [field]: e.target.value });

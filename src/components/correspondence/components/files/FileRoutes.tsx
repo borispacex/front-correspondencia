@@ -183,7 +183,7 @@ const SkeletonLine = ({ width }: { width: string }) => (
   <div className={`h-4 animate-pulse rounded bg-gray-200 dark:bg-white/[0.08] ${width}`} />
 );
 
-export const DocumentRoutes = ({ document, isLoading, isSelected = false }: DocumentRoutesProps) => {
+export const FileRoutes = ({ document, isLoading, isSelected = false }: DocumentRoutesProps) => {
   return (
     <>
       {isLoading ? (

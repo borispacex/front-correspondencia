@@ -289,7 +289,7 @@ export default function RouterTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-3">
-                      {can('documents.view') && onView && (
+                      {can('files.view') && onView && (
                         <Tooltip content="Ver tramite">
                           <Button
                             variant="ghost-outline"
@@ -299,7 +299,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.edit') && onViewHeader && (
+                      {can('files.edit') && onViewHeader && (
                         <Tooltip content="Cabecera de ruta">
                           <Button
                             variant="secondary-outline"
@@ -309,7 +309,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.edit') && onViewSheet && (
+                      {can('files.edit') && onViewSheet && (
                         <Tooltip content="Hoja de ruta">
                           <Button
                             variant="secondary-outline"
@@ -320,7 +320,7 @@ export default function RouterTable({
                         </Tooltip>
                       )}
 
-                      {can('documents.routes') && onViewRoutes && (
+                      {can('files.routes') && onViewRoutes && (
                         <Tooltip content="Ver rutas">
                           <Button
                             variant="primary-outline"
@@ -331,7 +331,7 @@ export default function RouterTable({
                         </Tooltip>
                       )}
 
-                      {can('documents.edit') && onEdit && (
+                      {can('files.edit') && onEdit && (
                         <Tooltip content="Editar">
                           <Button
                             variant="action-outline"
@@ -341,7 +341,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.derive') && onDerive && (
+                      {can('files.derive') && onDerive && (
                         <Tooltip content="Derivar">
                           <Button
                             variant="success-outline"
@@ -351,7 +351,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.delete') && onDelete && (
+                      {can('files.delete') && onDelete && (
                         <Tooltip content="Eliminar">
                           <Button
                             variant="danger-outline"
@@ -361,7 +361,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.archive') && onArchive && (
+                      {can('files.archive') && onArchive && (
                         <Tooltip content="Archivar">
                           <Button
                             variant="info-outline"
@@ -371,7 +371,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.unarchive') && onUnarchive && (
+                      {can('files.unarchive') && onUnarchive && (
                         <Tooltip content="Desarchivar">
                           <Button
                             variant="info-outline"
@@ -381,7 +381,7 @@ export default function RouterTable({
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('documents.receive') && onReceive && (
+                      {can('files.receive') && onReceive && (
                         <Tooltip content="Recibir">
                           <Button
                             variant="info-outline"

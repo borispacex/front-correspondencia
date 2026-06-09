@@ -3,7 +3,7 @@ import { ATTENDED_STATE_IDS } from '../../components/router/RouterStatusTabs.tsx
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
 import { useRouterPage } from '../../hooks/useRouterPage.ts';
 import { useState } from 'react';
-import { SignDocument } from '../../types/sign-document.type.ts';
+import { SignFile } from '../../types/sign-file.type.ts';
 import { Document } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';

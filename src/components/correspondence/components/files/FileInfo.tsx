@@ -120,7 +120,7 @@ const DocumentInfoCard = ({ document, isSelected }: { document: Document; isSele
   );
 };
 
-export const DocumentInfo = ({ document, isLoading, isSelected = false }: DocumentInfoProps) => {
+export const FileInfo = ({ document, isLoading, isSelected = false }: DocumentInfoProps) => {
   return (
     <>
       {isLoading ? (

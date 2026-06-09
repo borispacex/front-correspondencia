@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
-import { SignDocument, SignDocumentFilters, SignDocumentSortConfig } from '../types/sign-document.type.ts';
-import { useNotifications } from '../../../hooks/useNotification.tsx';
-import PageMeta from '../../common/PageMeta.tsx';
-import SignDocumentFilter from '../components/sign-document/SignDocumentFilter.tsx';
-import PageBreadCrumb from '../../common/PageBreadCrumb.tsx';
-import SignDocumentTable from '../components/sign-document/SignDocumentTable.tsx';
-import { usePermissions } from '../../../hooks/usePermissions.ts';
-import Button from '../../ui/button/Button.tsx';
-import { FingerprintPatternIcon } from '../../../icons';
-import { Modal } from '../../ui/modal';
-import SignDocumentForm from '../components/sign-document/SignDocumentForm.tsx';
-import { DocumentRoutes } from '../components/documents/DocumentRoutes.tsx';
-import { APP_NAME } from '../constants/correspondence.constants.ts';
+import { SignFile, SignFileFilters, SignFileSortConfig } from '../../types/sign-file.type.ts';
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
+import PageMeta from '../../../common/PageMeta.tsx';
+import SignFileFilter from '../../components/sign-files/SignFileFilter.tsx';
+import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
+import SignFileTable from '../../components/sign-files/SignFileTable.tsx';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
+import Button from '../../../ui/button/Button.tsx';
+import { FingerprintPatternIcon } from '../../../../icons';
+import { Modal } from '../../../ui/modal';
+import SignFileForm from '../../components/sign-files/SignFileForm.tsx';
+import { FileRoutes } from '../../components/files/FileRoutes.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
 
-const SIGN_DOCUMENTS: SignDocument[] = [
+const SIGN_DOCUMENTS: SignFile[] = [
   {
     id: 1,
     code: 'EMI/DGE/UGAT/AIT/001/2025',
@@ -64,17 +64,17 @@ const SIGN_DOCUMENTS: SignDocument[] = [
   },
 ];
 
-export default function SignDocumentPage() {
+export default function SignFilePage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
-  const [selecteds, setSelecteds] = useState<SignDocument | null>(null);
+  const [selecteds, setSelecteds] = useState<SignFile | null>(null);
 
-  const [documents, setDocuments] = useState<SignDocument[]>([]);
+  const [documents, setDocuments] = useState<SignFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalRoutesOpen, setIsRoutesModalOpen] = useState(false);
 
-  const [filters, setFilters] = useState<SignDocumentFilters>({
+  const [filters, setFilters] = useState<SignFileFilters>({
     code: '',
     route: '',
     subject: '',
@@ -82,7 +82,7 @@ export default function SignDocumentPage() {
     createdAt: '',
   });
 
-  const [sort, setSort] = useState<SignDocumentSortConfig>({
+  const [sort, setSort] = useState<SignFileSortConfig>({
     field: 'created_at',
     dir: 'desc',
   });
@@ -95,7 +95,7 @@ export default function SignDocumentPage() {
     setIsLoading(true);
 
     try {
-      // const data = await getPendingSignDocuments();
+      // const data = await getPendingSignFiles();
       // setDocuments(data);
       setDocuments(SIGN_DOCUMENTS);
     } catch (err: any) {
@@ -135,9 +135,9 @@ export default function SignDocumentPage() {
     });
 
     return [...filtered].sort((a, b) => {
-      const aVal = String(a[sort.field as keyof SignDocument] ?? '');
+      const aVal = String(a[sort.field as keyof SignFile] ?? '');
 
-      const bVal = String(b[sort.field as keyof SignDocument] ?? '');
+      const bVal = String(b[sort.field as keyof SignFile] ?? '');
 
       const cmp = aVal.localeCompare(bVal, undefined, {
         numeric: true,
@@ -152,14 +152,14 @@ export default function SignDocumentPage() {
   // Actions
   // ─────────────────────────────────────────────
 
-  async function handleApprove(document: SignDocument) {
+  async function handleApprove(document: SignFile) {
     setIsModalOpen(true);
     // setSelecteds();
   }
 
-  async function handleReject(document: SignDocument) {
+  async function handleReject(document: SignFile) {
     try {
-      // await rejectSignDocument(document.id);
+      // await rejectSignFile(document.id);
 
       addNotification({
         type: 'warning',
@@ -177,9 +177,9 @@ export default function SignDocumentPage() {
     }
   }
 
-  async function handleSign(document: SignDocument) {
+  async function handleSign(document: SignFile) {
     try {
-      // await signDocument(document.id);
+      // await signFile(document.id);
 
       addNotification({
         type: 'success',
@@ -197,22 +197,22 @@ export default function SignDocumentPage() {
     }
   }
 
-  function handleView(document: SignDocument) {
+  function handleView(document: SignFile) {
     console.log('Ver firma digital', document);
   }
 
-  function handleViewRoute(document: SignDocument) {
+  function handleViewRoute(document: SignFile) {
     console.log('Ver tramite', document);
   }
 
-  function handleViewRoute(document: SignDocument) {
+  function handleViewRoute(document: SignFile) {
     console.log('Ver tramite', document);
     setIsRoutesModalOpen(true);
   }
 
-  function handleApproveDocuments(document: SignDocument) {
+  function handleApproveDocuments(document: SignFile) {
     console.log('Ver tramite', document);
-    // setSelecteds(documents);
+    // setSelecteds(files);
     setIsModalOpen(true);
   }
 
@@ -229,8 +229,8 @@ export default function SignDocumentPage() {
       <div className="space-y-5">
         {/* Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <SignDocumentFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
-          {can('documents.create') && (
+          <SignFileFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          {can('files.create') && (
             <Button
               size="sm"
               onClick={() => handleApproveDocuments(null)}
@@ -242,7 +242,7 @@ export default function SignDocumentPage() {
         </div>
 
         {/* Table */}
-        <SignDocumentTable
+        <SignFileTable
           documents={filteredDocuments}
           isLoading={isLoading}
           onApprove={handleApprove}
@@ -258,8 +258,8 @@ export default function SignDocumentPage() {
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
         </p>
-        <SignDocumentForm
-          signDocuments={selecteds}
+        <SignFileForm
+          SignFiles={selecteds}
           onSuccess={() => {
             setIsModalOpen(false);
           }}
@@ -267,7 +267,7 @@ export default function SignDocumentPage() {
         />
       </Modal>
       <Modal isOpen={isModalRoutesOpen} onClose={() => setIsRoutesModalOpen(false)} className="max-w-md p-6 sm:p-8">
-        <DocumentRoutes document={document} isLoading={isLoading} />
+        <FileRoutes document={document} isLoading={isLoading} />
       </Modal>
     </>
   );

@@ -44,7 +44,7 @@ function StateBadge({ state }: { state?: string }) {
   );
 }
 
-export default function DocumentTable({ documents, isLoading, selectedDocumentId, onView, onViewRoutes }: Props) {
+export default function FileTable({ documents, isLoading, selectedDocumentId, onView, onViewRoutes }: Props) {
   const { can } = usePermissions();
 
   const [page, setPage] = useState(1);
@@ -322,7 +322,7 @@ export default function DocumentTable({ documents, isLoading, selectedDocumentId
                   {/* ── Acciones ──────────────────────────────────────── */}
                   <td className="px-5 py-5 align-top">
                     <div className="flex items-center justify-center gap-2">
-                      {can('documents.view') && onView && (
+                      {can('files.view') && onView && (
                         <Tooltip content="Ver documento">
                           <Button
                             variant="ghost-outline"
@@ -332,7 +332,7 @@ export default function DocumentTable({ documents, isLoading, selectedDocumentId
                           />
                         </Tooltip>
                       )}
-                      {can('documents.routes') && onViewRoutes && (
+                      {can('files.routes') && onViewRoutes && (
                         <Tooltip content="Ver rutas">
                           <Button
                             variant="primary-outline"

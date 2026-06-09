@@ -1,7 +1,7 @@
-import CorrespDashboard from './metrics/corresp/CorrespDashboard.tsx';
-import AdminDashboard from './metrics/admin/AdminDashboard.tsx';
+import CorrespDashboard from './corresp/CorrespDashboard.tsx';
+import AdminDashboard from './admin/AdminDashboard.tsx';
 
-export const CorrespondenceDashboard = () => {
+export const HomeCorrespondence = () => {
   return (
     <>
       <div className="col-span-6 space-y-6 xl:col-span-7">

@@ -1,6 +1,6 @@
-import { SignDocument } from '../types/sign-document.type.ts';
+import { SignFile } from '../types/sign-file.type.ts';
 
-export async function getSignDocuments(): Promise<SignDocument[]> {
+export async function getSignFiles(): Promise<SignFile[]> {
   return [
     {
       id: 1,
