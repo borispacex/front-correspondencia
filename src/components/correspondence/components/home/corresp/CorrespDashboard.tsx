@@ -1,76 +1,57 @@
 import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
+import { CorrespDashboardData } from '../../../types/dashboard/dashboard.type.ts';
+import { useCorrespDashboard } from '../../../hooks/useCorrespDashboard.ts';
 
-// ─── DATA (basada en documentos reales del Excel) ───────────────────────────
+// ─── Colores fijos para estados y prioridades (por índice) ───────────────────
+const STATE_COLORS = ['#10b981', '#f59e0b', '#0ea5e9', '#8b5cf6', '#6b7280', '#ef4444'];
+const PRIORITY_COLORS = ['#0ea5e9', '#ef4444', '#f59e0b', '#10b981', '#8b5cf6'];
+const UNIT_COLORS = ['#465fff', '#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#6b7280'];
 
-const DOCS_BY_STATE = [
-  { state: 'Atendido', count: 124, color: '#10b981' },
-  { state: 'Pendiente', count: 38, color: '#f59e0b' },
-  { state: 'En proceso', count: 22, color: '#0ea5e9' },
-  { state: 'Derivado', count: 15, color: '#8b5cf6' },
-  { state: 'Archivado', count: 9, color: '#6b7280' },
-  { state: 'Anulado', count: 3, color: '#ef4444' },
-];
+// ─── Loading skeleton ────────────────────────────────────────────────────────
 
-const DOCS_BY_TYPE = [
-  { type: 'Informe (INF)', count: 1450 },
-  { type: 'Oficio (OF)', count: 820 },
-  { type: 'Memorándum', count: 390 },
-  { type: 'Nota de servicio', count: 280 },
-  { type: 'Solicitud', count: 210 },
-  { type: 'Radiograma', count: 175 },
-  { type: 'Resolución', count: 88 },
-  { type: 'Otro', count: 145 },
-];
+function Skeleton({ className = '' }: { className?: string }) {
+  return <div className={`animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800 ${className}`} />;
+}
 
-const DOCS_BY_PRIORITY = [
-  { label: 'Normal', value: 198, color: '#0ea5e9' },
-  { label: 'Urgente', value: 13, color: '#ef4444' },
-];
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-28" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <Skeleton className="h-72" />
+        <Skeleton className="h-72" />
+      </div>
+      <Skeleton className="h-56 w-full" />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <Skeleton className="h-48" />
+        <Skeleton className="col-span-2 h-48" />
+      </div>
+    </div>
+  );
+}
 
-const DOCS_MONTHLY = [
-  { mes: 'Ene', entrada: 180, salida: 145 },
-  { mes: 'Feb', entrada: 210, salida: 178 },
-  { mes: 'Mar', entrada: 198, salida: 162 },
-  { mes: 'Abr', entrada: 225, salida: 190 },
-  { mes: 'May', entrada: 242, salida: 205 },
-  { mes: 'Jun', entrada: 215, salida: 188 },
-  { mes: 'Jul', entrada: 230, salida: 199 },
-  { mes: 'Ago', entrada: 248, salida: 210 },
-  { mes: 'Sep', entrada: 260, salida: 222 },
-  { mes: 'Oct', entrada: 235, salida: 200 },
-  { mes: 'Nov', entrada: 218, salida: 185 },
-  { mes: 'Dic', entrada: 195, salida: 167 },
-];
+function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-900/10">
+      <div className="text-center">
+        <p className="text-3xl">⚠️</p>
+        <p className="mt-2 font-semibold text-red-700 dark:text-red-400">Error al cargar datos</p>
+        <p className="mt-1 text-sm text-red-500">{message}</p>
+        <button onClick={onRetry} className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">
+          Reintentar
+        </button>
+      </div>
+    </div>
+  );
+}
 
-const DOCS_BY_UNIT = [
-  { unit: 'UALP', docs: 412 },
-  { unit: 'UASC', docs: 388 },
-  { unit: 'UACBBA', docs: 364 },
-  { unit: 'Nacional', docs: 290 },
-  { unit: 'UAT', docs: 198 },
-  { unit: 'UAR', docs: 142 },
-];
-
-const RESPONSE_TIME = [
-  { rango: '< 1 día', docs: 45 },
-  { rango: '1–3 días', docs: 78 },
-  { rango: '4–7 días', docs: 52 },
-  { rango: '8–15 días', docs: 28 },
-  { rango: '> 15 días', docs: 9 },
-];
-
-const TOP_DEPARTMENTS = [
-  { name: 'Rectorado', sent: 48, received: 312 },
-  { name: 'DNAA Financiero', sent: 218, received: 180 },
-  { name: 'Dir. Planificación', sent: 142, received: 195 },
-  { name: 'Dir. Posgrado CBBA', sent: 185, received: 160 },
-  { name: 'UAAF UASC', sent: 164, received: 148 },
-  { name: 'Dir. Tecnológico', sent: 132, received: 140 },
-];
-
-// ─── CARD METRIC ────────────────────────────────────────────────────────────
+// ─── MetricCard ───────────────────────────────────────────────────────────────
 
 function MetricCard({
   icon,
@@ -117,13 +98,15 @@ function MetricCard({
   );
 }
 
-// ─── ESTADO DOCS (donut) ─────────────────────────────────────────────────────
+// ─── EstadoChart ─────────────────────────────────────────────────────────────
 
-function EstadoChart() {
+function EstadoChart({ data }: { data: CorrespDashboardData['docs_by_state'] }) {
+  const total = data.reduce((s, d) => s + d.count, 0);
+  const colors = data.map((_, i) => STATE_COLORS[i % STATE_COLORS.length]);
   const options: ApexOptions = {
     chart: { type: 'donut', fontFamily: 'Outfit, sans-serif' },
-    labels: DOCS_BY_STATE.map((s) => s.state),
-    colors: DOCS_BY_STATE.map((s) => s.color),
+    labels: data.map((s) => s.state),
+    colors,
     legend: { position: 'bottom', fontFamily: 'Outfit', fontSize: '12px' },
     dataLabels: { enabled: true, style: { fontSize: '11px' } },
     plotOptions: {
@@ -135,7 +118,7 @@ function EstadoChart() {
             total: {
               show: true,
               label: 'Total',
-              formatter: () => String(DOCS_BY_STATE.reduce((s, d) => s + d.count, 0)),
+              formatter: () => String(total),
             },
           },
         },
@@ -144,21 +127,19 @@ function EstadoChart() {
     stroke: { width: 0 },
     tooltip: { y: { formatter: (v: number) => `${v} docs` } },
   };
-  return <Chart options={options} series={DOCS_BY_STATE.map((s) => s.count)} type="donut" height={260} />;
+  return <Chart options={options} series={data.map((s) => s.count)} type="donut" height={260} />;
 }
 
-// ─── TIPO DOCS (horizontal bar) ─────────────────────────────────────────────
+// ─── TipoChart ────────────────────────────────────────────────────────────────
 
-function TipoChart() {
+function TipoChart({ data }: { data: CorrespDashboardData['docs_by_type'] }) {
   const options: ApexOptions = {
     chart: { type: 'bar', fontFamily: 'Outfit, sans-serif', toolbar: { show: false } },
     colors: ['#465fff'],
-    plotOptions: {
-      bar: { horizontal: true, borderRadius: 4, borderRadiusApplication: 'end', barHeight: '65%' },
-    },
+    plotOptions: { bar: { horizontal: true, borderRadius: 4, borderRadiusApplication: 'end', barHeight: '65%' } },
     dataLabels: { enabled: true, style: { fontSize: '11px' } },
     xaxis: {
-      categories: DOCS_BY_TYPE.map((t) => t.type),
+      categories: data.map((t) => t.type),
       labels: { style: { fontSize: '11px' } },
       axisBorder: { show: false },
       axisTicks: { show: false },
@@ -167,25 +148,20 @@ function TipoChart() {
     tooltip: { y: { formatter: (v: number) => `${v.toLocaleString()} documentos` } },
   };
   return (
-    <Chart
-      options={options}
-      series={[{ name: 'Docs', data: DOCS_BY_TYPE.map((t) => t.count) }]}
-      type="bar"
-      height={280}
-    />
+    <Chart options={options} series={[{ name: 'Docs', data: data.map((t) => t.count) }]} type="bar" height={280} />
   );
 }
 
-// ─── MENSUAL ENTRADA/SALIDA ──────────────────────────────────────────────────
+// ─── MensualChart ─────────────────────────────────────────────────────────────
 
-function MensualChart() {
+function MensualChart({ data }: { data: CorrespDashboardData['docs_monthly'] }) {
   const options: ApexOptions = {
     chart: { type: 'bar', fontFamily: 'Outfit, sans-serif', toolbar: { show: false }, stacked: false },
     colors: ['#465fff', '#10b981'],
     plotOptions: { bar: { borderRadius: 3, columnWidth: '70%', borderRadiusApplication: 'end' } },
     dataLabels: { enabled: false },
     xaxis: {
-      categories: DOCS_MONTHLY.map((m) => m.mes),
+      categories: data.map((m) => m.mes),
       labels: { style: { fontSize: '11px' } },
       axisBorder: { show: false },
       axisTicks: { show: false },
@@ -198,8 +174,8 @@ function MensualChart() {
     <Chart
       options={options}
       series={[
-        { name: 'Entrada (I)', data: DOCS_MONTHLY.map((m) => m.entrada) },
-        { name: 'Salida (E)', data: DOCS_MONTHLY.map((m) => m.salida) },
+        { name: 'Entrada (I)', data: data.map((m) => m.entrada) },
+        { name: 'Salida (E)', data: data.map((m) => m.salida) },
       ]}
       type="bar"
       height={220}
@@ -207,24 +183,55 @@ function MensualChart() {
   );
 }
 
-// ─── DOCS BY UNIT (treemap-style cards) ─────────────────────────────────────
+// Elimina etiquetas HTML del texto (ej: <span class="label-danger">URGENTE!</span>)
+const stripHtml = (html: string): string => html.replace(/<[^>]*>/g, '').trim();
 
-function UnitCards() {
-  const max = Math.max(...DOCS_BY_UNIT.map((u) => u.docs));
-  const colors = ['#465fff', '#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#6b7280'];
+// ─── PriorityDisplay ─────────────────────────────────────────────────────────
+
+function PriorityDisplay({ data }: { data: CorrespDashboardData['docs_by_priority'] }) {
+  const total = data.reduce((s, p) => s + p.value, 0);
+  return (
+    <div className="flex flex-col gap-4">
+      {data.map((p, i) => (
+        <div key={i}>
+          <div className="mb-1.5 flex justify-between text-sm">
+            <span className="font-medium text-gray-700 dark:text-white/80">{stripHtml(p.label)}</span>
+            <span className="font-bold text-gray-800 dark:text-white/90">
+              {p.value} ({total > 0 ? Math.round((p.value / total) * 100) : 0}%)
+            </span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${total > 0 ? (p.value / total) * 100 : 0}%`,
+                backgroundColor: PRIORITY_COLORS[i % PRIORITY_COLORS.length],
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── UnitCards ────────────────────────────────────────────────────────────────
+
+function UnitCards({ data }: { data: CorrespDashboardData['docs_by_unit'] }) {
+  const max = Math.max(...data.map((u) => u.docs), 1);
   return (
     <div className="grid grid-cols-3 gap-3">
-      {DOCS_BY_UNIT.map((u, i) => (
+      {data.map((u, i) => (
         <div
           key={i}
           className="rounded-xl border border-gray-100 p-3 dark:border-gray-800"
-          style={{ borderLeftWidth: '3px', borderLeftColor: colors[i] }}
+          style={{ borderLeftWidth: '3px', borderLeftColor: UNIT_COLORS[i % UNIT_COLORS.length] }}
         >
           <div className="text-sm font-semibold text-gray-700 dark:text-white/80">{u.unit}</div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
             <div
               className="h-full rounded-full"
-              style={{ width: `${(u.docs / max) * 100}%`, backgroundColor: colors[i] }}
+              style={{ width: `${(u.docs / max) * 100}%`, backgroundColor: UNIT_COLORS[i % UNIT_COLORS.length] }}
             />
           </div>
           <div className="mt-1.5 text-lg font-bold text-gray-800 dark:text-white/90">{u.docs}</div>
@@ -235,16 +242,16 @@ function UnitCards() {
   );
 }
 
-// ─── TIEMPO DE RESPUESTA ─────────────────────────────────────────────────────
+// ─── ResponseTimeChart ────────────────────────────────────────────────────────
 
-function ResponseTimeChart() {
+function ResponseTimeChart({ data }: { data: CorrespDashboardData['response_time'] }) {
   const options: ApexOptions = {
     chart: { type: 'bar', fontFamily: 'Outfit, sans-serif', toolbar: { show: false } },
     colors: ['#8b5cf6'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '55%', borderRadiusApplication: 'end' } },
     dataLabels: { enabled: true, style: { fontSize: '11px' } },
     xaxis: {
-      categories: RESPONSE_TIME.map((r) => r.rango),
+      categories: data.map((r) => r.rango),
       labels: { style: { fontSize: '11px' } },
       axisBorder: { show: false },
       axisTicks: { show: false },
@@ -253,44 +260,13 @@ function ResponseTimeChart() {
     tooltip: { y: { formatter: (v: number) => `${v} docs` } },
   };
   return (
-    <Chart
-      options={options}
-      series={[{ name: 'Documentos', data: RESPONSE_TIME.map((r) => r.docs) }]}
-      type="bar"
-      height={200}
-    />
+    <Chart options={options} series={[{ name: 'Documentos', data: data.map((r) => r.docs) }]} type="bar" height={200} />
   );
 }
 
-// ─── PRIORITY PILLS ──────────────────────────────────────────────────────────
+// ─── TopDeptTable ─────────────────────────────────────────────────────────────
 
-function PriorityDisplay() {
-  const total = DOCS_BY_PRIORITY.reduce((s, p) => s + p.value, 0);
-  return (
-    <div className="flex flex-col gap-4">
-      {DOCS_BY_PRIORITY.map((p, i) => (
-        <div key={i}>
-          <div className="mb-1.5 flex justify-between text-sm">
-            <span className="font-medium text-gray-700 dark:text-white/80">{p.label}</span>
-            <span className="font-bold text-gray-800 dark:text-white/90">
-              {p.value} ({Math.round((p.value / total) * 100)}%)
-            </span>
-          </div>
-          <div className="h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${(p.value / total) * 100}%`, backgroundColor: p.color }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── TOP DEPARTMENTS TABLE ───────────────────────────────────────────────────
-
-function TopDeptTable() {
+function TopDeptTable({ data }: { data: CorrespDashboardData['top_departments'] }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -303,7 +279,7 @@ function TopDeptTable() {
           </tr>
         </thead>
         <tbody>
-          {TOP_DEPARTMENTS.map((d, i) => {
+          {data.map((d, i) => {
             const bal = d.sent - d.received;
             return (
               <tr key={i} className="border-b border-gray-50 dark:border-gray-800/50">
@@ -339,15 +315,79 @@ function TopDeptTable() {
   );
 }
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
+// ─── TimeKPIs (calculados dinámicamente desde response_time) ─────────────────
+
+function TimeKPIs({ data }: { data: CorrespDashboardData['response_time'] }) {
+  const total = data.reduce((s, r) => s + r.docs, 0);
+
+  const lessThanOne = data.find((r) => r.rango === '< 1 día')?.docs ?? 0;
+  const moreThan15 = data.find((r) => r.rango === '> 15 días')?.docs ?? 0;
+
+  // Promedio ponderado aproximado (punto medio de cada rango)
+  const midpoints: Record<string, number> = {
+    '< 1 día': 0.5,
+    '1–3 días': 2,
+    '4–7 días': 5.5,
+    '8–15 días': 11.5,
+    '> 15 días': 20,
+  };
+  const avgDays =
+    total > 0 ? (data.reduce((s, r) => s + (midpoints[r.rango] ?? 0) * r.docs, 0) / total).toFixed(1) : '0';
+
+  const slaCount = data
+    .filter((r) => !r.rango.startsWith('> 15') && r.rango !== '8–15 días')
+    .reduce((s, r) => s + r.docs, 0);
+  const sla = total > 0 ? Math.round((slaCount / total) * 100) : 0;
+
+  const kpis = [
+    { label: 'Promedio de atención', value: `${avgDays} días`, color: '#465fff' },
+    {
+      label: 'Docs. atendidos < 24 hs',
+      value: total > 0 ? `${Math.round((lessThanOne / total) * 100)}%` : '0%',
+      color: '#0ea5e9',
+    },
+    {
+      label: 'Docs. > 15 días',
+      value: total > 0 ? `${Math.round((moreThan15 / total) * 100)}%` : '0%',
+      color: '#ef4444',
+    },
+    { label: 'SLA cumplido (≤ 7 días)', value: `${sla}%`, color: '#8b5cf6' },
+    { label: 'Total documentos analizados', value: total.toLocaleString(), color: '#10b981' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {kpis.map((item, i) => (
+        <div key={i} className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-white/[0.02]">
+          <span className="text-sm text-gray-600 dark:text-gray-300">{item.label}</span>
+          <span className="text-base font-bold" style={{ color: item.color }}>
+            {item.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export const CorrespDashboard = () => {
+  const { data, loading, error, refetch } = useCorrespDashboard();
   const [tab, setTab] = useState<'general' | 'departamentos' | 'tiempos'>('general');
 
-  const totalDocs = DOCS_MONTHLY.reduce((s, m) => s + m.entrada + m.salida, 0);
-  const pendientes = DOCS_BY_STATE.find((s) => s.state === 'Pendiente')?.count ?? 0;
-  const atendidos = DOCS_BY_STATE.find((s) => s.state === 'Atendido')?.count ?? 0;
-  const eficiencia = Math.round((atendidos / DOCS_BY_STATE.reduce((s, d) => s + d.count, 0)) * 100);
+  if (loading) return <DashboardSkeleton />;
+  if (error || !data) return <ErrorCard message={error ?? 'Sin datos'} onRetry={refetch} />;
+
+  const {
+    metrics,
+    docs_by_state,
+    docs_by_type,
+    docs_by_priority,
+    docs_monthly,
+    docs_by_unit,
+    response_time,
+    top_departments,
+  } = data;
 
   return (
     <div className="space-y-6">
@@ -356,7 +396,7 @@ export const CorrespDashboard = () => {
         <div>
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Dashboard Correspondencia</h2>
           <p className="mt-0.5 text-sm text-gray-400 dark:text-gray-500">
-            Documentos, rutas, estados y tiempos de respuesta · EMI 2024
+            Documentos, rutas, estados y tiempos de respuesta · {new Date().getFullYear()}
           </p>
         </div>
         <div className="flex gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
@@ -380,71 +420,60 @@ export const CorrespDashboard = () => {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <MetricCard
           icon="📄"
-          label="Docs. totales 2024"
-          value={totalDocs.toLocaleString()}
+          label={`Docs. totales ${new Date().getFullYear()}`}
+          value={metrics.total_docs.toLocaleString()}
           sub="Entrada + salida"
           color="#465fff"
-          trend={{ value: 12, label: 'vs 2023' }}
         />
-        <MetricCard
-          icon="⏳"
-          label="Pendientes"
-          value={pendientes}
-          sub="Requieren atención"
-          color="#f59e0b"
-          trend={{ value: -8, label: 'vs mes ant.' }}
-        />
+        <MetricCard icon="⏳" label="Pendientes" value={metrics.pendientes} sub="Requieren atención" color="#f59e0b" />
         <MetricCard
           icon="✅"
           label="Eficiencia"
-          value={`${eficiencia}%`}
+          value={`${metrics.eficiencia}%`}
           sub="Docs. atendidos / total"
           color="#10b981"
-          trend={{ value: 5, label: 'vs trim. ant.' }}
         />
-        <MetricCard icon="🔁" label="Rutas generadas" value="4,820" sub="Derivaciones registradas" color="#8b5cf6" />
+        <MetricCard
+          icon="🔁"
+          label="Rutas generadas"
+          value={metrics.total_routers.toLocaleString()}
+          sub="Derivaciones registradas"
+          color="#8b5cf6"
+        />
       </div>
 
       {/* ── Tab: General ── */}
       {tab === 'general' && (
         <>
-          {/* Row 1 */}
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            {/* Estado */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
               <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">Documentos por estado</h3>
-              <EstadoChart />
+              <EstadoChart data={docs_by_state} />
             </div>
-            {/* Tipo */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
               <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">Documentos por tipo</h3>
-              <TipoChart />
+              <TipoChart data={docs_by_type} />
             </div>
           </div>
 
-          {/* Row 2: Mensual full-width */}
           <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
             <h3 className="mb-1 text-base font-semibold text-gray-800 dark:text-white/90">
               Documentos recibidos vs. generados por mes
             </h3>
-            <p className="mb-4 text-xs text-gray-400">Flujo mensual 2024 · (I) Internos + (E) Externos</p>
-            <MensualChart />
+            <p className="mb-4 text-xs text-gray-400">Flujo mensual · (I) Internos + (E) Externos</p>
+            <MensualChart data={docs_monthly} />
           </div>
 
-          {/* Row 3: Priority + Units */}
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* Priority */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
               <h3 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">Por prioridad</h3>
-              <PriorityDisplay />
-              <p className="mt-4 text-xs text-gray-400">Urgente: documentos con prioridad_id = 1</p>
+              <PriorityDisplay data={docs_by_priority} />
             </div>
-            {/* Units */}
             <div className="col-span-2 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
               <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
                 Volumen por unidad académica
               </h3>
-              <UnitCards />
+              <UnitCards data={docs_by_unit} />
             </div>
           </div>
         </>
@@ -456,7 +485,7 @@ export const CorrespDashboard = () => {
           <h3 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">
             Top departamentos por flujo de correspondencia
           </h3>
-          <TopDeptTable />
+          <TopDeptTable data={top_departments} />
           <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
             Balance = Enviados − Recibidos. Positivo: mayor generación. Negativo: mayor recepción.
           </p>
@@ -470,32 +499,12 @@ export const CorrespDashboard = () => {
             <h3 className="mb-1 text-base font-semibold text-gray-800 dark:text-white/90">
               Tiempo de respuesta / atención
             </h3>
-            <p className="mb-4 text-xs text-gray-400">Días entre creación y atención del documento</p>
-            <ResponseTimeChart />
+            <p className="mb-4 text-xs text-gray-400">Días entre creación y última actualización</p>
+            <ResponseTimeChart data={response_time} />
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-            <h3 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">
-              Indicadores de tiempos (2024)
-            </h3>
-            <div className="space-y-4">
-              {[
-                { label: 'Promedio de atención', value: '3.8 días', color: '#465fff' },
-                { label: 'Mediana de respuesta', value: '2.1 días', color: '#10b981' },
-                { label: 'Docs. < 24 hs', value: '21%', color: '#0ea5e9' },
-                { label: 'Docs. > 15 días', value: '4%', color: '#ef4444' },
-                { label: 'SLA cumplido (≤ 7 días)', value: '83%', color: '#8b5cf6' },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-white/[0.02]"
-                >
-                  <span className="text-sm text-gray-600 dark:text-gray-300">{item.label}</span>
-                  <span className="text-base font-bold" style={{ color: item.color }}>
-                    {item.value}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <h3 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">Indicadores de tiempos</h3>
+            <TimeKPIs data={response_time} />
           </div>
         </div>
       )}
