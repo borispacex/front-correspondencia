@@ -71,7 +71,7 @@ export default function RouterPendingShowPage() {
         items={[
           {
             label: 'Bandeja de Entrada',
-            path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING,
+            path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING,
           },
           {
             label: `#${id}`,

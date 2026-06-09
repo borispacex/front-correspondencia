@@ -19,6 +19,8 @@ import {
   FileTextIcon,
   FingerprintPatternIcon,
   LockOpenIcon,
+  MailboxIcon,
+  MailsIcon,
 } from '../icons';
 import { useSidebar } from '../context/SidebarContext';
 import type { MenuItem } from '../types/admin/menu-items/menu-item.types';
@@ -124,40 +126,88 @@ const CORRESPONDENCIA_ITEMS: NavItem[] = [
     subItems: [
       {
         name: 'Trámites',
-        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL,
+        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL,
         countKey: 'all',
         permission: 'correspondencia_tramite.all',
       },
       {
         name: 'Bandeja de Entrada',
-        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING,
+        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING,
         countKey: 'pending',
         permission: 'correspondencia_tramite.pending',
       },
       {
         name: 'Bandeja de Salida',
-        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED,
+        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
         countKey: 'attended',
         permission: 'correspondencia_tramite.attended',
       },
       {
         name: 'Archivados',
-        path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED,
+        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED,
         countKey: 'archived',
         permission: 'correspondencia_tramite.archived',
       },
     ],
   },
   {
+    icon: <FolderIcon />,
+    name: 'Trámites',
+    subItems: [
+      {
+        name: 'Mis trámites',
+        path: ROUTES.DOCUMENTS.MY_DOCUMENTS.ALL,
+        permission: 'correspondencia.my_tramite',
+      },
+      {
+        name: 'Buscar trámite',
+        path: ROUTES.DOCUMENTS.ALL_DOCUMENTS.ALL,
+        permission: 'correspondencia.all_tramite',
+      },
+    ],
+  },
+  {
+    icon: <MailboxIcon />,
+    name: 'Buzón',
+    subItems: [
+      {
+        name: 'Bandeja de entrada',
+        path: ROUTES.MAILBOX.INBOX.ALL,
+        permission: 'correspondencia.mailbox.inbox',
+      },
+      {
+        name: 'Bandeja de salida',
+        path: ROUTES.MAILBOX.OUTBOX.ALL,
+        permission: 'correspondencia.mailbox.outbox',
+      },
+    ],
+  },
+  {
+    icon: <MailsIcon />,
+    name: 'Correspondencia',
+    subItems: [
+      {
+        name: 'Sin acción',
+        path: ROUTES.CORRESPONDENCE.PENDING.ALL,
+        permission: 'correspondencia.pending',
+      },
+      {
+        name: 'Archivados',
+        path: ROUTES.CORRESPONDENCE.ARCHIVED.ALL,
+        permission: 'correspondencia.archived',
+      },
+    ],
+  },
+  {
     icon: <FileTextIcon />,
     name: 'Archivos',
-    path: ROUTES.CORRESPONDENCE.FILE,
+    path: ROUTES.FILE,
     permission: 'correspondencia_documentos.index',
   },
   {
     icon: <FingerprintPatternIcon />,
     name: 'Firma digital',
-    path: ROUTES.CORRESPONDENCE.SIGN_FILE,
+    path: ROUTES.SIGN_FILE,
     permission: 'correspondencia_firmar.index',
   },
 ];

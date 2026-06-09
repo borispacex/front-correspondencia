@@ -35,7 +35,7 @@ export default function RouterAttendedPage() {
   };
   const handleView = (document: Document) => {
     console.log('Ver tramite', document);
-    navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED}/${document.id}`);
+    navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED}/${document.id}`);
   };
 
   async function handleSubmitRouter(data: any) {

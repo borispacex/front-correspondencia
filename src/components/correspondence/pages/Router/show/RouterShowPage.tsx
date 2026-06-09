@@ -77,7 +77,7 @@ export default function RouterShowPage() {
         items={[
           {
             label: 'Trámite',
-            path: ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL,
+            path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL,
           },
           {
             label: `#${id}`,

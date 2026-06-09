@@ -23,7 +23,7 @@ export default function RouterPendingPage() {
   const handleViewRoutes = (document: Document) => console.log('Rutas:', document);
   const handleView = (document: Document) => {
     console.log('Ver documento', document);
-    navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING}/${document.id}`);
+    navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING}/${document.id}`);
   };
   const handleReceive = (document_id: number) => {
     console.log('Recibir', document_id);

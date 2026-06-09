@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import PageMeta from '../../../../common/PageMeta.tsx';
-import PageBreadCrumb from '../../../../common/PageBreadCrumb.tsx';
-import { Document } from '../../../types/documents/document.type.ts';
-import { getDocumentById } from '../../../services/document.service.ts';
-import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
-import { ROUTES } from '../../../../../constants/routes.constants.ts';
-import RouterAttendedInfo from '../../../components/router/show/RouterAttendedInfo.tsx';
-import { APP_NAME } from '../../../constants/correspondence.constants.ts';
-import Tooltip from '../../../../form/Tooltip.tsx';
-import Button from '../../../../ui/button/Button.tsx';
-import { ArchiveRestoreIcon, FileTextIcon, ForwardIcon, PrinterIcon, RouteIcon } from '../../../../../icons';
 
-export default function RouterAttendedShowPage() {
+import { Document } from '../../types/documents/document.type.ts';
+import { getDocumentById } from '../../services/document.service.ts';
+import PageMeta from '../../../common/PageMeta.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
+import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
+import { ROUTES } from '../../../../constants/routes.constants.ts';
+import Tooltip from '../../../form/Tooltip.tsx';
+import Button from '../../../ui/button/Button.tsx';
+import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
+import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
+import PendingInfo from '../../components/correspondence/pending/PendingInfo.tsx';
+
+export default function PendingShowPage() {
   const { id } = useParams();
 
   const [document, setDocument] = useState<Document | null>(null);
@@ -44,31 +45,27 @@ export default function RouterAttendedShowPage() {
   }, [fetchDocument]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleForward = (document_id: number) => {
-    console.log('Reenviar:', document_id);
-  };
-
-  const handleBackup = (document_id: number) => {
-    console.log('Respaldo:', document_id);
-  };
-
   const handleViewRoutes = (document: Document) => {
-    console.log('Ver rutas:', document);
+    console.log('Rutas:', document);
+  };
+
+  const handleReceive = (document_id: number) => {
+    console.log('Recibir:', document_id);
+  };
+
+  const handleDelete = (document_id: number) => {
+    console.log('Eliminar:', document_id);
   };
 
   return (
     <>
-      <PageMeta
-        title={`Detalle Trámite atendido | ${APP_NAME}`}
-        description="Información detallada del trámite atendido"
-      />
-
+      <PageMeta title={`Detalle sin acción | ${APP_NAME}`} description="Información detallada del tramite sin acción" />
       <PageBreadCrumb
-        pageTitle="Trámite atendido"
+        pageTitle="Sin acción"
         items={[
           {
-            label: 'Bandeja de Salida',
-            path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
+            label: 'Sin acción',
+            path: ROUTES.CORRESPONDENCE.PENDING.ALL,
           },
           {
             label: `#${id}`,
@@ -90,25 +87,25 @@ export default function RouterAttendedShowPage() {
               Ver rutas
             </Button>
           </Tooltip>
-          <Tooltip content="Respaldo">
+          <Tooltip content="Recibir">
             <Button
               className="mr-3"
-              variant="secondary"
-              size="sm"
-              startIcon={<PrinterIcon className="size-3.5" />}
-              onClick={() => handleBackup(document.id)}
-            >
-              Respaldo
-            </Button>
-          </Tooltip>
-          <Tooltip content="Reenviar">
-            <Button
               variant="info"
               size="sm"
-              startIcon={<ForwardIcon className="size-3.5" />}
-              onClick={() => handleForward(document.id)}
+              startIcon={<InboxIcon className="size-3.5" />}
+              onClick={() => handleReceive(document.id)}
             >
-              Reenviar
+              Recibir
+            </Button>
+          </Tooltip>
+          <Tooltip content="Eliminar">
+            <Button
+              variant="danger"
+              size="sm"
+              startIcon={<TrashBinIcon className="size-3.5" />}
+              onClick={() => handleDelete(document.id)}
+            >
+              Eliminar
             </Button>
           </Tooltip>
         </div>
@@ -116,7 +113,7 @@ export default function RouterAttendedShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <RouterAttendedInfo document={document} isLoading={isLoadingDocument} />
+          <PendingInfo document={document} isLoading={isLoadingDocument} />
         </div>
 
         <div className="xl:col-span-2">

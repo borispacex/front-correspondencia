@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import PageMeta from '../../../../common/PageMeta.tsx';
-import PageBreadCrumb from '../../../../common/PageBreadCrumb.tsx';
-import { Document } from '../../../types/documents/document.type.ts';
-import { getDocumentById } from '../../../services/document.service.ts';
-import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
-import { ROUTES } from '../../../../../constants/routes.constants.ts';
-import RouterAttendedInfo from '../../../components/router/show/RouterAttendedInfo.tsx';
-import { APP_NAME } from '../../../constants/correspondence.constants.ts';
-import Tooltip from '../../../../form/Tooltip.tsx';
-import Button from '../../../../ui/button/Button.tsx';
-import { ArchiveRestoreIcon, FileTextIcon, ForwardIcon, PrinterIcon, RouteIcon } from '../../../../../icons';
+import { Document } from '../../types/documents/document.type.ts';
+import { getDocumentById } from '../../services/document.service.ts';
+import PageMeta from '../../../common/PageMeta.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
+import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
+import { ROUTES } from '../../../../constants/routes.constants.ts';
+import Tooltip from '../../../form/Tooltip.tsx';
+import Button from '../../../ui/button/Button.tsx';
+import { ForwardIcon, PrinterIcon, RouteIcon } from '../../../../icons';
+import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
 
-export default function RouterAttendedShowPage() {
+export default function OutboxShowPage() {
   const { id } = useParams();
 
   const [document, setDocument] = useState<Document | null>(null);
@@ -68,7 +67,7 @@ export default function RouterAttendedShowPage() {
         items={[
           {
             label: 'Bandeja de Salida',
-            path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
+            path: ROUTES.MAILBOX.OUTBOX.ALL,
           },
           {
             label: `#${id}`,
@@ -116,7 +115,7 @@ export default function RouterAttendedShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <RouterAttendedInfo document={document} isLoading={isLoadingDocument} />
+          <OutboxShowPage document={document} isLoading={isLoadingDocument} />
         </div>
 
         <div className="xl:col-span-2">

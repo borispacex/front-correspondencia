@@ -147,16 +147,16 @@ export default function RouterPage() {
     console.log('Ver tramite', document);
     switch (statusTab) {
       case 'all':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL}/${document.id}`);
+        navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL}/${document.id}`);
         return;
       case 'pending':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING}/${document.id}`);
+        navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING}/${document.id}`);
         return;
       case 'attended':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED}/${document.id}`);
+        navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED}/${document.id}`);
         return;
       case 'archived':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED}/${document.id}`);
+        navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED}/${document.id}`);
         return;
     }
   };

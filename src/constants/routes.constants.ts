@@ -22,7 +22,7 @@ export const ROUTES = {
     EDIT: (id: number | string) => `/admin/usuarios/${id}/editar`,
   },
   // Correspondencia
-  CORRESPONDENCE: {
+  CORRESPONDENCESS: {
     ROUTE_SHEET: {
       ALL: '/correspondencia/tramite',
       SHOW: '/correspondencia/tramite/:id',
@@ -33,37 +33,38 @@ export const ROUTES = {
       ARCHIVED: '/correspondencia/tramite/archivados',
       ARCHIVED_SHOW: '/correspondencia/tramite/archivados/:id',
     },
-    DOCUMENTS: {
-      MY_DOCUMENTS: {
-        ALL: '/correspondencia/tramite/mis-tramites',
-        SHOW: '/correspondencia/tramite/mis-tramites:id',
-      },
-      ALL_DOCUMENTS: {
-        ALL: '/correspondencia/tramite/todos',
-        SHOW: '/correspondencia/tramite/todos/:id',
-      },
-    },
-    MAILBOX: {
-      INBOX: {
-        ALL: '/correspondencia/tramite/bandeja-entrada',
-        SHOW: '/correspondencia/tramite/bandeja-entrada/:id',
-      },
-      OUTBOX: {
-        ALL: '/correspondencia/tramite/bandeja-salida',
-        SHOW: '/correspondencia/tramite/bandeja-salida/:id',
-      },
-    },
-    CORRESPONDENCE: {
-      PENDING: {
-        ALL: '/correspondencia/tramite/sin-accion',
-        SHOW: '/correspondencia/tramite/sin-accion/:id',
-      },
-      ARCHIVED: {
-        ALL: '/correspondencia/tramite/archivado',
-        SHOW: '/correspondencia/tramite/archivado/:id',
-      },
-    },
-    FILE: '/correspondencia/archivos',
-    SIGN_FILE: '/correspondencia/firma-digital',
   },
+  // Correspondencia
+  DOCUMENTS: {
+    MY_DOCUMENTS: {
+      ALL: '/correspondencia/tramite/mis-tramites',
+      SHOW: '/correspondencia/tramite/mis-tramites/:id',
+    },
+    ALL_DOCUMENTS: {
+      ALL: '/correspondencia/tramite/todos',
+      SHOW: '/correspondencia/tramite/todos/:id',
+    },
+  },
+  MAILBOX: {
+    INBOX: {
+      ALL: '/correspondencia/tramite/bandeja-entrada',
+      SHOW: '/correspondencia/tramite/bandeja-entrada/:id',
+    },
+    OUTBOX: {
+      ALL: '/correspondencia/tramite/bandeja-salida',
+      SHOW: '/correspondencia/tramite/bandeja-salida/:id',
+    },
+  },
+  CORRESPONDENCE: {
+    PENDING: {
+      ALL: '/correspondencia/tramite/sin-accion',
+      SHOW: '/correspondencia/tramite/sin-accion/:id',
+    },
+    ARCHIVED: {
+      ALL: '/correspondencia/tramite/archivado',
+      SHOW: '/correspondencia/tramite/archivado/:id',
+    },
+  },
+  FILE: '/correspondencia/archivos',
+  SIGN_FILE: '/correspondencia/firma-digital',
 } as const;

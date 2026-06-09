@@ -7,26 +7,26 @@ import {
   UpdateDocumentRequest,
   Document,
 } from '../../types/documents/document.type.ts';
-import { RouterFilter, SortConfig } from '../../components/router/RouterFilter.tsx';
-import RouterStatusTabs, {
-  ARCHIVED_STATE_IDS,
-  ATTENDED_STATE_IDS,
-  PENDING_STATE_IDS,
-  RouterStatusTab,
-} from '../../components/router/RouterStatusTabs.tsx';
 import { getDocuments } from '../../services/document.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { PlusIcon } from '../../../../icons';
-import RouterTable from '../../components/router/RouterTable.tsx';
 import { Modal } from '../../../ui/modal';
-import FileForm from '../../components/files/FileForm.tsx';
-import RouterForm from '../../components/router/RouterForm.tsx';
 import ModalDelete from '../../../modal/ModalDelete.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../../constants/routes.constants.ts';
+import DocumentForm from '../../components/documents/my-documents/DocumentForm.tsx';
+import RouterForm from '../../components/documents/my-documents/RouterForm.tsx';
+import { MyDocumentFilter, MyDocumentSortConfig } from '../../components/documents/my-documents/MyDocumentFilter.tsx';
+import MyDocumentStatusTabs, {
+  ARCHIVED_STATE_IDS,
+  ATTENDED_STATE_IDS,
+  MyDocumentStatusTab,
+  PENDING_STATE_IDS,
+} from '../../components/documents/my-documents/MyDocumentStatusTabs.tsx';
+import MyDocumentTable from '../../components/documents/my-documents/MyDocumentTable.tsx';
 
 export default function MyDocumentPage() {
   const { can } = usePermissions();
@@ -51,8 +51,8 @@ export default function MyDocumentPage() {
     priority: '',
   });
 
-  const [sort, setSort] = useState<SortConfig>({ field: 'id', dir: 'desc' });
-  const [statusTab, setStatusTab] = useState<RouterStatusTab>('all');
+  const [sort, setSort] = useState<MyDocumentSortConfig>({ field: 'id', dir: 'desc' });
+  const [statusTab, setStatusTab] = useState<MyDocumentStatusTab>('all');
 
   // ─────────────────────────────────────────────────────────────
   // Conteos para los tabs + contexto global (sidebar)
@@ -141,20 +141,7 @@ export default function MyDocumentPage() {
   const handleViewSheet = (document: Document) => console.log('Hoja:', document);
   const handleView = (document: Document) => {
     console.log('Ver tramite', document);
-    switch (statusTab) {
-      case 'all':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ALL}/${document.id}`);
-        return;
-      case 'pending':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.PENDING}/${document.id}`);
-        return;
-      case 'attended':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ATTENDED}/${document.id}`);
-        return;
-      case 'archived':
-        navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED}/${document.id}`);
-        return;
-    }
+    navigate(`${ROUTES.DOCUMENTS.MY_DOCUMENTS.ALL}/${document.id}`);
   };
 
   function handleEdit(document: Document) {
@@ -226,10 +213,10 @@ export default function MyDocumentPage() {
       <PageBreadCrumb pageTitle="Trámites" />
 
       <div className="space-y-5">
-        <RouterStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
+        <MyDocumentStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
 
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <MyDocumentFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('files.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
               Nuevo Trámite
@@ -237,7 +224,7 @@ export default function MyDocumentPage() {
           )}
         </div>
 
-        <RouterTable
+        <MyDocumentTable
           documents={filteredDocuments}
           isLoading={isLoading}
           onEdit={handleEdit}
@@ -262,7 +249,7 @@ export default function MyDocumentPage() {
         <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
           Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
         </p>
-        <FileForm document={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
+        <DocumentForm document={selected} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
       </Modal>
 
       <Modal

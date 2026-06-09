@@ -30,7 +30,7 @@ export default function RouterArchivedPage() {
   };
   const handleView = (document: Document) => {
     console.log('Ver documento', document);
-    navigate(`${ROUTES.CORRESPONDENCE.ROUTE_SHEET.ARCHIVED}/${document.id}`);
+    navigate(`${ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED}/${document.id}`);
   };
 
   // ── Render ───────────────────────────────────────────────────

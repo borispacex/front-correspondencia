@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import PageMeta from '../../../../common/PageMeta.tsx';
-import PageBreadCrumb from '../../../../common/PageBreadCrumb.tsx';
-import { Document } from '../../../types/documents/document.type.ts';
-import { getDocumentById } from '../../../services/document.service.ts';
-import { RouterRoutes } from '../../../components/router/show/RouterRoutes.tsx';
-import { ROUTES } from '../../../../../constants/routes.constants.ts';
-import RouterAttendedInfo from '../../../components/router/show/RouterAttendedInfo.tsx';
-import { APP_NAME } from '../../../constants/correspondence.constants.ts';
-import Tooltip from '../../../../form/Tooltip.tsx';
-import Button from '../../../../ui/button/Button.tsx';
-import { ArchiveRestoreIcon, FileTextIcon, ForwardIcon, PrinterIcon, RouteIcon } from '../../../../../icons';
 
-export default function RouterAttendedShowPage() {
+import { Document } from '../../types/documents/document.type.ts';
+import { getDocumentById } from '../../services/document.service.ts';
+import PageMeta from '../../../common/PageMeta.tsx';
+import { APP_NAME } from '../../constants/correspondence.constants.ts';
+import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
+import { ROUTES } from '../../../../constants/routes.constants.ts';
+import Tooltip from '../../../form/Tooltip.tsx';
+import Button from '../../../ui/button/Button.tsx';
+import { ArchiveRestoreIcon, RouteIcon } from '../../../../icons';
+import ArchivedInfo from '../../components/correspondence/archived/ArchivedInfo.tsx';
+import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
+
+export default function ArchivedShowPage() {
   const { id } = useParams();
 
   const [document, setDocument] = useState<Document | null>(null);
@@ -44,31 +45,26 @@ export default function RouterAttendedShowPage() {
   }, [fetchDocument]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleForward = (document_id: number) => {
-    console.log('Reenviar:', document_id);
-  };
-
-  const handleBackup = (document_id: number) => {
-    console.log('Respaldo:', document_id);
-  };
-
   const handleViewRoutes = (document: Document) => {
-    console.log('Ver rutas:', document);
+    console.log('Rutas:', document);
+  };
+
+  const handleUnarchive = (document_id: number) => {
+    console.log('Desarchivar:', document_id);
   };
 
   return (
     <>
       <PageMeta
-        title={`Detalle Trámite atendido | ${APP_NAME}`}
-        description="Información detallada del trámite atendido"
+        title={`Detalle Trámite archivado | ${APP_NAME}`}
+        description="Información detallada del tramite archivado"
       />
-
       <PageBreadCrumb
-        pageTitle="Trámite atendido"
+        pageTitle="Trámite archivado"
         items={[
           {
-            label: 'Bandeja de Salida',
-            path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
+            label: 'Archivados',
+            path: ROUTES.CORRESPONDENCE.ARCHIVED.ALL,
           },
           {
             label: `#${id}`,
@@ -90,25 +86,14 @@ export default function RouterAttendedShowPage() {
               Ver rutas
             </Button>
           </Tooltip>
-          <Tooltip content="Respaldo">
-            <Button
-              className="mr-3"
-              variant="secondary"
-              size="sm"
-              startIcon={<PrinterIcon className="size-3.5" />}
-              onClick={() => handleBackup(document.id)}
-            >
-              Respaldo
-            </Button>
-          </Tooltip>
-          <Tooltip content="Reenviar">
+          <Tooltip content="Desarchivar">
             <Button
               variant="info"
               size="sm"
-              startIcon={<ForwardIcon className="size-3.5" />}
-              onClick={() => handleForward(document.id)}
+              startIcon={<ArchiveRestoreIcon className="size-3.5" />}
+              onClick={() => handleUnarchive(document.id)}
             >
-              Reenviar
+              Desarchivar
             </Button>
           </Tooltip>
         </div>
@@ -116,7 +101,7 @@ export default function RouterAttendedShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <RouterAttendedInfo document={document} isLoading={isLoadingDocument} />
+          <ArchivedInfo document={document} isLoading={isLoadingDocument} />
         </div>
 
         <div className="xl:col-span-2">
