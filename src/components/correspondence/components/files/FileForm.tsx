@@ -10,10 +10,10 @@ import DatePicker from '../../../form/date-picker.tsx';
 
 import Select, { Option } from '../../../form/Select.tsx';
 
-import { getDepartments } from '../../services/department.service.ts';
-import { getTypeDocuments } from '../../services/type-document.service.ts';
-import { getPriorities } from '../../services/priority.service.ts';
-import { getProcedures } from '../../services/procedure.service.ts';
+import { getDepartments } from '../../services/items/department.service.ts';
+import { getTypeDocuments } from '../../services/items/type-document.service.ts';
+import { getPriorities } from '../../services/items/priority.service.ts';
+import { getProcedures } from '../../services/items/procedure.service.ts';
 import DropZonePdf from '../../../form/form-elements/DropZonePdf.tsx';
 import { InfoIcon } from '../../../../icons';
 import Tooltip from '../../../form/Tooltip.tsx';

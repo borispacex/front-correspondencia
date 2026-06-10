@@ -45,7 +45,7 @@ export default function RouterPage() {
   const [confirmId, setConfirmId] = useState<number | null>(null);
 
   // ─────────────────────────────────────────────────────────────
-  // Filters, sort y status tab
+  // filters, sort y status tab
   // ─────────────────────────────────────────────────────────────
   const [filters, setFilters] = useState<DocumentFilters>({
     nro: '',

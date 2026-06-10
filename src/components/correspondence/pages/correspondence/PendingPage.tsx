@@ -22,7 +22,7 @@ export default function PendingPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   // ─────────────────────────────────────────────────────────────
-  // Filters, sort y status tab
+  // filters, sort y status tab
   // ─────────────────────────────────────────────────────────────
   const [filters, setFilters] = useState<DocumentFilters>({
     nro: '',

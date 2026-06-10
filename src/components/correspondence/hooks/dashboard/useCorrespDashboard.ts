@@ -1,6 +1,6 @@
-import { getAdminDashboard } from '../services/dashboard.service.ts';
+import { CorrespDashboardData } from '../../types/dashboard/dashboard.type.ts';
 import { useEffect, useState } from 'react';
-import { AdminDashboardData } from '../types/dashboard/dashboard.type.ts';
+import { getCorrespDashboard } from '../../services/dashboard/dashboard.service.ts';
 
 interface FetchState<T> {
   data: T | null;
@@ -9,8 +9,8 @@ interface FetchState<T> {
   refetch: () => void;
 }
 
-export const useAdminDashboard = (): FetchState<AdminDashboardData> => {
-  const [data, setData] = useState<AdminDashboardData | null>(null);
+export const useCorrespDashboard = (): FetchState<CorrespDashboardData> => {
+  const [data, setData] = useState<CorrespDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -20,7 +20,7 @@ export const useAdminDashboard = (): FetchState<AdminDashboardData> => {
     setLoading(true);
     setError(null);
 
-    getAdminDashboard()
+    getCorrespDashboard()
       .then((res) => {
         if (!cancelled) setData(res);
       })

@@ -16,7 +16,7 @@ import RouterForm from '../../components/documents/my-documents/RouterForm.tsx';
 import { MyDocumentFilter } from '../../components/documents/my-documents/MyDocumentFilter.tsx';
 import MyDocumentTable from '../../components/documents/my-documents/MyDocumentTable.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
-import { useMyDocumentFilters } from '../../hooks/Filters/useMyDocumentFilters.ts';
+import { useMyDocumentFilters } from '../../hooks/filters/useMyDocumentFilters.ts';
 
 export default function MyDocumentPage() {
   const { can } = usePermissions();
@@ -30,7 +30,7 @@ export default function MyDocumentPage() {
   const [selected, setSelected] = useState<Document | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
 
-  // ──────────────────────────── Filters ─────────────────────────────────
+  // ──────────────────────────── filters ─────────────────────────────────
   const { filters, setFilters, sort, setSort, resetFilters, filteredDocuments } = useMyDocumentFilters(documents);
   // ──────────────────────────── Load data ─────────────────────────────────
   const fetchDocuments = useCallback(async () => {

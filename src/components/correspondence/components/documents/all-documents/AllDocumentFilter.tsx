@@ -5,28 +5,17 @@ import InputField from '../../../../form/input/InputField.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { BrushCleaningIcon } from '../../../../../icons';
+import { AllDocumentFilters, AllDocumentSortConfig } from '../../../hooks/filters/useAllDocumentFilters.ts';
 
-export interface AllDocumentFilters {
-  nro: string;
-  origin: string;
-  subject: string;
-  priority: string;
-  sender: string;
-}
-
-export interface AllDocumentSortConfig {
-  field: string;
-  dir: 'asc' | 'desc';
-}
-
-interface AllDocumentFilterProps {
+interface Props {
   filters: AllDocumentFilters;
   sort: AllDocumentSortConfig;
   onFiltersChange: (filters: AllDocumentFilters) => void;
   onSortChange: (sort: AllDocumentSortConfig) => void;
+  onReset: () => void;
 }
 
-export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange }: AllDocumentFilterProps) => {
+export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange, onReset }: Props) => {
   const handleInputChange =
     (field: keyof AllDocumentFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onFiltersChange({ ...filters, [field]: e.target.value });
@@ -41,16 +30,22 @@ export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange
     onSortChange({ field, dir: dir as 'asc' | 'desc' });
   };
 
-  const clearFilters = () => {
-    onFiltersChange({ nro: '', origin: '', subject: '', priority: '', sender: '' });
-    onSortChange({ field: 'id', dir: 'desc' });
-  };
-
   const PRIORITY_OPTIONS: Option[] = [
     { value: '', label: 'Todas' },
-    { value: 'NORMAL', label: 'Normal' },
-    { value: 'URGENTE', label: 'Urgente' },
-    { value: 'ALTA', label: 'Alta' },
+    { value: '2', label: 'Normal' },
+    { value: '1', label: 'Urgente' },
+  ];
+
+  const STATUS_OPTIONS: Option[] = [
+    { value: '', label: 'Todas' },
+    { value: '1', label: 'Creado' },
+    { value: '2', label: 'En proceso...' },
+    { value: '3', label: 'Enviado' },
+    { value: '4', label: 'Derivado' },
+    { value: '5', label: 'Recibido' },
+    { value: '6', label: 'Arcivado' },
+    { value: '7', label: 'Archivado' },
+    { value: '8', label: 'Eliminado' },
   ];
 
   const SORT_OPTIONS: Option[] = [
@@ -74,12 +69,12 @@ export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange
       {/* Procedencia */}
       <div className="flex min-w-[160px] flex-1 flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Procedencia
+          Cite
         </Label>
         <InputField
           size="xs"
-          value={filters.origin}
-          onChange={handleInputChange('origin')}
+          value={filters.nroCite}
+          onChange={handleInputChange('nroCite')}
           placeholder="Buscar procedencia…"
         />
       </div>
@@ -124,6 +119,20 @@ export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange
         />
       </div>
 
+      {/* Prioridad */}
+      <div className="flex min-w-[110px] flex-col gap-1">
+        <Label size="xs" className="tracking-wide uppercase">
+          Estado
+        </Label>
+        <Select
+          size="xs"
+          options={STATUS_OPTIONS}
+          defaultValue={filters.status}
+          onChange={handleSelectChange('status')}
+          placeholder="Todas"
+        />
+      </div>
+
       {/* Ordenar */}
       <div className="flex min-w-[150px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
@@ -140,7 +149,7 @@ export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange
 
       {/* Limpiar */}
       <Tooltip content="Limpiar">
-        <Button size="xs" variant="outline" onClick={clearFilters} className="h-[38px]">
+        <Button size="xs" variant="outline" onClick={onReset} className="h-[38px]">
           <BrushCleaningIcon width="20" height="20" />
         </Button>
       </Tooltip>

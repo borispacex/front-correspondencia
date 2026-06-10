@@ -5,7 +5,7 @@ import InputField from '../../../../form/input/InputField.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { BrushCleaningIcon } from '../../../../../icons';
-import { MyDocumentFilters, MyDocumentSortConfig } from '../../../hooks/Filters/useMyDocumentFilters.ts';
+import { MyDocumentFilters, MyDocumentSortConfig } from '../../../hooks/filters/useMyDocumentFilters.ts';
 
 interface Props {
   filters: MyDocumentFilters;

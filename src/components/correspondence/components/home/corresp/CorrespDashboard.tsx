@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { CorrespDashboardData } from '../../../types/dashboard/dashboard.type.ts';
-import { useCorrespDashboard } from '../../../hooks/useCorrespDashboard.ts';
+import { useCorrespDashboard } from '../../../hooks/dashboard/useCorrespDashboard.ts';
 
 // ─── Colores fijos para estados y prioridades (por índice) ───────────────────
 const STATE_COLORS = ['#10b981', '#f59e0b', '#0ea5e9', '#8b5cf6', '#6b7280', '#ef4444'];

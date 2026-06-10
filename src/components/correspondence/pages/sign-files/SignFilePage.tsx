@@ -114,7 +114,7 @@ export default function SignFilePage() {
   }, []);
 
   // ─────────────────────────────────────────────
-  // Filters + Sort
+  // filters + Sort
   // ─────────────────────────────────────────────
 
   const filteredDocuments = useMemo(() => {
@@ -227,7 +227,7 @@ export default function SignFilePage() {
       <PageBreadCrumb pageTitle="Firma Digital" />
 
       <div className="space-y-5">
-        {/* Filters */}
+        {/* filters */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <SignFileFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
           {can('files.create') && (

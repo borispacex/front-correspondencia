@@ -14,13 +14,13 @@ import { useFormValidation } from '../../../../hooks/useFormValidation.ts';
 
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
 
-import { getDepartments } from '../../services/department.service.ts';
-import { getProcedures } from '../../services/procedure.service.ts';
-import { getStateDocuments } from '../../services/state-document.service.ts';
-import { getProvides } from '../../services/provided.service.ts';
+import { getDepartments } from '../../services/items/department.service.ts';
+import { getProcedures } from '../../services/items/procedure.service.ts';
+import { getStateDocuments } from '../../services/items/state-document.service.ts';
+import { getProvides } from '../../services/items/provided.service.ts';
 import { getUsersByDepartment } from '../../../../services/admin/users.service.ts';
-import { getTypeDocuments } from '../../services/type-document.service.ts';
-import { getPriorities } from '../../services/priority.service.ts';
+import { getTypeDocuments } from '../../services/items/type-document.service.ts';
+import { getPriorities } from '../../services/items/priority.service.ts';
 import DropZonePdf from '../../../form/form-elements/DropZonePdf.tsx';
 import CheckboxSkeleton from '../../../animation/CheckboxSkeleton.tsx';
 import Checkbox from '../../../form/input/Checkbox.tsx';

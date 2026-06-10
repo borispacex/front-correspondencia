@@ -54,24 +54,31 @@ export const API_ENDPOINTS = {
   CORRESPONDENCE: {
     PROCEDURE: {
       BASE: '/correspondencia/procedures',
+      BY_ID: (id: number) => `/correspondencia/procedures/${id}`,
     },
     PRIORITY: {
       BASE: '/correspondencia/priorities',
+      BY_ID: (id: number) => `/correspondencia/priorities/${id}`,
     },
     TYPE_DOCUMENT: {
       BASE: '/correspondencia/type-documents',
+      BY_ID: (id: number) => `/correspondencia/type-documents/${id}`,
     },
     STATE_DOCUMENT: {
       BASE: '/correspondencia/state-documents',
+      BY_ID: (id: number) => `/correspondencia/state-documents/${id}`,
     },
     DEPARTMENT: {
       BASE: '/correspondencia/departments',
+      BY_ID: (id: number) => `/correspondencia/departments/${id}`,
     },
     PROVIDED: {
       BASE: '/correspondencia/provides',
+      BY_ID: (id: number) => `/correspondencia/provides/${id}`,
     },
     UNIT: {
       BASE: '/correspondencia/units',
+      BY_ID: (id: number) => `/correspondencia/units/${id}`,
     },
     DOCUMENT: {
       BASE: '/correspondencia/documents',

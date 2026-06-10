@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { AdminDashboardData } from '../../../types/dashboard/dashboard.type.ts';
-import { useAdminDashboard } from '../../../hooks/useAdminDashboard.ts';
+import { useAdminDashboard } from '../../../hooks/dashboard/useAdminDashboard.ts';
 
 // ─── Colores fijos para roles (se asignan por índice) ───────────────────────
 const ROLE_COLORS = ['#465fff', '#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#6b7280'];
