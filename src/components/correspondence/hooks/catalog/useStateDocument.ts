@@ -1,14 +1,21 @@
-import { useCallback, useState } from 'react';
-import { getStateDocumentById, getStateDocuments } from '../../services/catalog/state-document.service.ts';
-import { StateDocument } from '../../types/catalog/state-document.type.ts';
-import { ApiQueryParams } from '../../../../types/common/api.types.ts';
+import { useCallback } from 'react';
+import { useCatalog } from '../../context/CatalogContext.tsx';
+
+const DEFAULT_BADGE = 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200';
+
+const STATE_COLORS: Record<number, string> = {
+  1: DEFAULT_BADGE,
+  2: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200',
+  3: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200',
+  4: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200',
+  5: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200',
+  6: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200',
+  7: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200',
+  8: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200',
+};
 
 export function useStateDocument() {
-  const [stateDocuments, setStateDocuments] = useState<StateDocument[]>([]);
-  const [stateDocument, setStateDocument] = useState<StateDocument | null>(null);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { stateDocuments } = useCatalog();
 
   // Buscar estado por id dentro de la colección cargada
   const findById = useCallback(
@@ -26,59 +33,17 @@ export function useStateDocument() {
     [findById],
   );
 
-  // Obtener lista
-  const getAll = useCallback(async (params?: ApiQueryParams) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await getStateDocuments(params);
-      setStateDocuments(response);
-
-      return response;
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Error al obtener los estados del documento';
-
-      setError(message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Obtener por id desde API
-  const getById = useCallback(async (id: number) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await getStateDocumentById(id);
-      setStateDocument(response);
-
-      return response;
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Error al obtener el estado documento';
-
-      setError(message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+  const getBadgeClassById = useCallback((id?: number | string) => {
+    if (!id) return DEFAULT_BADGE;
+    return STATE_COLORS[Number(id)] ?? DEFAULT_BADGE;
   }, []);
 
   return {
     stateDocuments,
-    stateDocument,
-
-    isLoading,
-    error,
-
-    getAll,
-    getById,
 
     findById,
     getNameById,
 
-    refetch: getAll,
+    getBadgeClassById,
   };
 }

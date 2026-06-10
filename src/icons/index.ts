@@ -121,6 +121,7 @@ import { ReactComponent as ForwardIcon } from './forward.svg?react';
 import { ReactComponent as MailboxIcon } from './mailbox.svg?react';
 import { ReactComponent as MailIcon } from './mail.svg?react';
 import { ReactComponent as MessageCircleIcon } from './message-circle.svg?react';
+import { ReactComponent as LoaderIcon } from './loader.svg?react';
 
 export {
   ErrorHexaIcon,
@@ -246,4 +247,5 @@ export {
   MailboxIcon,
   MailLineIcon,
   MessageCircleIcon,
+  LoaderIcon,
 };

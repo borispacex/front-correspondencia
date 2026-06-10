@@ -18,6 +18,8 @@ import TableSkeleton from '../../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
+import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
+import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
 
 interface Props {
   documents: Document[];
@@ -90,24 +92,6 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
     return pages;
   }
 
-  // ── Priority config ────────────────────────────────────────────────────────────
-  const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
-    NORMAL: { label: 'NORMAL', cls: 'bg-blue-100  text-blue-700  dark:bg-blue-900/40  dark:text-blue-300' },
-    URGENTE: { label: 'URGENTE', cls: 'bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300' },
-  };
-
-  function PriorityBadge({ priority }: { priority?: string }) {
-    const cfg = PRIORITY_CONFIG[priority ?? 'NORMAL'] ?? PRIORITY_CONFIG.NORMAL;
-    return (
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${cfg.cls}`}
-      >
-        <BadgeIcon />
-        {cfg.label}
-      </span>
-    );
-  }
-
   // ── Copy ───────────────────────────────────────────────────────────────────
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
@@ -145,6 +129,9 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Derivado por
+              </th>
+              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                Estado
               </th>
               <th className="w-40 px-5 py-4 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Acciones
@@ -195,10 +182,10 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                         {document.priority_id && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PRIORIDAD:</span>{' '}
-                            <PriorityBadge priority={document.priority_id === 1 ? 'URGENTE' : 'NORMAL'} />
+                            <PriorityBadge priorityId={document.priority_id} />
                           </p>
                         )}
-                        {document.doc_cite && (
+                        {document.doc_numero_cite && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
                             {document.doc_numero_cite}
@@ -257,6 +244,10 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                         </div>
                       )}
                     </div>
+                  </td>
+
+                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                    <StateDocumentBadge stateDocumentId={document.state_document_id} />
                   </td>
 
                   <td className="px-5 py-5 align-top">

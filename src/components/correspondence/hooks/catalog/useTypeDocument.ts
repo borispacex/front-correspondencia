@@ -1,14 +1,8 @@
-import { useCallback, useState } from 'react';
-import { getTypeDocumentById, getTypeDocuments } from '../../services/catalog/type-document.service.ts';
-import { TypeDocument } from '../../types/catalog/type-document.type.ts';
-import { ApiQueryParams } from '../../../../types/common/api.types.ts';
+import { useCallback } from 'react';
+import { useCatalog } from '../../context/CatalogContext.tsx';
 
 export function useTypeDocument() {
-  const [typeDocuments, setTypeDocuments] = useState<TypeDocument[]>([]);
-  const [typeDocument, setTypeDocument] = useState<TypeDocument | null>(null);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { typeDocuments } = useCatalog();
 
   // Buscar estado por id dentro de la colección cargada
   const findById = useCallback(
@@ -26,59 +20,10 @@ export function useTypeDocument() {
     [findById],
   );
 
-  // Obtener lista
-  const getAll = useCallback(async (params?: ApiQueryParams) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await getTypeDocuments(params);
-      setTypeDocuments(response);
-
-      return response;
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Error al obtener las rutas';
-
-      setError(message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Obtener por id
-  const getById = useCallback(async (id: number) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await getTypeDocumentById(id);
-      setTypeDocument(response);
-
-      return response;
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Error al obtener la ruta';
-
-      setError(message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   return {
     typeDocuments,
-    typeDocument,
-
-    isLoading,
-    error,
-
-    getAll,
-    getById,
 
     findById,
     getNameById,
-
-    refetch: getAll,
   };
 }
