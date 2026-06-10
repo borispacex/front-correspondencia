@@ -238,7 +238,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           aria-required={required}
           tabIndex={disabled || loading ? -1 : 0}
           className={[
-            'relative flex w-full cursor-pointer items-start rounded-lg border transition-all duration-150 outline-none',
+            'catalog-start relative flex w-full cursor-pointer rounded-lg border transition-all duration-150 outline-none',
             sizeMap[size],
             error
               ? 'border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-200 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-900/40'
@@ -260,7 +260,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                   <span
                     key={val}
                     className={[
-                      'group inline-flex items-center gap-1 rounded-full border border-transparent',
+                      'group catalog-center inline-flex gap-1 rounded-full border border-transparent',
                       'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
                       'hover:border-blue-200 dark:hover:border-blue-700',
                       'transition-colors duration-100',
@@ -401,7 +401,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               >
                 <span
                   className={[
-                    'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
+                    'catalog-center flex h-4 w-4 shrink-0 justify-center rounded border transition-colors',
                     allSelectableSelected
                       ? 'border-blue-500 bg-blue-500 text-white dark:border-blue-600 dark:bg-blue-600'
                       : 'border-gray-300 dark:border-gray-600',
@@ -446,7 +446,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                       onClick={() => handleSelect(option.value)}
                       onMouseEnter={() => setFocusedIndex(index)}
                       className={[
-                        'flex items-center gap-2.5 px-3 py-2 transition-colors',
+                        'catalog-center flex gap-2.5 px-3 py-2 transition-colors',
                         option.disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer',
                         isFocused && !option.disabled ? 'bg-blue-50 dark:bg-blue-900/20' : '',
                         isSelected && !isFocused ? 'bg-blue-50/60 dark:bg-blue-900/10' : '',
@@ -458,7 +458,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                       {/* Checkbox */}
                       <span
                         className={[
-                          'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors duration-100',
+                          'catalog-center flex h-4 w-4 shrink-0 justify-center rounded border transition-colors duration-100',
                           isSelected
                             ? 'border-blue-500 bg-blue-500 text-white dark:border-blue-600 dark:bg-blue-600'
                             : 'border-gray-300 dark:border-gray-600',

@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
-import { getProvidedById, getProvides } from '../../services/items/provided.service.ts';
-import { Provided } from '../../types/items/provided.type.ts';
+import { getTypeDocumentById, getTypeDocuments } from '../../services/catalog/type-document.service.ts';
+import { TypeDocument } from '../../types/catalog/type-document.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
-export function useProvided() {
-  const [provides, setProvides] = useState<Provided[]>([]);
-  const [provided, setProvided] = useState<Provided | null>(null);
+export function useTypeDocument() {
+  const [typeDocuments, setTypeDocuments] = useState<TypeDocument[]>([]);
+  const [typeDocument, setTypeDocument] = useState<TypeDocument | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,15 +13,15 @@ export function useProvided() {
   // Buscar estado por id dentro de la colección cargada
   const findById = useCallback(
     (id?: number | string) => {
-      return provides.find((item) => String(item.id) === String(id));
+      return typeDocuments.find((item) => String(item.id) === String(id));
     },
-    [provides],
+    [typeDocuments],
   );
 
   // Obtener nombre por id
   const getNameById = useCallback(
     (id?: number | string) => {
-      return findById(id)?.prov_name ?? '';
+      return findById(id)?.typ_name ?? '';
     },
     [findById],
   );
@@ -32,8 +32,8 @@ export function useProvided() {
     setError(null);
 
     try {
-      const response = await getProvides(params);
-      setProvides(response);
+      const response = await getTypeDocuments(params);
+      setTypeDocuments(response);
 
       return response;
     } catch (err: any) {
@@ -52,8 +52,8 @@ export function useProvided() {
     setError(null);
 
     try {
-      const response = await getProvidedById(id);
-      setProvided(response);
+      const response = await getTypeDocumentById(id);
+      setTypeDocument(response);
 
       return response;
     } catch (err: any) {
@@ -67,8 +67,8 @@ export function useProvided() {
   }, []);
 
   return {
-    provides,
-    provided,
+    typeDocuments,
+    typeDocument,
 
     isLoading,
     error,

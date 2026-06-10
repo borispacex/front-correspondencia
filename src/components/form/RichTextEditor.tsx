@@ -35,7 +35,7 @@ const Btn = ({
     onClick={onClick}
     className={[
       // mobile: 32px touch target / desktop: 22px compact
-      'inline-flex shrink-0 items-center justify-center rounded transition-colors',
+      'catalog-center inline-flex shrink-0 justify-center rounded transition-colors',
       'h-8 md:h-[22px]',
       wide ? 'gap-1 px-2' : 'w-8 md:w-[22px]',
       active

@@ -4,10 +4,10 @@ import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../../..
 import { useNotifications } from '../../../../../hooks/useNotification.tsx';
 import Select, { Option } from '../../../../form/Select.tsx';
 import { useFormValidation } from '../../../../../hooks/useFormValidation.ts';
-import { getDepartments } from '../../../services/items/department.service.ts';
-import { getTypeDocuments } from '../../../services/items/type-document.service.ts';
-import { getPriorities } from '../../../services/items/priority.service.ts';
-import { getProcedures } from '../../../services/items/procedure.service.ts';
+import { getDepartments } from '../../../services/catalog/department.service.ts';
+import { getTypeDocuments } from '../../../services/catalog/type-document.service.ts';
+import { getPriorities } from '../../../services/catalog/priority.service.ts';
+import { getProcedures } from '../../../services/catalog/procedure.service.ts';
 import Label from '../../../../form/Label.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import { InfoIcon } from '../../../../../icons';

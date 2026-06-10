@@ -36,7 +36,7 @@ export async function deleteMenuItem(id: number): Promise<void> {
   await http.delete(API_ENDPOINTS.MENU_ITEMS.BY_ID(id));
 }
 
-/** Admin view: all menu items regardless of the current user's roles */
+/** Admin view: all menu catalog regardless of the current user's roles */
 export async function getMenuItemsAll(): Promise<MenuItem[]> {
   const { data } = await http.get<ApiResponse<MenuItem[]>>(API_ENDPOINTS.MENU_ITEMS.BASE, {
     params: { all: true },

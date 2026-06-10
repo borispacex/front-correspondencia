@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
-import { getUnitById, getUnits } from '../../services/items/unit.service.ts';
-import { Unit } from '../../types/unit.type.ts';
+import { getDepartmentById, getDepartments } from '../../services/catalog/department.service.ts';
+import { Department } from '../../types/catalog/department.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
-export function useUnit() {
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [unit, setUnit] = useState<Unit | null>(null);
+export function useDepartment() {
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [department, setDepartment] = useState<Department | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,15 +13,15 @@ export function useUnit() {
   // Buscar estado por id dentro de la colección cargada
   const findById = useCallback(
     (id?: number | string) => {
-      return units.find((item) => String(item.id) === String(id));
+      return departments.find((item) => String(item.id) === String(id));
     },
-    [units],
+    [departments],
   );
 
   // Obtener nombre por id
   const getNameById = useCallback(
     (id?: number | string) => {
-      return findById(id)?.uni_name ?? '';
+      return findById(id)?.dep_name ?? '';
     },
     [findById],
   );
@@ -32,8 +32,8 @@ export function useUnit() {
     setError(null);
 
     try {
-      const response = await getUnits(params);
-      setUnits(response);
+      const response = await getDepartments(params);
+      setDepartments(response);
 
       return response;
     } catch (err: any) {
@@ -52,8 +52,8 @@ export function useUnit() {
     setError(null);
 
     try {
-      const response = await getUnitById(id);
-      setUnit(response);
+      const response = await getDepartmentById(id);
+      setDepartment(response);
 
       return response;
     } catch (err: any) {
@@ -67,8 +67,8 @@ export function useUnit() {
   }, []);
 
   return {
-    units,
-    unit,
+    departments,
+    department,
 
     isLoading,
     error,

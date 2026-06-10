@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
-import { getStateDocumentById, getStateDocuments } from '../../services/items/state-document.service.ts';
-import { StateDocument } from '../../types/items/state-document.type.ts';
+import { getUnitById, getUnits } from '../../services/catalog/unit.service.ts';
+import { Unit } from '../../types/unit.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
-export function useStateDocument() {
-  const [stateDocuments, setStateDocuments] = useState<StateDocument[]>([]);
-  const [stateDocument, setStateDocument] = useState<StateDocument | null>(null);
+export function useUnit() {
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [unit, setUnit] = useState<Unit | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,15 +13,15 @@ export function useStateDocument() {
   // Buscar estado por id dentro de la colección cargada
   const findById = useCallback(
     (id?: number | string) => {
-      return stateDocuments.find((item) => String(item.id) === String(id));
+      return units.find((item) => String(item.id) === String(id));
     },
-    [stateDocuments],
+    [units],
   );
 
   // Obtener nombre por id
   const getNameById = useCallback(
     (id?: number | string) => {
-      return findById(id)?.sdoc_name ?? '';
+      return findById(id)?.uni_name ?? '';
     },
     [findById],
   );
@@ -32,12 +32,12 @@ export function useStateDocument() {
     setError(null);
 
     try {
-      const response = await getStateDocuments(params);
-      setStateDocuments(response);
+      const response = await getUnits(params);
+      setUnits(response);
 
       return response;
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Error al obtener los estados del documento';
+      const message = err?.response?.data?.message ?? 'Error al obtener las rutas';
 
       setError(message);
       throw err;
@@ -46,18 +46,18 @@ export function useStateDocument() {
     }
   }, []);
 
-  // Obtener por id desde API
+  // Obtener por id
   const getById = useCallback(async (id: number) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await getStateDocumentById(id);
-      setStateDocument(response);
+      const response = await getUnitById(id);
+      setUnit(response);
 
       return response;
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Error al obtener el estado documento';
+      const message = err?.response?.data?.message ?? 'Error al obtener la ruta';
 
       setError(message);
       throw err;
@@ -67,8 +67,8 @@ export function useStateDocument() {
   }, []);
 
   return {
-    stateDocuments,
-    stateDocument,
+    units,
+    unit,
 
     isLoading,
     error,

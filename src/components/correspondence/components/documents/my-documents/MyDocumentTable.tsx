@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import {
   AngleDownIcon,
   AngleUpIcon,
-  BadgeIcon,
   CalenderIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -22,6 +21,7 @@ import TableSkeleton from '../../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
+import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
 
 interface Props {
   documents: Document[];
@@ -106,24 +106,6 @@ export default function MyDocumentTable({
     return pages;
   }
 
-  // ── Priority config ────────────────────────────────────────────────────────────
-  const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
-    NORMAL: { label: 'NORMAL', cls: 'bg-blue-100  text-blue-700  dark:bg-blue-900/40  dark:text-blue-300' },
-    URGENTE: { label: 'URGENTE', cls: 'bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300' },
-  };
-
-  function PriorityBadge({ priority }: { priority?: string }) {
-    const cfg = PRIORITY_CONFIG[priority ?? 'NORMAL'] ?? PRIORITY_CONFIG.NORMAL;
-    return (
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${cfg.cls}`}
-      >
-        <BadgeIcon />
-        {cfg.label}
-      </span>
-    );
-  }
-
   // ── Copy ───────────────────────────────────────────────────────────────────
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
@@ -137,7 +119,7 @@ export default function MyDocumentTable({
     }
   }
 
-  const btnBase = 'inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition-colors';
+  const btnBase = 'inline-flex h-8 w-8 catalog-center justify-center rounded-lg border text-sm transition-colors';
   const btnNormal = `${btnBase} border-gray-200 text-gray-500 hover:border-brand-400 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400 disabled:opacity-40`;
   const btnActive = `${btnBase} border-brand-500 bg-brand-500 text-white`;
 
@@ -211,7 +193,7 @@ export default function MyDocumentTable({
                         {document.priority_id && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PRIORIDAD:</span>{' '}
-                            <PriorityBadge priority={document.priority_id === 1 ? 'URGENTE' : 'NORMAL'} />
+                            <PriorityBadge priorityId={document.priority_id} />
                           </p>
                         )}
                         {document.doc_numero_cite && (

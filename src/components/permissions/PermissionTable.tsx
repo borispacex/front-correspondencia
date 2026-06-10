@@ -104,7 +104,7 @@ export default function PermissionTable({ permissions, isLoading, onEdit, onDele
     return sortDir === 'asc' ? <AngleUpIcon className="size-3" /> : <AngleDownIcon className="size-3" />;
   }
 
-  const btnBase = 'inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition-colors';
+  const btnBase = 'inline-flex h-8 w-8 catalog-center justify-center rounded-lg border text-sm transition-colors';
   const btnNormal = `${btnBase} border-gray-200 text-gray-500 hover:border-brand-400 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400 disabled:opacity-40`;
   const btnActive = `${btnBase} border-brand-500 bg-brand-500 text-white`;
 
