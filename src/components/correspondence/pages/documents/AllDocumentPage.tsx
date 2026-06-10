@@ -15,14 +15,14 @@ import {
 } from '../../components/documents/all-documents/AllDocumentFilter.tsx';
 
 import AllDocumentTable from '../../components/documents/all-documents/AllDocumentTable.tsx';
+import { useDocument } from '../../hooks/useDocument.ts';
 
 export default function AllDocumentPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
 
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { documents, isLoading, getAll } = useDocument();
 
   // ─────────────────────────────────────────────────────────────
   // Filters, sort y status tab
@@ -81,18 +81,12 @@ export default function AllDocumentPage() {
   // Load data
   // ─────────────────────────────────────────────────────────────
   const fetchDocuments = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await getDocuments();
-      setDocuments(data);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    await getAll();
+  }, [getAll]);
 
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+    getAll();
+  }, [getAll]);
 
   // ─────────────────────────────────────────────────────────────
   // Handlers

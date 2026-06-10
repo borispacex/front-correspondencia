@@ -2,7 +2,6 @@ import { ARCHIVED_STATE_IDS } from '../../components/router/RouterStatusTabs.tsx
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
 import { useRouterPage } from '../../hooks/useRouterPage.ts';
-import { SignFile } from '../../types/sign-file.type.ts';
 import { Document } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';

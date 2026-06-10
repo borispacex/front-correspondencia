@@ -57,10 +57,10 @@ export default function MyDocumentShowPage() {
 
   return (
     <>
-      <PageMeta title={`Detalle mis trámites | ${APP_NAME}`} description="Información detallada de mi tramite" />
+      <PageMeta title={`Trámite #${id} | ${APP_NAME}`} description="Información detallada de mi tramite" />
 
       <PageBreadCrumb
-        pageTitle="Mis trámites"
+        pageTitle={`Trámite #${id}`}
         items={[
           {
             label: 'Mis trámites',

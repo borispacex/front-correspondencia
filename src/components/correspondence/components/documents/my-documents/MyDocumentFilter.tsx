@@ -5,28 +5,17 @@ import InputField from '../../../../form/input/InputField.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { BrushCleaningIcon } from '../../../../../icons';
+import { MyDocumentFilters, MyDocumentSortConfig } from '../../../hooks/Filters/useMyDocumentFilters.ts';
 
-export interface MyDocumentFilters {
-  nro: string;
-  origin: string;
-  subject: string;
-  priority: string;
-  sender: string;
-}
-
-export interface MyDocumentSortConfig {
-  field: string;
-  dir: 'asc' | 'desc';
-}
-
-interface MyDocumentFilterProps {
+interface Props {
   filters: MyDocumentFilters;
   sort: MyDocumentSortConfig;
   onFiltersChange: (filters: MyDocumentFilters) => void;
   onSortChange: (sort: MyDocumentSortConfig) => void;
+  onReset: () => void;
 }
 
-export const MyDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange }: MyDocumentFilterProps) => {
+export const MyDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange, onReset }: Props) => {
   const handleInputChange =
     (field: keyof MyDocumentFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onFiltersChange({ ...filters, [field]: e.target.value });
@@ -41,16 +30,10 @@ export const MyDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange 
     onSortChange({ field, dir: dir as 'asc' | 'desc' });
   };
 
-  const clearFilters = () => {
-    onFiltersChange({ nro: '', origin: '', subject: '', priority: '', sender: '' });
-    onSortChange({ field: 'id', dir: 'desc' });
-  };
-
   const PRIORITY_OPTIONS: Option[] = [
     { value: '', label: 'Todas' },
-    { value: 'NORMAL', label: 'Normal' },
-    { value: 'URGENTE', label: 'Urgente' },
-    { value: 'ALTA', label: 'Alta' },
+    { value: '2', label: 'Normal' },
+    { value: '1', label: 'Urgente' },
   ];
 
   const SORT_OPTIONS: Option[] = [
@@ -74,12 +57,12 @@ export const MyDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange 
       {/* Procedencia */}
       <div className="flex min-w-[160px] flex-1 flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Procedencia
+          Cite
         </Label>
         <InputField
           size="xs"
-          value={filters.origin}
-          onChange={handleInputChange('origin')}
+          value={filters.nroCite}
+          onChange={handleInputChange('nroCite')}
           placeholder="Buscar procedencia…"
         />
       </div>
@@ -140,7 +123,7 @@ export const MyDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange 
 
       {/* Limpiar */}
       <Tooltip content="Limpiar">
-        <Button size="xs" variant="outline" onClick={clearFilters} className="h-[38px]">
+        <Button size="xs" variant="outline" onClick={onReset} className="h-[38px]">
           <BrushCleaningIcon width="20" height="20" />
         </Button>
       </Tooltip>

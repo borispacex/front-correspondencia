@@ -27,7 +27,6 @@ import type { MenuItem } from '../types/admin/menu-items/menu-item.types';
 import { useMenu } from '../hooks/useMenu';
 import { useAuth } from '../hooks/auth/useAuth';
 import { ROUTES } from '../constants/routes.constants.ts';
-import { useDocumentCounts } from '../components/correspondence/context/DocumentCountContext.tsx';
 
 type NavItem = {
   name: string;
@@ -39,8 +38,6 @@ type NavItem = {
     pro?: boolean;
     new?: boolean;
     permission?: string;
-    /** Clave del conteo a mostrar como badge numérico */
-    countKey?: 'all' | 'pending' | 'attended' | 'archived';
   }[];
   permission?: string;
 };
@@ -120,36 +117,36 @@ const principalItems: NavItem[] = [
 
 // ── Sección Correspondencia (con countKey en sub-ítems) ──────
 const CORRESPONDENCIA_ITEMS: NavItem[] = [
-  {
-    icon: <FolderIcon />,
-    name: 'Trámites',
-    subItems: [
-      {
-        name: 'Trámites',
-        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL,
-        countKey: 'all',
-        permission: 'correspondencia_tramite.all',
-      },
-      {
-        name: 'Bandeja de Entrada',
-        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING,
-        countKey: 'pending',
-        permission: 'correspondencia_tramite.pending',
-      },
-      {
-        name: 'Bandeja de Salida',
-        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
-        countKey: 'attended',
-        permission: 'correspondencia_tramite.attended',
-      },
-      {
-        name: 'Archivados',
-        path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED,
-        countKey: 'archived',
-        permission: 'correspondencia_tramite.archived',
-      },
-    ],
-  },
+  // {
+  //   icon: <FolderIcon />,
+  //   name: 'Trámites',
+  //   subItems: [
+  //     {
+  //       name: 'Trámites',
+  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL,
+  //       countKey: 'all',
+  //       permission: 'correspondencia_tramite.all',
+  //     },
+  //     {
+  //       name: 'Bandeja de Entrada',
+  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING,
+  //       countKey: 'pending',
+  //       permission: 'correspondencia_tramite.pending',
+  //     },
+  //     {
+  //       name: 'Bandeja de Salida',
+  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
+  //       countKey: 'attended',
+  //       permission: 'correspondencia_tramite.attended',
+  //     },
+  //     {
+  //       name: 'Archivados',
+  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED,
+  //       countKey: 'archived',
+  //       permission: 'correspondencia_tramite.archived',
+  //     },
+  //   ],
+  // },
   {
     icon: <FolderIcon />,
     name: 'Trámites',
@@ -228,26 +225,11 @@ const ALL_ADMIN_ITEMS: NavItem[] = [
 
 type MenuType = 'dynamic' | 'principal' | 'admin' | 'correspondencia';
 
-// ── Prefijo numérico  (31) antes del label ───────────────────
-function CountPrefix({ count, active }: { count: number; active: boolean }) {
-  return (
-    <span
-      className={`mr-1.5 inline-flex h-5 min-w-[22px] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 ${
-        active ? 'text-brand-500 dark:text-brand-400' : 'text-gray-400 dark:text-gray-500'
-      }`}
-    >
-      {count > 9999 ? '9999+' : count}
-    </span>
-  );
-}
-
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
   const { menuItems } = useMenu();
   const { user } = useAuth();
-
-  const counts = useDocumentCounts();
 
   const adminItems: NavItem[] = ALL_ADMIN_ITEMS.map((item) => {
     if (item.subItems) {
@@ -383,7 +365,6 @@ const AppSidebar: React.FC = () => {
               <ul className="mt-2 ml-9 space-y-1">
                 {nav.subItems.map((subItem) => {
                   const active = isActive(subItem.path);
-                  const count = subItem.countKey ? counts[subItem.countKey] : 0;
                   return (
                     <li key={subItem.name}>
                       <Link
@@ -392,7 +373,6 @@ const AppSidebar: React.FC = () => {
                           active ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'
                         }`}
                       >
-                        {subItem.countKey && <CountPrefix count={count} active={active} />}
                         {subItem.name}
                         <span className="ml-auto flex items-center gap-1">
                           {/* trailing badges (new / pro) */}

@@ -79,6 +79,7 @@ export const API_ENDPOINTS = {
     },
     ROUTER: {
       BASE: '/correspondencia/routers',
+      BY_ID: (id: number) => `/correspondencia/routers/${id}`,
     },
   },
 } as const;

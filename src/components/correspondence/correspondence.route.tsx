@@ -29,20 +29,20 @@ export const correspondenceRoutes: RouteObject[] = [
     element: <CorrespondenceLayout />,
     children: [
       // ── Trámites (todos) ─────────────────────────────────────
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL, element: <RouterPage /> },
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.SHOW, element: <RouterShowPage /> },
-
-      // ── Bandeja de Entrada (pendientes) ──────────────────────
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING, element: <RouterPendingPage /> },
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING_SHOW, element: <RouterPendingShowPage /> },
-
-      // ── Bandeja de Salida (atendidos) ────────────────────────
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED, element: <RouterAttendedPage /> },
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED_SHOW, element: <RouterAttendedShowPage /> },
-
-      // ── Archivados ───────────────────────────────────────────
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED, element: <RouterArchivedPage /> },
-      { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED_SHOW, element: <RouterArchivedShowPage /> },
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL, element: <RouterPage /> },
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.SHOW, element: <RouterShowPage /> },
+      //
+      // // ── Bandeja de Entrada (pendientes) ──────────────────────
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING, element: <RouterPendingPage /> },
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING_SHOW, element: <RouterPendingShowPage /> },
+      //
+      // // ── Bandeja de Salida (atendidos) ────────────────────────
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED, element: <RouterAttendedPage /> },
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED_SHOW, element: <RouterAttendedShowPage /> },
+      //
+      // // ── Archivados ───────────────────────────────────────────
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED, element: <RouterArchivedPage /> },
+      // { path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED_SHOW, element: <RouterArchivedShowPage /> },
 
       // ── Trámites ─────────────────────────────────────
       { path: ROUTES.DOCUMENTS.MY_DOCUMENTS.ALL, element: <MyDocumentPage /> },

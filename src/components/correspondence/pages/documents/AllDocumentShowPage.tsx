@@ -51,13 +51,13 @@ export default function AllDocumentShowPage() {
 
   return (
     <>
-      <PageMeta title={`Detalle los trámites | ${APP_NAME}`} description="Información detallada de los tramites" />
+      <PageMeta title={`Tramite #${id} | ${APP_NAME}`} description="Información detallada de los tramites" />
 
       <PageBreadCrumb
-        pageTitle="Todos los Trámites"
+        pageTitle={`Tramite #${id}`}
         items={[
           {
-            label: 'Todos los Trámites',
+            label: 'Buscar trámite',
             path: ROUTES.DOCUMENTS.ALL_DOCUMENTS.ALL,
           },
           {

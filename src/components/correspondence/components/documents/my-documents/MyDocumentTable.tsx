@@ -214,7 +214,7 @@ export default function MyDocumentTable({
                             <PriorityBadge priority={document.priority_id === 1 ? 'URGENTE' : 'NORMAL'} />
                           </p>
                         )}
-                        {document.doc_cite && (
+                        {document.doc_numero_cite && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
                             {document.doc_numero_cite}

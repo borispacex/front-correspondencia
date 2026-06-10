@@ -1,13 +1,7 @@
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  CreateDocumentRequest,
-  DocumentFilters,
-  UpdateDocumentRequest,
-  Document,
-} from '../../types/documents/document.type.ts';
-import { getDocuments } from '../../services/document.service.ts';
+import { useCallback, useEffect, useState } from 'react';
+import { CreateDocumentRequest, UpdateDocumentRequest, Document } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import Button from '../../../ui/button/Button.tsx';
@@ -19,126 +13,43 @@ import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../../constants/routes.constants.ts';
 import DocumentForm from '../../components/documents/my-documents/DocumentForm.tsx';
 import RouterForm from '../../components/documents/my-documents/RouterForm.tsx';
-import { MyDocumentFilter, MyDocumentSortConfig } from '../../components/documents/my-documents/MyDocumentFilter.tsx';
-import MyDocumentStatusTabs, {
-  ARCHIVED_STATE_IDS,
-  ATTENDED_STATE_IDS,
-  MyDocumentStatusTab,
-  PENDING_STATE_IDS,
-} from '../../components/documents/my-documents/MyDocumentStatusTabs.tsx';
+import { MyDocumentFilter } from '../../components/documents/my-documents/MyDocumentFilter.tsx';
 import MyDocumentTable from '../../components/documents/my-documents/MyDocumentTable.tsx';
+import { useDocument } from '../../hooks/useDocument.ts';
+import { useMyDocumentFilters } from '../../hooks/Filters/useMyDocumentFilters.ts';
 
 export default function MyDocumentPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
 
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { documents, isLoading, getAll } = useDocument();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRouterModalOpen, setIsRouterModalOpen] = useState(false);
   const [selected, setSelected] = useState<Document | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
 
-  // ─────────────────────────────────────────────────────────────
-  // Filters, sort y status tab
-  // ─────────────────────────────────────────────────────────────
-  const [filters, setFilters] = useState<DocumentFilters>({
-    nro: '',
-    old: '',
-    origin: '',
-    subject: '',
-    priority: '',
-  });
-
-  const [sort, setSort] = useState<MyDocumentSortConfig>({ field: 'id', dir: 'desc' });
-  const [statusTab, setStatusTab] = useState<MyDocumentStatusTab>('all');
-
-  // ─────────────────────────────────────────────────────────────
-  // Conteos para los tabs + contexto global (sidebar)
-  // ─────────────────────────────────────────────────────────────
-  const tabCounts = useMemo(
-    () => ({
-      all: documents.length,
-      pending: documents.filter((d) => PENDING_STATE_IDS.includes(d.state_document_id)).length,
-      attended: documents.filter((d) => ATTENDED_STATE_IDS.includes(d.state_document_id)).length,
-      archived: documents.filter((d) => ARCHIVED_STATE_IDS.includes(d.state_document_id)).length,
-    }),
-    [documents],
-  );
-
-  // ─────────────────────────────────────────────────────────────
-  // Filtered data
-  // ─────────────────────────────────────────────────────────────
-  const filteredDocuments = useMemo(() => {
-    const filtered = documents.filter((document) => {
-      if (statusTab === 'pending' && !PENDING_STATE_IDS.includes(document.state_document_id)) return false;
-      if (statusTab === 'attended' && !ATTENDED_STATE_IDS.includes(document.state_document_id)) return false;
-      if (statusTab === 'archived' && !ARCHIVED_STATE_IDS.includes(document.state_document_id)) return false;
-
-      const nroMatch =
-        !filters.nro ||
-        String(document.doc_contador ?? '')
-          .toLowerCase()
-          .includes(filters.nro.toLowerCase());
-      const oldMatch =
-        !filters.old ||
-        String(document.doc_cite ?? '')
-          .toLowerCase()
-          .includes(filters.old.toLowerCase());
-      const originMatch =
-        !filters.origin ||
-        String(document.doc_dep_name ?? '')
-          .toLowerCase()
-          .includes(filters.origin.toLowerCase());
-      const subjectMatch =
-        !filters.subject ||
-        String(document.doc_referencia ?? '')
-          .toLowerCase()
-          .includes(filters.subject.toLowerCase());
-      const priorityMatch =
-        !filters.priority ||
-        String(document.pri_name ?? '')
-          .toLowerCase()
-          .includes(filters.priority.toLowerCase());
-
-      return nroMatch && oldMatch && originMatch && subjectMatch && priorityMatch;
-    });
-
-    return [...filtered].sort((a, b) => {
-      const aVal = String(a[sort.field as keyof Document] ?? '');
-      const bVal = String(b[sort.field as keyof Document] ?? '');
-      const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
-      return sort.dir === 'asc' ? cmp : -cmp;
-    });
-  }, [documents, filters, sort, statusTab]);
-
-  // ─────────────────────────────────────────────────────────────
-  // Load data
-  // ─────────────────────────────────────────────────────────────
+  // ──────────────────────────── Filters ─────────────────────────────────
+  const { filters, setFilters, sort, setSort, resetFilters, filteredDocuments } = useMyDocumentFilters(documents);
+  // ──────────────────────────── Load data ─────────────────────────────────
   const fetchDocuments = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await getDocuments();
-      setDocuments(data);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
+    await getAll();
+  }, [getAll]);
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
-
-  // ─────────────────────────────────────────────────────────────
-  // Handlers
-  // ─────────────────────────────────────────────────────────────
+    getAll();
+  }, [getAll]);
+  // ─────────────────────────── Handlers ──────────────────────────────────
   const handleDerive = (document: Document) => {
     setSelected(document);
     setIsRouterModalOpen(true);
   };
-  const handleViewHeader = (document: Document) => console.log('Cabecera:', document);
-  const handleViewSheet = (document: Document) => console.log('Hoja:', document);
+  const handleViewHeader = (document: Document) => {
+    console.log('Cabecera:', document);
+  };
+  const handleViewSheet = (document: Document) => {
+    console.log('Hoja:', document);
+  };
   const handleView = (document: Document) => {
     console.log('Ver tramite', document);
     navigate(`${ROUTES.DOCUMENTS.MY_DOCUMENTS.ALL}/${document.id}`);
@@ -203,20 +114,21 @@ export default function MyDocumentPage() {
       });
     }
   }
-
-  // ─────────────────────────────────────────────────────────────
-  // Render
-  // ─────────────────────────────────────────────────────────────
+  // ───────────────────────── Render ────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Trámites | ${APP_NAME}`} description="Gestión de creación de tramites" />
-      <PageBreadCrumb pageTitle="Trámites" />
+      <PageMeta title={`Mis Trámites | ${APP_NAME}`} description="Gestión de creación de tramites" />
+      <PageBreadCrumb pageTitle="Mis trámites" />
 
       <div className="space-y-5">
-        <MyDocumentStatusTabs active={statusTab} counts={tabCounts} onChange={(tab) => setStatusTab(tab)} />
-
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <MyDocumentFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <MyDocumentFilter
+            filters={filters}
+            sort={sort}
+            onFiltersChange={setFilters}
+            onSortChange={setSort}
+            onReset={resetFilters}
+          />
           {can('files.create') && (
             <Button size="sm" onClick={handleCreate} startIcon={<PlusIcon className="size-4 text-white" />}>
               Nuevo Trámite
