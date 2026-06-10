@@ -20,6 +20,7 @@ import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
 import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
 import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
+import { getYear } from '../../../../../utils/format.utils.ts';
 
 interface Props {
   documents: Document[];
@@ -97,7 +98,7 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
 
   async function handleCopy(document: Document) {
     try {
-      await navigator.clipboard.writeText(String(document.doc_contador ?? document.id));
+      await navigator.clipboard.writeText(`${document.doc_contador ?? ''}/${getYear(document.created_at) ?? ''}`);
       setCopiedId(document.id);
       setTimeout(() => setCopiedId(null), 1800);
     } catch (error) {
@@ -128,7 +129,7 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                 <span className="flex items-center gap-1">Trámite {renderSortIcon('doc_contador')}</span>
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Derivado por
+                Observaciones
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Estado
@@ -161,7 +162,7 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                     <div className="space-y-3">
                       <div className="mb-1 flex flex-wrap items-center gap-2">
                         <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:text-brand-400 dark:bg-brand-500/10 rounded-full border px-3 py-1 text-xs font-medium">
-                          {document.doc_contador ?? document.id}
+                          {document.doc_contador ?? ''}/{getYear(document.created_at) ?? ''}
                         </span>
                         <Tooltip content={copiedId === document.id ? 'Copiado' : 'Copiar'}>
                           <button
@@ -179,6 +180,14 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {document.id && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">
+                              NRO TRAMITE ANTIGUO:
+                            </span>{' '}
+                            {document.id}
+                          </p>
+                        )}
                         {document.priority_id && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PRIORIDAD:</span>{' '}
@@ -223,24 +232,11 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                     <div className="space-y-3">
                       {document.id % 2 == 0 ? (
                         <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>CRISTIAN MACELO MAMANI VIDES</p>
-                          <p>JEFE DE GESTON Y ASISTENCIA TECNOLOGICA</p>
-                          <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span> Para su
-                            atencion
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <CalenderIcon className="text-brand-600 dark:text-brand-400 size-4" />
-                            <span>01/05/2026</span>
-                          </p>
+                          <p>Sin observaciones</p>
                         </div>
                       ) : (
                         <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>Sin derivaciones.</p>
-                          <p className="flex items-center gap-2">
-                            <MailIcon className="text-brand-600 dark:text-brand-400 size-4" />
-                            <span>Tienes 1 documento pendiente.</span>
-                          </p>
+                          <p>Con observaciones</p>
                         </div>
                       )}
                     </div>
