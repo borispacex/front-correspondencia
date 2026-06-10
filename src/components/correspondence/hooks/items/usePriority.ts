@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { getPriorityById, getPriorities } from '../../services/items/priority.service.ts';
-import { Priority } from '../../types/priority.type.ts';
+import { Priority } from '../../types/items/priority.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
 export function usePriority() {

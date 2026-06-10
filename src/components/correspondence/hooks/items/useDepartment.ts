@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { getDepartmentById, getDepartments } from '../../services/items/department.service.ts';
-import { Department } from '../../types/department.type.ts';
+import { Department } from '../../types/items/department.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
 export function useDepartment() {

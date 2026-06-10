@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { getProvidedById, getProvides } from '../../services/items/provided.service.ts';
-import { Provided } from '../../types/provided.type.ts';
+import { Provided } from '../../types/items/provided.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
 export function useProvided() {

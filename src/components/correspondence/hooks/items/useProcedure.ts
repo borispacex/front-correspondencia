@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { getProcedureById, getProcedures } from '../../services/items/procedure.service.ts';
-import { Procedure } from '../../types/procedure.type.ts';
+import { Procedure } from '../../types/items/procedure.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
 export function useProcedure() {

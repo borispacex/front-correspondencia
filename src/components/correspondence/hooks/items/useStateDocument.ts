@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { getStateDocumentById, getStateDocuments } from '../../services/items/state-document.service.ts';
-import { StateDocument } from '../../types/state-document.type.ts';
+import { StateDocument } from '../../types/items/state-document.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
 export function useStateDocument() {

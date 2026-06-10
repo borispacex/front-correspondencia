@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { getTypeDocumentById, getTypeDocuments } from '../../services/items/type-document.service.ts';
-import { TypeDocument } from '../../types/type-document.type.ts';
+import { TypeDocument } from '../../types/items/type-document.type.ts';
 import { ApiQueryParams } from '../../../../types/common/api.types.ts';
 
 export function useTypeDocument() {

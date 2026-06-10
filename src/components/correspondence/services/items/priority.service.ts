@@ -2,7 +2,7 @@ import type { ApiQueryParams, ApiResponse } from '../../../../types/common/api.t
 import http from '../../../../services/http.service.ts';
 import { API_ENDPOINTS } from '../../../../constants/api.constants.ts';
 import { buildQueryParams } from '../../../../utils/query.utils.ts';
-import { Priority } from '../../types/priority.type.ts';
+import { Priority } from '../../types/items/priority.type.ts';
 
 export async function getPriorities(params?: ApiQueryParams): Promise<Priority[]> {
   const { data } = await http.get<ApiResponse<Priority[]>>(API_ENDPOINTS.CORRESPONDENCE.PRIORITY.BASE, {
