@@ -65,10 +65,7 @@ export function useMyDocumentFilters(documents: Document[]) {
           .includes(filters.subject.toLowerCase());
 
       const priorityMatch =
-        !filters.priority ||
-        String(document.priority_id ?? '')
-          .toLowerCase()
-          .includes(filters.priority.toLowerCase());
+        !filters.priority || !filters.priority || String(document.priority_id ?? '') === String(filters.priority);
 
       return nroMatch && nroCiteMatch && senderMatch && subjectMatch && priorityMatch;
     });

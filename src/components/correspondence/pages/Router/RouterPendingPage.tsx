@@ -31,8 +31,8 @@ export default function RouterPendingPage() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Bandeja de Entrada | ${APP_NAME}`} description="Documentos pendientes de atención" />
-      <PageBreadCrumb pageTitle="Bandeja de Entrada" />
+      <PageMeta title={`Bandeja de entrada | ${APP_NAME}`} description="Documentos pendientes de atención" />
+      <PageBreadCrumb pageTitle="Bandeja de entrada" />
 
       <div className="space-y-5">
         {/* Indicador de estado */}

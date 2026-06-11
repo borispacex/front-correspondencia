@@ -67,7 +67,7 @@ export default function InboxShowPage() {
         pageTitle="Trámite pendiente"
         items={[
           {
-            label: 'Bandeja de Entrada',
+            label: 'Bandeja de entrada',
             path: ROUTES.MAILBOX.INBOX.ALL,
           },
           {

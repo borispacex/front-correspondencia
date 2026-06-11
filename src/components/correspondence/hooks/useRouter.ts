@@ -19,6 +19,7 @@ export function useRouter() {
 
     try {
       const response = await getRouters(params);
+      console.log('routes', response);
       setRouters(response);
 
       return response;

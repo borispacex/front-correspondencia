@@ -1,57 +1,69 @@
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
-import { ATTENDED_STATE_IDS } from '../../components/router/RouterStatusTabs.tsx';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
-import { useRouterPage } from '../../hooks/useRouterPage.ts';
-import { Document } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
-
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import { ROUTES } from '../../../../constants/routes.constants.ts';
 import { useNavigate } from 'react-router';
 import { OutboxFilter } from '../../components/mailbox/outbox/OutboxFilter.tsx';
 import OutboxTable from '../../components/mailbox/outbox/OutboxTable.tsx';
-
-const isAttended = (stateId: number) => ATTENDED_STATE_IDS.includes(stateId);
+import { useCallback, useEffect } from 'react';
+import { useRouter } from '../../hooks/useRouter.ts';
+import { useOutboxFilters } from '../../hooks/filters/useOutboxFilters.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { STATE } from '../../constants/state-document.constants.ts';
 
 export default function OutboxPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
 
-  const { documents, isLoading, filters, setFilters, sort, setSort, fetchDocuments } = useRouterPage(isAttended);
+  const { routers, isLoading, getAll } = useRouter();
+
+  // ──────────────────────────── filters ─────────────────────────────────
+  const { filters, setFilters, sort, setSort, resetFilters, filteredRouters } = useOutboxFilters(routers);
+  // ──────────────────────────── Load data ─────────────────────────────────
+  const fetchRouters = useCallback(async () => {
+    await getAll({
+      included: ['document'],
+      filter: { state_document_id: [STATE.ENVIADO] },
+    });
+  }, [getAll]);
+  useEffect(() => {
+    getAll({ included: ['document'], filter: { state_document_id: [STATE.ENVIADO] } });
+  }, [getAll]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => {
-    console.log('Rutas:', document);
+  const handleViewRoutes = (router: Router) => {
+    console.log('Rutas:', router);
   };
-  const handleView = (document: Document) => {
-    console.log('Ver tramite', document);
-    navigate(`${ROUTES.MAILBOX.OUTBOX.ALL}/${document.id}`);
+  const handleView = (router: Router) => {
+    console.log('Ver documento', router);
+    navigate(`${ROUTES.MAILBOX.OUTBOX.ALL}/${router.id}`);
   };
-
+  const handleReceive = (document_id: number) => {
+    console.log('Recibir', document_id);
+  };
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Bandeja de Salida | ${APP_NAME}`} description="Documentos atendidos / derivados" />
-      <PageBreadCrumb pageTitle="Bandeja de Salida" />
+      <PageMeta title={`Bandeja de salida | ${APP_NAME}`} description="Documentos pendientes de atención" />
+      <PageBreadCrumb pageTitle="Bandeja de salida" />
 
       <div className="space-y-5">
-        {/* Indicador de estado */}
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-300">
-            <span className="size-2 rounded-full bg-green-500" />
-            Atendidos · {documents.length}
-          </span>
-        </div>
-
         {/* Filtros */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <OutboxFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <OutboxFilter
+            filters={filters}
+            sort={sort}
+            onFiltersChange={setFilters}
+            onSortChange={setSort}
+            onReset={resetFilters}
+          />
         </div>
 
         {/* Tabla */}
-        <OutboxTable documents={documents} isLoading={isLoading} onViewRoutes={handleViewRoutes} onView={handleView} />
+        <OutboxTable routers={routers} isLoading={isLoading} onViewRoutes={handleViewRoutes} onView={handleView} />
       </div>
     </>
   );

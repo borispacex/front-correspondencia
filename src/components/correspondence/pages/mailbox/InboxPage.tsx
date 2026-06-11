@@ -1,8 +1,5 @@
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
-import { PENDING_STATE_IDS } from '../../components/router/RouterStatusTabs.tsx';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
-import { useRouterPage } from '../../hooks/useRouterPage.ts';
-import { Document } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
@@ -10,20 +7,39 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import { useNavigate } from 'react-router';
 import { InboxFilter } from '../../components/mailbox/inbox/InboxFilter.tsx';
 import InboxTable from '../../components/mailbox/inbox/InboxTable.tsx';
-
-const isPending = (stateId: number) => PENDING_STATE_IDS.includes(stateId);
+import { useCallback, useEffect } from 'react';
+import { useRouter } from '../../hooks/useRouter.ts';
+import { useInboxFilters } from '../../hooks/filters/useInboxFilters.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { STATE } from '../../constants/state-document.constants.ts';
 
 export default function InboxPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
 
-  const { documents, isLoading, filters, setFilters, sort, setSort } = useRouterPage(isPending);
+  const { routers, isLoading, getAll } = useRouter();
+
+  // ──────────────────────────── filters ─────────────────────────────────
+  const { filters, setFilters, sort, setSort, resetFilters, filteredRouters } = useInboxFilters(routers);
+  // ──────────────────────────── Load data ─────────────────────────────────
+  const fetchRouters = useCallback(async () => {
+    await getAll({
+      included: ['document'],
+      filter: { state_document_id: [STATE.ENVIADO, STATE.DERIVADO, STATE.RECIBIDO] },
+    });
+  }, [getAll]);
+  useEffect(() => {
+    getAll({ included: ['document'], filter: { state_document_id: [STATE.ENVIADO, STATE.DERIVADO, STATE.RECIBIDO] } });
+  }, [getAll]);
+
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => console.log('Rutas:', document);
-  const handleView = (document: Document) => {
-    console.log('Ver documento', document);
-    navigate(`${ROUTES.MAILBOX.INBOX.ALL}/${document.id}`);
+  const handleViewRoutes = (router: Router) => {
+    console.log('Rutas:', router);
+  };
+  const handleView = (router: Router) => {
+    console.log('Ver documento', router);
+    navigate(`${ROUTES.MAILBOX.INBOX.ALL}/${router.id}`);
   };
   const handleReceive = (document_id: number) => {
     console.log('Recibir', document_id);
@@ -31,26 +47,24 @@ export default function InboxPage() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Bandeja de Entrada | ${APP_NAME}`} description="Documentos pendientes de atención" />
-      <PageBreadCrumb pageTitle="Bandeja de Entrada" />
+      <PageMeta title={`Bandeja de entrada | ${APP_NAME}`} description="Documentos pendientes de atención" />
+      <PageBreadCrumb pageTitle="Bandeja de entrada" />
 
       <div className="space-y-5">
-        {/* Indicador de estado */}
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full border border-yellow-200 bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-700 dark:border-yellow-500/20 dark:bg-yellow-500/10 dark:text-yellow-300">
-            <span className="size-2 animate-pulse rounded-full bg-yellow-500" />
-            Pendientes · {documents.length}
-          </span>
-        </div>
-
         {/* Filtros */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <InboxFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <InboxFilter
+            filters={filters}
+            sort={sort}
+            onFiltersChange={setFilters}
+            onSortChange={setSort}
+            onReset={resetFilters}
+          />
         </div>
 
         {/* Tabla */}
         <InboxTable
-          documents={documents}
+          routers={filteredRouters}
           isLoading={isLoading}
           onReceive={handleReceive}
           onViewRoutes={handleViewRoutes}

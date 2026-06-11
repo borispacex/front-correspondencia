@@ -21,6 +21,7 @@ import { Document } from '../../../types/documents/document.type.ts';
 import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
 import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
 import { getYear } from '../../../../../utils/format.utils.ts';
+import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
 
 interface Props {
   documents: Document[];
@@ -34,6 +35,7 @@ const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
 export default function AllDocumentTable({ documents, isLoading, onViewRoutes, onView }: Props) {
   const { can } = usePermissions();
+  const { getNameByValue } = useOrigin();
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -129,7 +131,7 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                 <span className="flex items-center gap-1">Trámite {renderSortIcon('doc_contador')}</span>
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Observaciones
+                Derivación
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Estado
@@ -180,7 +182,7 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {document.id && (
+                        {document.doc_numero_cite && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">
                               NRO TRAMITE ANTIGUO:
@@ -194,30 +196,30 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                             <PriorityBadge priorityId={document.priority_id} />
                           </p>
                         )}
-                        {document.doc_numero_cite && (
-                          <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
-                            {document.doc_numero_cite}
-                          </p>
-                        )}
-                        {document.doc_dep_name && (
+                        {document.doc_procedencia && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PROCEDENCIA:</span>{' '}
-                            {document.doc_dep_name}
+                            {getNameByValue(document.doc_procedencia)}
                           </p>
                         )}
                         {document.doc_remite && (
                           <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITENTE:</span>{' '}
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITE:</span>{' '}
                             {document.doc_remite}
                           </p>
                         )}
-                        {document.typ_name && (
+                        {document.doc_cite && (
                           <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">TIPO:</span>{' '}
-                            {document.typ_name}
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
+                            {document.doc_cite}
                           </p>
                         )}
+                        {/*{document.doc_numero_cite && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="text-brand-600 dark:text-brand-400 font-semibold">NRO CITE:</span>{' '}*/}
+                        {/*    {document.doc_numero_cite}*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
                         {document.doc_referencia && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">OBJETO/REFERENCIA:</span>{' '}
@@ -228,17 +230,29 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                     </div>
                   </td>
 
-                  <td className="px-5 py-5 align-top">
+                  <td className="px-5 py-5">
                     <div className="space-y-3">
-                      {document.id % 2 == 0 ? (
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>Sin observaciones</p>
-                        </div>
-                      ) : (
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>Con observaciones</p>
-                        </div>
-                      )}
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {document.routers?.length ? (
+                          <div>
+                            <p>
+                              <span className="font-semibold text-sky-600 dark:text-sky-400">DERIVACIONES:</span>{' '}
+                              {document.routers.length}
+                            </p>{' '}
+                            {document.routers.map((router, i) => (
+                              <div key={router.id} className="flex flex-col border-gray-100 dark:border-white/[0.05]">
+                                <span className="text-xs text-gray-800 dark:text-gray-200">
+                                  {i + 1}.- {router.rout_remite_document.toUpperCase() || '-'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-700 dark:text-gray-300">
+                            <p>No tiene derivaciones</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </td>
 

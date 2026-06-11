@@ -70,7 +70,7 @@ export default function RouterPendingShowPage() {
         pageTitle="Trámite pendiente"
         items={[
           {
-            label: 'Bandeja de Entrada',
+            label: 'Bandeja de entrada',
             path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING,
           },
           {

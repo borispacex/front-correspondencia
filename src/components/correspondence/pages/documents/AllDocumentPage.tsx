@@ -20,7 +20,7 @@ export default function AllDocumentPage() {
   const { filters, setFilters, sort, setSort, resetFilters, filteredDocuments } = useAllDocumentFilters(documents);
   // ──────────────────────────── Load data ─────────────────────────────────
   useEffect(() => {
-    getAll();
+    getAll({ included: ['routers'] });
   }, [getAll]);
 
   // ─────────────────────────── Handlers ──────────────────────────────────

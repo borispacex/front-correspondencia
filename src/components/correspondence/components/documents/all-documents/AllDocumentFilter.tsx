@@ -40,10 +40,10 @@ export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange
     { value: '', label: 'Todas' },
     { value: '1', label: 'Creado' },
     { value: '2', label: 'En proceso...' },
-    { value: '3', label: 'Enviado' },
-    { value: '4', label: 'Derivado' },
-    { value: '5', label: 'Recibido' },
-    { value: '6', label: 'Arcivado' },
+    { value: '3', label: 'Arcivado' },
+    { value: '4', label: 'Enviado' },
+    { value: '5', label: 'Derivado' },
+    { value: '6', label: 'Recibido' },
     { value: '7', label: 'Archivado' },
     { value: '8', label: 'Eliminado' },
   ];
@@ -61,7 +61,7 @@ export const AllDocumentFilter = ({ filters, sort, onFiltersChange, onSortChange
       {/* Nro */}
       <div className="flex min-w-[100px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Nro
+          Nro Tramite
         </Label>
         <InputField size="xs" value={filters.nro} onChange={handleInputChange('nro')} placeholder="Buscar Nro…" />
       </div>

@@ -17,6 +17,7 @@ import { MyDocumentFilter } from '../../components/documents/my-documents/MyDocu
 import MyDocumentTable from '../../components/documents/my-documents/MyDocumentTable.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
 import { useMyDocumentFilters } from '../../hooks/filters/useMyDocumentFilters.ts';
+import { STATE } from '../../constants/state-document.constants.ts';
 
 export default function MyDocumentPage() {
   const { can } = usePermissions();
@@ -34,10 +35,10 @@ export default function MyDocumentPage() {
   const { filters, setFilters, sort, setSort, resetFilters, filteredDocuments } = useMyDocumentFilters(documents);
   // ──────────────────────────── Load data ─────────────────────────────────
   const fetchDocuments = useCallback(async () => {
-    await getAll();
+    await getAll({ filter: { state_document_id: [STATE.CREADO] } });
   }, [getAll]);
   useEffect(() => {
-    getAll();
+    getAll({ filter: { state_document_id: [STATE.CREADO] } });
   }, [getAll]);
   // ─────────────────────────── Handlers ──────────────────────────────────
   const handleDerive = (document: Document) => {

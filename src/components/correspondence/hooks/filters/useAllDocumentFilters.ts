@@ -67,16 +67,10 @@ export function useAllDocumentFilters(documents: Document[]) {
           .includes(filters.subject.toLowerCase());
 
       const priorityMatch =
-        !filters.priority ||
-        String(document.priority_id ?? '')
-          .toLowerCase()
-          .includes(filters.priority.toLowerCase());
+        !filters.priority || !filters.priority || String(document.priority_id ?? '') === String(filters.priority);
 
       const statusMatch =
-        !filters.status ||
-        String(document.state_document_id ?? '')
-          .toLowerCase()
-          .includes(filters.status.toLowerCase());
+        !filters.status || !filters.status || String(document.state_document_id ?? '') === String(filters.status);
 
       return nroMatch && nroCiteMatch && senderMatch && subjectMatch && priorityMatch && statusMatch;
     });

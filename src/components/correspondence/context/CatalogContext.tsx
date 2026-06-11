@@ -14,6 +14,8 @@ import { getProcedures } from '../services/catalog/procedure.service.ts';
 import { getStateDocuments } from '../services/catalog/state-document.service.ts';
 import { getProvides } from '../services/catalog/provided.service.ts';
 import { getTypeDocuments } from '../services/catalog/type-document.service.ts';
+import { Origin } from '../types/catalog/origin.type.ts';
+import { ORIGINS } from '../constants/origin.constants.ts';
 
 interface CatalogContextType {
   priorities: Priority[];
@@ -23,6 +25,7 @@ interface CatalogContextType {
   procedures: Procedure[];
   stateDocuments: StateDocument[];
   typeDocuments: TypeDocument[];
+  origins: Origin[];
 
   isLoading: boolean;
 
@@ -89,6 +92,7 @@ export function CatalogProvider({ children }: { children: React.ReactNode }) {
       procedures,
       stateDocuments,
       typeDocuments,
+      origins: ORIGINS,
 
       isLoading,
 

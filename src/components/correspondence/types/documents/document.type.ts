@@ -1,3 +1,10 @@
+import { Department } from '../catalog/department.type.ts';
+import { TypeDocument } from '../catalog/type-document.type.ts';
+import { Priority } from '../catalog/priority.type.ts';
+import { StateDocument } from '../catalog/state-document.type.ts';
+import { Procedure } from '../catalog/procedure.type.ts';
+import { Router } from '../routers/router.type.ts';
+
 export interface Document {
   id: number;
   department_id: number;
@@ -33,6 +40,13 @@ export interface Document {
   pri_name?: string;
   sdoc_name?: string;
   proc_name?: string;
+  // children
+  department?: Department;
+  typeDocument?: TypeDocument;
+  priority?: Priority;
+  stateDocument?: StateDocument;
+  procedure?: Procedure;
+  routers?: Router[];
 }
 
 export interface DocumentFilters {

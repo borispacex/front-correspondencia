@@ -66,7 +66,7 @@ export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange }:
       {/* Nro */}
       <div className="flex min-w-[100px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Nro
+          Nro Tramite
         </Label>
         <InputField size="xs" value={filters.nro} onChange={handleInputChange('nro')} placeholder="Buscar Nro…" />
       </div>

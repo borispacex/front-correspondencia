@@ -23,6 +23,9 @@ import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
 import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
 import { getYear } from '../../../../../utils/format.utils.ts';
+import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
+import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
+import { useTypeDocument } from '../../../hooks/catalog/useTypeDocument.ts';
 
 interface Props {
   documents: Document[];
@@ -48,6 +51,8 @@ export default function MyDocumentTable({
   onView,
 }: Props) {
   const { can } = usePermissions();
+  const { getNameByValue } = useOrigin();
+  const { getNameById } = useTypeDocument();
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -143,7 +148,10 @@ export default function MyDocumentTable({
                 <span className="flex items-center gap-1">Trámite {renderSortIcon('doc_contador')}</span>
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Derivado por
+                Derivación
+              </th>
+              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                Estado
               </th>
               <th className="w-40 px-5 py-4 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Acciones
@@ -205,30 +213,36 @@ export default function MyDocumentTable({
                             <PriorityBadge priorityId={document.priority_id} />
                           </p>
                         )}
-                        {document.doc_numero_cite && (
-                          <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
-                            {document.doc_numero_cite}
-                          </p>
-                        )}
-                        {document.doc_dep_name && (
+                        {document.doc_procedencia && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PROCEDENCIA:</span>{' '}
-                            {document.doc_dep_name}
+                            {getNameByValue(document.doc_procedencia)}
                           </p>
                         )}
                         {document.doc_remite && (
                           <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITENTE:</span>{' '}
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITE:</span>{' '}
                             {document.doc_remite}
                           </p>
                         )}
-                        {document.typ_name && (
+                        {document.doc_cite && (
                           <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">TIPO:</span>{' '}
-                            {document.typ_name}
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
+                            {document.doc_cite}
                           </p>
                         )}
+                        {/*{document.doc_numero_cite && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="text-brand-600 dark:text-brand-400 font-semibold">NRO CITE:</span>{' '}*/}
+                        {/*    {document.doc_numero_cite}*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
+                        {/*{document.type_document_id && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="text-brand-600 dark:text-brand-400 font-semibold">TIPO DOCUMENTO:</span>{' '}*/}
+                        {/*    {getNameById(document.type_document_id)}*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
                         {document.doc_referencia && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">OBJETO/REFERENCIA:</span>{' '}
@@ -239,31 +253,20 @@ export default function MyDocumentTable({
                     </div>
                   </td>
 
-                  <td className="px-5 py-5 align-top">
+                  <td className="px-5 py-5">
                     <div className="space-y-3">
-                      {document.id % 2 == 0 ? (
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>CRISTIAN MACELO MAMANI VIDES</p>
-                          <p>JEFE DE GESTON Y ASISTENCIA TECNOLOGICA</p>
-                          <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span> Para su
-                            atencion
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <CalenderIcon className="text-brand-600 dark:text-brand-400 size-4" />
-                            <span>01/05/2026</span>
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>Sin derivaciones.</p>
-                          <p className="flex items-center gap-2">
-                            <MailIcon className="text-brand-600 dark:text-brand-400 size-4" />
-                            <span>Tienes 1 documento pendiente.</span>
-                          </p>
-                        </div>
-                      )}
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        <p>Sin derivación.</p>
+                        {/*<p className="flex items-center gap-2">*/}
+                        {/*  <MailIcon className="size-4 text-sky-600 dark:text-sky-400" />*/}
+                        {/*  <span>Tienes 1 documento pendiente.</span>*/}
+                        {/*</p>*/}
+                      </div>
                     </div>
+                  </td>
+
+                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                    <StateDocumentBadge stateDocumentId={document.state_document_id} />
                   </td>
 
                   <td className="px-5 py-5 align-top">
