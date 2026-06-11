@@ -1,198 +1,346 @@
+import { FileInputIcon, RouteIcon } from '../../../../icons';
+import { Router } from '../../types/routers/router.type.ts';
 import { Document } from '../../types/documents/document.type.ts';
-import { FileInputIcon } from '../../../../icons';
 
-interface RouterRoutesProps {
+// ─────────────────────────────────────────────────────────────
+// Props
+// ─────────────────────────────────────────────────────────────
+interface Props {
   document?: Document | null;
   isLoading?: boolean;
   isSelected?: boolean;
 }
 
-interface HistoryEvent {
-  icon: 'cart' | 'card' | 'mail';
-  title: string;
-  subtitle: string;
-  time: string;
-  date: string;
+// ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
+function getInitials(name?: string): string {
+  if (!name) return '?';
+  const clean = name.replace(/^(CRNL\.|ING\.|DAEN\.|CNL\.|DR\.|LIC\.)\s*/gi, '').trim();
+  const parts = clean.split(/\s+/);
+  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase();
 }
 
-const orderHistory: HistoryEvent[] = [
-  {
-    icon: 'cart',
-    title: 'CNL. DAEN. MARIO RAUL SANDOVAL NAVA ',
-    subtitle: 'UNIDAD DE TECNOLOGÍAS DE LA INFORMACIÓN Y COMUNICACIÓN',
-    time: '12:54',
-    date: '10/01/2025',
-  },
-  {
-    icon: 'card',
-    title: 'CNL. DAEN. JUAN MANUEL MOLINA PATIÑO',
-    subtitle: 'Div. DE CUENTAS POR COBRAR',
-    time: '12:58',
-    date: '01/02/2025',
-  },
-  {
-    icon: 'mail',
-    title: 'CNL. DAEN. JESUS ARIEL ESPINOZA FERREL',
-    subtitle: 'Dir. Nal. de Asuntos Administrativos y Financieros',
-    time: '12:58',
-    date: '15/03/2025',
-  },
-];
-
-function IconCart() {
+function formatDateTime(iso?: string): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={1.8}>
-      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <path d="M16 10a4 4 0 01-8 0" />
-    </svg>
+    d.toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+    ' ' +
+    d.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })
   );
 }
 
-function IconCard() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={1.8}>
-      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-      <line x1="1" y1="10" x2="23" y2="10" />
-    </svg>
-  );
+function formatDate(iso?: string): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('es-BO', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 }
 
-function IconMail() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={1.8}>
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-      <polyline points="22,6 12,13 2,6" />
-    </svg>
-  );
+function stripHtml(value?: string): string {
+  if (!value) return '';
+  return value.replace(/<[^>]+>/g, '').trim();
 }
 
-function HistoryIcon({ type }: { type: HistoryEvent['icon'] }) {
-  const icons = {
-    cart: <IconCart />,
-    card: <IconCard />,
-    mail: <IconMail />,
-  };
+// ─────────────────────────────────────────────────────────────
+// Estado badge
+// ─────────────────────────────────────────────────────────────
+const PENDING_STATE_IDS = [1, 2];
+const ATTENDED_STATE_IDS = [3, 4, 5];
 
-  return (
-    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
-      {icons[type]}
-    </div>
-  );
+function getStateCls(stateId: number): string {
+  if (PENDING_STATE_IDS.includes(stateId))
+    return 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-300 dark:border-yellow-500/20';
+  if (ATTENDED_STATE_IDS.includes(stateId))
+    return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/20';
+  return 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/[0.05] dark:text-gray-400 dark:border-white/[0.08]';
 }
 
-const DocumentHistorySkeleton = () => {
+// ─────────────────────────────────────────────────────────────
+// Skeleton
+// ─────────────────────────────────────────────────────────────
+function SkeletonLine({ className }: { className?: string }) {
+  return <div className={`h-4 animate-pulse rounded bg-gray-200 dark:bg-white/[0.08] ${className ?? ''}`} />;
+}
+
+function DocumentHistorySkeleton() {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <SkeletonLine width="w-32" />
-
-      <div className="mt-6 space-y-5">
+      <div className="mb-5 space-y-2">
+        <SkeletonLine className="w-40" />
+        <SkeletonLine className="w-64" />
+        <SkeletonLine className="w-32" />
+      </div>
+      <SkeletonLine className="mb-4 w-24" />
+      <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="flex items-start gap-4">
-            <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-white/[0.08]" />
-
+          <div key={i} className="flex items-start gap-3">
+            <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-white/[0.08]" />
             <div className="flex-1 space-y-2">
-              <SkeletonLine width="w-32" />
-              <SkeletonLine width="w-48" />
+              <SkeletonLine className="w-48" />
+              <SkeletonLine className="w-36" />
             </div>
           </div>
         ))}
       </div>
-
-      <div className="mt-6 flex gap-2 border-t border-gray-200 pt-5 dark:border-white/[0.05]">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-9 flex-1 animate-pulse rounded-lg bg-gray-200 dark:bg-white/[0.08]" />
-        ))}
-      </div>
     </div>
   );
-};
+}
 
-const EmptyHistoryState = () => {
+// ─────────────────────────────────────────────────────────────
+// Empty states
+// ─────────────────────────────────────────────────────────────
+function EmptyHistoryState() {
   return (
     <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 dark:border-white/[0.08] dark:bg-white/[0.03]">
       <div className="flex flex-col items-center justify-center text-center">
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
           <FileInputIcon className="h-7 w-7 text-gray-400" />
         </div>
-
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200">Ningún documento seleccionado</h3>
-
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          Selecciona un documento de la tabla para visualizar sus rutas.
+          Selecciona un documento de la tabla para visualizar su recorrido.
         </p>
       </div>
     </div>
   );
-};
+}
 
-const DocumentHistoryCard = ({ isSelected }: { isSelected: boolean }) => {
+function EmptyRoutersState() {
   return (
-    <div
-      className={`rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03] ${
-        isSelected
-          ? `border-brand-300 ring-brand-500/20 dark:border-brand-500/40 dark:ring-brand-500/30 shadow-sm ring-1`
-          : `border-gray-100 hover:border-gray-200 dark:border-white/[0.05] dark:hover:border-white/[0.08]`
-      } `}
-    >
-      <h2 className="mb-5 text-base font-semibold text-gray-800 dark:text-white/90">Rutas</h2>
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-8 text-center dark:border-white/[0.08]">
+      <RouteIcon className="mb-2 h-8 w-8 text-gray-300 dark:text-gray-600" />
+      <p className="text-xs text-gray-500 dark:text-gray-400">Este documento aún no tiene derivaciones registradas.</p>
+    </div>
+  );
+}
 
-      <div className="relative">
-        <div className="absolute top-10 bottom-10 left-5 w-px bg-gray-200 dark:bg-white/[0.08]" />
+// ─────────────────────────────────────────────────────────────
+// DocumentHeader
+// ─────────────────────────────────────────────────────────────
+function DocumentHeader({ document: doc }: { document: Document }) {
+  const isUrgent = doc.priority_id === 1 || stripHtml(doc.pri_name).toUpperCase().includes('URGENTE');
 
-        <div className="space-y-5">
-          {orderHistory.map((event, i) => (
-            <div key={i} className="relative flex items-start gap-4">
-              <HistoryIcon type={event.icon} />
+  return (
+    <div className="mb-5 rounded-xl border border-gray-100 bg-gray-50/60 p-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
+      {/* Cites + estado */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Cite principal */}
+          <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
+            {doc.doc_numero_cite ?? doc.doc_cite ?? `DOC-${doc.id}`}
+          </span>
+          {/* Hoja de ruta */}
+          {doc.doc_contador && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-gray-300">
+              <RouteIcon className="h-3 w-3" />
+              {doc.doc_contador}
+            </span>
+          )}
+        </div>
 
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">{event.title}</p>
-
-                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{event.subtitle}</p>
-              </div>
-
-              <div className="shrink-0 text-right">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{event.time}</p>
-
-                <p className="text-xs text-gray-400 dark:text-gray-500">{event.date}</p>
-              </div>
-            </div>
-          ))}
+        {/* Prioridad + estado */}
+        <div className="flex items-center gap-2">
+          {isUrgent && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-red-700 uppercase dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+              Urgente
+            </span>
+          )}
+          <span
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${getStateCls(doc.state_document_id)}`}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+            {doc.sdoc_name ?? 'Sin estado'}
+          </span>
         </div>
       </div>
 
-      <div className="mt-6 flex gap-2 border-t border-gray-200 pt-5 dark:border-white/[0.05]">
-        {(['Cancelar', 'Derivar', 'Ver'] as const).map((label) => (
-          <button
-            key={label}
-            className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-all duration-150 ${
-              label === 'Ver'
-                ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
-                : 'border-gray-200 bg-transparent text-gray-600 hover:bg-gray-50 dark:border-white/[0.10] dark:text-gray-300 dark:hover:bg-white/[0.04]'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Referencia / asunto */}
+      {doc.doc_referencia && (
+        <p className="mb-3 text-sm leading-relaxed text-gray-700 dark:text-gray-300">{doc.doc_referencia}</p>
+      )}
+
+      {/* Meta */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {doc.doc_remite && (
+          <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <span className="font-medium text-gray-700 dark:text-gray-300">{doc.doc_remite}</span>
+          </span>
+        )}
+        {doc.doc_dep_name && <span className="text-xs text-gray-500 dark:text-gray-400">{doc.doc_dep_name}</span>}
+        {doc.typ_name && <span className="text-xs text-gray-500 dark:text-gray-400">{doc.typ_name}</span>}
+        {(doc.doc_fecha_origen ?? doc.created_at) && (
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {formatDate(doc.doc_fecha_origen ?? doc.created_at)}
+          </span>
+        )}
       </div>
     </div>
   );
-};
+}
 
-const SkeletonLine = ({ width }: { width: string }) => (
-  <div className={`h-4 animate-pulse rounded bg-gray-200 dark:bg-white/[0.08] ${width}`} />
-);
+// ─────────────────────────────────────────────────────────────
+// RouterStep — un paso en el timeline
+// ─────────────────────────────────────────────────────────────
+type StepVariant = 'origin' | 'middle' | 'last';
 
-export const RouterRoutes = ({ document, isLoading, isSelected = false }: RouterRoutesProps) => {
+function RouterStep({ router, variant }: { router: Router; variant: StepVariant }) {
+  const ini = getInitials(router.rout_remite_document);
+
+  // Colores del avatar y línea según variante
+  const avatarCls =
+    variant === 'origin'
+      ? 'bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300'
+      : variant === 'last'
+        ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
+        : 'bg-gray-100 text-gray-600 dark:bg-white/[0.08] dark:text-gray-300';
+
+  const dotRingCls =
+    variant === 'origin'
+      ? 'border-brand-400 dark:border-brand-500'
+      : variant === 'last'
+        ? 'border-green-400 dark:border-green-500'
+        : 'border-gray-300 dark:border-white/[0.15]';
+
+  const cardBorderCls =
+    variant === 'origin'
+      ? 'border-brand-200 dark:border-brand-500/30'
+      : variant === 'last'
+        ? 'border-green-200 dark:border-green-500/30'
+        : 'border-gray-100 dark:border-white/[0.05]';
+
   return (
-    <>
-      {isLoading ? (
-        <DocumentHistorySkeleton />
-      ) : !document ? (
-        <EmptyHistoryState />
-      ) : (
-        <DocumentHistoryCard isSelected={isSelected} />
-      )}
-    </>
+    <div className="relative flex gap-3">
+      {/* Dot + línea vertical */}
+      <div className="flex flex-col items-center">
+        <div
+          className={`z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 bg-white dark:bg-gray-900 ${dotRingCls}`}
+        >
+          <span
+            className={`h-2 w-2 rounded-full ${variant === 'origin' ? 'bg-brand-400' : variant === 'last' ? 'bg-green-400' : 'bg-gray-300 dark:bg-gray-500'}`}
+          />
+        </div>
+        {variant !== 'last' && <div className="mt-1 w-px flex-1 bg-gray-200 dark:bg-white/[0.08]" />}
+      </div>
+
+      {/* Card */}
+      <div className={`mb-3 flex-1 rounded-xl border bg-white p-3.5 dark:bg-white/[0.02] ${cardBorderCls}`}>
+        {/* Remitente + fecha */}
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${avatarCls}`}
+            >
+              {ini}
+            </div>
+            <div>
+              <p className="text-xs leading-tight font-semibold text-gray-800 dark:text-white/90">
+                {router.rout_remite_document ?? '—'}
+              </p>
+              {router.rout_cite_document && (
+                <p className="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{router.rout_cite_document}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-[11px] text-gray-400 dark:text-gray-500">{formatDateTime(router.created_at)}</span>
+            {router.rout_numero_cite && (
+              <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                {router.rout_numero_cite}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Destinatario */}
+        {router.rout_recibe && (
+          <div className="mt-2.5 flex items-center gap-1.5">
+            <span className="text-[11px] text-gray-500 dark:text-gray-400">Para:</span>
+            <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300">{router.rout_recibe}</span>
+          </div>
+        )}
+
+        {/* Referencia */}
+        {router.rout_referencia_document && (
+          <p className="mt-2 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
+            {router.rout_referencia_document}
+          </p>
+        )}
+
+        {/* Observación */}
+        {router.rout_observacion && (
+          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg border border-gray-100 bg-gray-50 px-2.5 py-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <span className="mt-px text-[10px] font-semibold tracking-wide text-gray-400 uppercase dark:text-gray-500">
+              Obs.
+            </span>
+            <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-400">{router.rout_observacion}</p>
+          </div>
+        )}
+
+        {/* Estado de la derivación */}
+        {router.stateDocument?.sdoc_name && (
+          <div className="mt-2.5">
+            <span
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${getStateCls(router.state_document_id)}`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-current" />
+              {router.stateDocument.sdoc_name}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// RouterTimeline
+// ─────────────────────────────────────────────────────────────
+function RouterTimeline({ routers }: { routers: Router[] }) {
+  return (
+    <div className="mt-1">
+      {/* Label sección */}
+      <p className="mb-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+        Recorrido · {routers.length} derivación{routers.length !== 1 ? 'es' : ''}
+      </p>
+
+      <div>
+        {routers.map((r, i) => {
+          const variant: StepVariant = i === 0 ? 'origin' : i === routers.length - 1 ? 'last' : 'middle';
+          return <RouterStep key={r.id} router={r} variant={variant} />;
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Export principal
+// ─────────────────────────────────────────────────────────────
+export const RouterRoutes = ({ document, isLoading, isSelected = false }: Props) => {
+  if (isLoading) return <DocumentHistorySkeleton />;
+  if (!document) return <EmptyHistoryState />;
+
+  const routers = document.routers ?? [];
+
+  return (
+    <div
+      className={`rounded-2xl border bg-white p-5 dark:bg-white/[0.03] ${
+        isSelected
+          ? 'border-brand-300 ring-brand-500/20 dark:border-brand-500/40 dark:ring-brand-500/30 shadow-sm ring-1'
+          : 'border-gray-200 dark:border-white/[0.05]'
+      }`}
+    >
+      {/* Cabecera del documento */}
+      <DocumentHeader document={document} />
+
+      {/* Timeline o empty */}
+      {routers.length === 0 ? <EmptyRoutersState /> : <RouterTimeline routers={routers} />}
+    </div>
   );
 };

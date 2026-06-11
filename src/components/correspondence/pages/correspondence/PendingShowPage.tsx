@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { Document } from '../../types/documents/document.type.ts';
-import { getDocumentById } from '../../services/document.service.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { getRouterById } from '../../services/router.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -16,52 +16,55 @@ import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 export default function PendingShowPage() {
   const { id } = useParams();
 
+  const [router, setRouter] = useState<Router | null>(null);
   const [document, setDocument] = useState<Document | null>(null);
-
-  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [isLoadingRouter, setIsLoadingRouter] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const fetchDocument = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!id) return;
 
-    setIsLoadingDocument(true);
+    setIsLoadingRouter(true);
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id));
+      const response = await getRouterById(Number(id), {
+        included: ['document.routers'],
+      });
 
-      setDocument(response);
-
-      // TODO:
-      // cargar historial/rutas
+      setRouter(response);
+      setDocument(response.document ?? null);
     } finally {
-      setIsLoadingDocument(false);
+      setIsLoadingRouter(false);
       setIsLoadingHistory(false);
     }
   }, [id]);
 
   useEffect(() => {
-    fetchDocument();
-  }, [fetchDocument]);
+    fetchData();
+  }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => {
-    console.log('Rutas:', document);
+  const handleViewRoutes = (router: Router) => {
+    console.log('Rutas:', router);
   };
 
-  const handleReceive = (document_id: number) => {
-    console.log('Recibir:', document_id);
+  const handleReceive = (router_id: number) => {
+    console.log('Recibir:', router_id);
   };
 
-  const handleDelete = (document_id: number) => {
-    console.log('Eliminar:', document_id);
+  const handleDelete = (router_id: number) => {
+    console.log('Eliminar:', router_id);
   };
 
   return (
     <>
-      <PageMeta title={`Detalle sin acción | ${APP_NAME}`} description="Información detallada del tramite sin acción" />
+      <PageMeta
+        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
+        description="Información detallada del tramite sin acción"
+      />
       <PageBreadCrumb
-        pageTitle="Sin acción"
+        pageTitle={`Tramite (Derivación) #${router?.id}`}
         items={[
           {
             label: 'Sin acción',
@@ -81,7 +84,7 @@ export default function PendingShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(document)}
+              onClick={() => handleViewRoutes(router)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -93,7 +96,7 @@ export default function PendingShowPage() {
               variant="info"
               size="sm"
               startIcon={<InboxIcon className="size-3.5" />}
-              onClick={() => handleReceive(document.id)}
+              onClick={() => handleReceive(router.id)}
             >
               Recibir
             </Button>
@@ -103,7 +106,7 @@ export default function PendingShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => handleDelete(document.id)}
+              onClick={() => handleDelete(router.id)}
             >
               Eliminar
             </Button>
@@ -113,7 +116,7 @@ export default function PendingShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <PendingInfo document={document} isLoading={isLoadingDocument} />
+          <PendingInfo router={router} isLoading={isLoadingRouter} />
         </div>
 
         <div className="xl:col-span-2">

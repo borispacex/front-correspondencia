@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Document } from '../../types/documents/document.type.ts';
-import { getDocumentById } from '../../services/document.service.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { getRouterById } from '../../services/router.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -11,60 +11,62 @@ import Button from '../../../ui/button/Button.tsx';
 import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
 import InboxInfo from '../../components/mailbox/inbox/InboxInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
+import { getDocumentById } from '../../services/document.service.ts';
+import { Document } from '../../types/documents/document.type.ts';
 
 export default function InboxShowPage() {
   const { id } = useParams();
 
+  const [router, setRouter] = useState<Router | null>(null);
   const [document, setDocument] = useState<Document | null>(null);
-
-  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [isLoadingRouter, setIsLoadingRouter] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const fetchDocument = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!id) return;
 
-    setIsLoadingDocument(true);
+    setIsLoadingRouter(true);
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id));
+      const response = await getRouterById(Number(id), {
+        included: ['document.routers'],
+      });
 
-      setDocument(response);
-
-      // TODO:
-      // cargar historial/rutas
+      setRouter(response);
+      setDocument(response.document ?? null);
     } finally {
-      setIsLoadingDocument(false);
+      setIsLoadingRouter(false);
       setIsLoadingHistory(false);
     }
   }, [id]);
 
   useEffect(() => {
-    fetchDocument();
-  }, [fetchDocument]);
+    fetchData();
+  }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleReceive = (document_id: number) => {
-    console.log('Recibir:', document_id);
+  const handleReceive = (router_id: number) => {
+    console.log('Recibir:', router_id);
   };
 
-  const handleViewRoutes = (document: Document) => {
-    console.log('Ver rutas:', document);
+  const handleViewRoutes = (router: Router) => {
+    console.log('Ver rutas:', router);
   };
 
-  const handleDelete = (document_id: number) => {
-    console.log('Eliminar:', document_id);
+  const handleDelete = (router_id: number) => {
+    console.log('Eliminar:', router_id);
   };
 
   return (
     <>
       <PageMeta
-        title={`Detalle Trámite pendiente | ${APP_NAME}`}
+        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
         description="Información detallada del trámite pendiente"
       />
 
       <PageBreadCrumb
-        pageTitle="Trámite pendiente"
+        pageTitle={`Tramite (Derivación) #${router?.id}`}
         items={[
           {
             label: 'Bandeja de entrada',
@@ -84,7 +86,7 @@ export default function InboxShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(document)}
+              onClick={() => handleViewRoutes(router)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -96,7 +98,7 @@ export default function InboxShowPage() {
               variant="info"
               size="sm"
               startIcon={<InboxIcon className="size-3.5" />}
-              onClick={() => handleReceive(document.id)}
+              onClick={() => handleReceive(router.id)}
             >
               Recibir
             </Button>
@@ -106,7 +108,7 @@ export default function InboxShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => handleDelete(document.id)}
+              onClick={() => handleDelete(router.id)}
             >
               Eliminar
             </Button>
@@ -116,7 +118,7 @@ export default function InboxShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <InboxInfo document={document} isLoading={isLoadingDocument} />
+          <InboxInfo router={router} isLoading={isLoadingRouter} />
         </div>
 
         <div className="xl:col-span-2">

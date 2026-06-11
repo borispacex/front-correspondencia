@@ -14,10 +14,9 @@ import AllDocumentInfo from '../../components/documents/all-documents/AllDocumen
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 
 export default function AllDocumentShowPage() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
 
   const [document, setDocument] = useState<Document | null>(null);
-
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
@@ -28,12 +27,8 @@ export default function AllDocumentShowPage() {
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id));
-
+      const response = await getDocumentById(Number(id), { included: ['routers'] });
       setDocument(response);
-
-      // TODO:
-      // cargar historial/rutas
     } finally {
       setIsLoadingDocument(false);
       setIsLoadingHistory(false);
@@ -45,9 +40,13 @@ export default function AllDocumentShowPage() {
   }, [fetchDocument]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => {
-    console.log('Ver rutas', document);
+  const handleViewRoutes = (doc: Document) => {
+    console.log('Ver rutas', doc);
   };
+
+  // const handleDerive = (doc: Document) => {
+  //   console.log('Derivar', doc);
+  // };
 
   return (
     <>
@@ -55,25 +54,19 @@ export default function AllDocumentShowPage() {
 
       <PageBreadCrumb
         pageTitle={`Tramite #${id}`}
-        items={[
-          {
-            label: 'Buscar trámite',
-            path: ROUTES.DOCUMENTS.ALL_DOCUMENTS.ALL,
-          },
-          {
-            label: `#${id}`,
-          },
-        ]}
+        items={[{ label: 'Buscar trámite', path: ROUTES.DOCUMENTS.ALL_DOCUMENTS.ALL }, { label: `#${id}` }]}
       />
 
+      {/* ── Barra de acciones ─────────────────────────────── */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-        <div></div>
-        <div>
+        <div />
+        <div className="flex items-center gap-3">
           <Tooltip content="Ver rutas">
             <Button
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(document)}
+              disabled={!document}
+              onClick={() => document && handleViewRoutes(document)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -82,6 +75,7 @@ export default function AllDocumentShowPage() {
         </div>
       </div>
 
+      {/* ── Contenido ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
           <AllDocumentInfo document={document} isLoading={isLoadingDocument} />

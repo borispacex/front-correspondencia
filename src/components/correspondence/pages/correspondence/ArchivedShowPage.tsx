@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { Document } from '../../types/documents/document.type.ts';
-import { getDocumentById } from '../../services/document.service.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { getRouterById } from '../../services/router.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -12,55 +12,56 @@ import Button from '../../../ui/button/Button.tsx';
 import { ArchiveRestoreIcon, RouteIcon } from '../../../../icons';
 import ArchivedInfo from '../../components/correspondence/archived/ArchivedInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
+import { Document } from '../../types/documents/document.type.ts';
 
 export default function ArchivedShowPage() {
   const { id } = useParams();
 
+  const [router, setRouter] = useState<Router | null>(null);
   const [document, setDocument] = useState<Document | null>(null);
-
-  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [isLoadingRouter, setIsLoadingRouter] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const fetchDocument = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!id) return;
 
-    setIsLoadingDocument(true);
+    setIsLoadingRouter(true);
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id));
+      const response = await getRouterById(Number(id), {
+        included: ['document.routers'],
+      });
 
-      setDocument(response);
-
-      // TODO:
-      // cargar historial/rutas
+      setRouter(response);
+      setDocument(response.document ?? null);
     } finally {
-      setIsLoadingDocument(false);
+      setIsLoadingRouter(false);
       setIsLoadingHistory(false);
     }
   }, [id]);
 
   useEffect(() => {
-    fetchDocument();
-  }, [fetchDocument]);
+    fetchData();
+  }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => {
-    console.log('Rutas:', document);
+  const handleViewRoutes = (router: Router) => {
+    console.log('Rutas:', router);
   };
 
-  const handleUnarchive = (document_id: number) => {
-    console.log('Desarchivar:', document_id);
+  const handleUnarchive = (router_id: number) => {
+    console.log('Desarchivar:', router_id);
   };
 
   return (
     <>
       <PageMeta
-        title={`Detalle Trámite archivado | ${APP_NAME}`}
+        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
         description="Información detallada del tramite archivado"
       />
       <PageBreadCrumb
-        pageTitle="Trámite archivado"
+        pageTitle={`Tramite (Derivación) #${router?.id}`}
         items={[
           {
             label: 'Archivados',
@@ -80,7 +81,7 @@ export default function ArchivedShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(document)}
+              onClick={() => handleViewRoutes(router)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -91,7 +92,7 @@ export default function ArchivedShowPage() {
               variant="info"
               size="sm"
               startIcon={<ArchiveRestoreIcon className="size-3.5" />}
-              onClick={() => handleUnarchive(document.id)}
+              onClick={() => handleUnarchive(router.id)}
             >
               Desarchivar
             </Button>
@@ -101,7 +102,7 @@ export default function ArchivedShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <ArchivedInfo document={document} isLoading={isLoadingDocument} />
+          <ArchivedInfo router={router} isLoading={isLoadingRouter} />
         </div>
 
         <div className="xl:col-span-2">

@@ -9,7 +9,7 @@ import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
-import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
+import { PencilIcon, PrinterIcon, SendHorizontalIcon, TrashBinIcon } from '../../../../icons';
 import MyDocumentInfo from '../../components/documents/my-documents/MyDocumentInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 
@@ -28,7 +28,7 @@ export default function MyDocumentShowPage() {
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id));
+      const response = await getDocumentById(Number(id), { included: ['routers'] });
 
       setDocument(response);
 
@@ -45,11 +45,14 @@ export default function MyDocumentShowPage() {
   }, [fetchDocument]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => {
-    console.log('Ver rutas', document);
+  const handleDerive = (document: Document) => {
+    console.log('Derivar', document);
   };
-  const handleReceive = (document_id: number) => {
-    console.log('Recibir', document_id);
+  const handleEdit = (document: Document) => {
+    console.log('Editar', document);
+  };
+  const handleViewSheet = (document: Document) => {
+    console.log('Hoja de ruta', document);
   };
   const handleDelete = (document_id: number) => {
     console.log('Eliminar', document_id);
@@ -75,26 +78,37 @@ export default function MyDocumentShowPage() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div></div>
         <div>
-          <Tooltip content="Ver rutas">
+          <Tooltip content="Hoja de ruta">
             <Button
               className="mr-3"
-              variant="primary"
+              variant="secondary"
               size="sm"
-              onClick={() => handleViewRoutes(document)}
-              startIcon={<RouteIcon className="size-3.5" />}
+              startIcon={<PrinterIcon className="size-3.5" />}
+              onClick={() => handleViewSheet(document)}
             >
-              Ver rutas
+              Hoja de ruta
             </Button>
           </Tooltip>
-          <Tooltip content="Recibir">
+          <Tooltip content="Editar">
             <Button
               className="mr-3"
-              variant="info"
+              variant="action"
               size="sm"
-              startIcon={<InboxIcon className="size-3.5" />}
-              onClick={() => handleReceive(document.id)}
+              onClick={() => handleEdit(document)}
+              startIcon={<PencilIcon className="size-3.5" />}
             >
-              Recibir
+              Editar
+            </Button>
+          </Tooltip>
+          <Tooltip content="Derivar">
+            <Button
+              className="mr-3"
+              variant="success"
+              size="sm"
+              startIcon={<SendHorizontalIcon className="size-3.5" />}
+              onClick={() => handleDerive(document)}
+            >
+              Derivar
             </Button>
           </Tooltip>
           <Tooltip content="Eliminar">

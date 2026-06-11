@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Document } from '../../types/documents/document.type.ts';
-import { getDocumentById } from '../../services/document.service.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { getRouterById } from '../../services/router.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -9,60 +9,64 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { ForwardIcon, PrinterIcon, RouteIcon } from '../../../../icons';
+import { Document } from '../../types/documents/document.type.ts';
+import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
+import OutboxInfo from '../../components/mailbox/outbox/OutboxInfo.tsx';
 
 export default function OutboxShowPage() {
   const { id } = useParams();
 
+  const [router, setRouter] = useState<Router | null>(null);
   const [document, setDocument] = useState<Document | null>(null);
-
-  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [isLoadingRouter, setIsLoadingRouter] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const fetchDocument = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!id) return;
 
-    setIsLoadingDocument(true);
+    setIsLoadingRouter(true);
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id));
+      const response = await getRouterById(Number(id), {
+        included: ['document.routers'],
+      });
 
-      setDocument(response);
-
-      // TODO:
-      // cargar historial/rutas
+      setRouter(response);
+      // El documento con sus routers viene dentro del router
+      setDocument(response.document ?? null);
     } finally {
-      setIsLoadingDocument(false);
+      setIsLoadingRouter(false);
       setIsLoadingHistory(false);
     }
   }, [id]);
 
   useEffect(() => {
-    fetchDocument();
-  }, [fetchDocument]);
+    fetchData();
+  }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleForward = (document_id: number) => {
-    console.log('Reenviar:', document_id);
+  const handleForward = (router_id: number) => {
+    console.log('Reenviar:', router_id);
   };
 
-  const handleBackup = (document_id: number) => {
-    console.log('Respaldo:', document_id);
+  const handleBackup = (router_id: number) => {
+    console.log('Respaldo:', router_id);
   };
 
-  const handleViewRoutes = (document: Document) => {
-    console.log('Ver rutas:', document);
+  const handleViewRoutes = (router: Router) => {
+    console.log('Ver rutas:', router);
   };
 
   return (
     <>
       <PageMeta
-        title={`Detalle Trámite atendido | ${APP_NAME}`}
-        description="Información detallada del trámite atendido"
+        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
+        description="Información detallada del trámite"
       />
 
       <PageBreadCrumb
-        pageTitle="Trámite atendido"
+        pageTitle={`Tramite (Derivación) #${router?.id}`}
         items={[
           {
             label: 'Bandeja de Salida',
@@ -82,7 +86,7 @@ export default function OutboxShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(document)}
+              onClick={() => handleViewRoutes(router)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -94,7 +98,7 @@ export default function OutboxShowPage() {
               variant="secondary"
               size="sm"
               startIcon={<PrinterIcon className="size-3.5" />}
-              onClick={() => handleBackup(document.id)}
+              onClick={() => handleBackup(router.id)}
             >
               Respaldo
             </Button>
@@ -104,7 +108,7 @@ export default function OutboxShowPage() {
               variant="info"
               size="sm"
               startIcon={<ForwardIcon className="size-3.5" />}
-              onClick={() => handleForward(document.id)}
+              onClick={() => handleForward(router.id)}
             >
               Reenviar
             </Button>
@@ -114,7 +118,7 @@ export default function OutboxShowPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="xl:col-span-1">
-          <OutboxShowPage document={document} isLoading={isLoadingDocument} />
+          <OutboxInfo router={router} isLoading={isLoadingRouter} />
         </div>
 
         <div className="xl:col-span-2">
