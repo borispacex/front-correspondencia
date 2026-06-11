@@ -5,7 +5,6 @@ import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
 import { Document, DocumentFilters, SortConfig } from '../../types/documents/document.type.ts';
 import FileTable from '../../components/files/FileTable.tsx';
 import { getDocuments } from '../../services/document.service.ts';
-import { RouterFilter } from '../../components/router/RouterFilter.tsx';
 import FileStatusTabs, {
   DocumentStatusTab,
   MY_DOCUMENT_STATE_IDS,
@@ -13,6 +12,7 @@ import FileStatusTabs, {
 } from '../../components/files/FileStatusTabs.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import { useNavigate } from 'react-router';
+import { FileFilter } from '../../components/files/FileFilter.tsx';
 
 export default function FilePage() {
   const { addNotification } = useNotifications();
@@ -147,7 +147,7 @@ export default function FilePage() {
 
         {/* Filtros */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <RouterFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <FileFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
         </div>
 
         {/* Tabla */}

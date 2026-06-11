@@ -18,8 +18,8 @@ import TableSkeleton from '../../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
-import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
-import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
+import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
+import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { getYear } from '../../../../../utils/format.utils.ts';
 import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
 

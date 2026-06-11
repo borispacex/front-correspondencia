@@ -9,7 +9,6 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { ForwardIcon, PrinterIcon, RouteIcon } from '../../../../icons';
-import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
 
 export default function OutboxShowPage() {
   const { id } = useParams();

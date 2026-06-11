@@ -10,8 +10,8 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { RouteIcon } from '../../../../icons';
-import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
 import AllDocumentInfo from '../../components/documents/all-documents/AllDocumentInfo.tsx';
+import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 
 export default function AllDocumentShowPage() {
   const { id } = useParams();

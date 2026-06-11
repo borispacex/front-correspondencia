@@ -1,5 +1,5 @@
-import { Document } from '../../../types/documents/document.type.ts';
-import { FileInputIcon } from '../../../../../icons';
+import { Document } from '../../types/documents/document.type.ts';
+import { FileInputIcon } from '../../../../icons';
 
 interface RouterRoutesProps {
   document?: Document | null;

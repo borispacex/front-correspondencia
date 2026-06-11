@@ -15,10 +15,10 @@ import TableSkeleton from '../../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Router } from '../../../types/routers/router.type.ts';
-import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
+import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
 import { getYear } from '../../../../../utils/format.utils.ts';
 import { useTypeDocument } from '../../../hooks/catalog/useTypeDocument.ts';
-import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
+import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
 import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
 

@@ -41,8 +41,8 @@ export default function InboxPage() {
     console.log('Ver documento', router);
     navigate(`${ROUTES.MAILBOX.INBOX.ALL}/${router.id}`);
   };
-  const handleReceive = (document_id: number) => {
-    console.log('Recibir', document_id);
+  const handleReceive = (router_id: number) => {
+    console.log('Recibir', router_id);
   };
   // ── Render ───────────────────────────────────────────────────
   return (

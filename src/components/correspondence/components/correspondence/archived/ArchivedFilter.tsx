@@ -72,8 +72,8 @@ export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange, o
     { value: 'id:desc', label: 'Más reciente' },
     { value: 'id:asc', label: 'Más antiguo' },
     { value: 'priority_id:asc', label: 'Prioridad A→Z' },
-    { value: 'doc_fecha_origen:desc', label: 'Fecha ↓' },
-    { value: 'doc_fecha_origen:asc', label: 'Fecha ↑' },
+    { value: 'created_at:desc', label: 'Fecha ↓' },
+    { value: 'created_at:asc', label: 'Fecha ↑' },
   ];
 
   return (

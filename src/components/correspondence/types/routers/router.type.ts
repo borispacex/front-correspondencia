@@ -1,4 +1,8 @@
 import { Document } from '../documents/document.type.ts';
+import { TypeDocument } from '../catalog/type-document.type.ts';
+import { Priority } from '../catalog/priority.type.ts';
+import { StateDocument } from '../catalog/state-document.type.ts';
+import { Procedure } from '../catalog/procedure.type.ts';
 
 export interface Router {
   id: number;
@@ -25,10 +29,15 @@ export interface Router {
   procedure_d_id?: number;
   procedure_id_parent_rec?: number;
   rout_url_document?: string;
-  document?: Document;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
+  // children
+  document?: Document;
+  typeDocument?: TypeDocument;
+  priority?: Priority;
+  stateDocument?: StateDocument;
+  procedure?: Procedure;
 }
 
 export interface CreateRouterRequest {

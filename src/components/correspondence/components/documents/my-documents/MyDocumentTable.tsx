@@ -21,10 +21,10 @@ import TableSkeleton from '../../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
-import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
+import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
 import { getYear } from '../../../../../utils/format.utils.ts';
 import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
-import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
+import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { useTypeDocument } from '../../../hooks/catalog/useTypeDocument.ts';
 
 interface Props {

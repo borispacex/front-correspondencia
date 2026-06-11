@@ -50,8 +50,8 @@ export default function ArchivedPage() {
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Bandeja de entrada | ${APP_NAME}`} description="Documentos pendientes de atención" />
-      <PageBreadCrumb pageTitle="Bandeja de entrada" />
+      <PageMeta title={`Archivados | ${APP_NAME}`} description="Documentos pendientes de atención" />
+      <PageBreadCrumb pageTitle="Archivados" />
 
       <div className="space-y-5">
         {/* Filtros */}

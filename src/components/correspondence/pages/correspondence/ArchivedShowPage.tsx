@@ -11,7 +11,7 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { ArchiveRestoreIcon, RouteIcon } from '../../../../icons';
 import ArchivedInfo from '../../components/correspondence/archived/ArchivedInfo.tsx';
-import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
+import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 
 export default function ArchivedShowPage() {
   const { id } = useParams();

@@ -117,36 +117,6 @@ const principalItems: NavItem[] = [
 
 // ── Sección Correspondencia (con countKey en sub-ítems) ──────
 const CORRESPONDENCIA_ITEMS: NavItem[] = [
-  // {
-  //   icon: <FolderIcon />,
-  //   name: 'Trámites',
-  //   subItems: [
-  //     {
-  //       name: 'Trámites',
-  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ALL,
-  //       countKey: 'all',
-  //       permission: 'correspondencia_tramite.all',
-  //     },
-  //     {
-  //       name: 'Bandeja de Entrada',
-  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.PENDING,
-  //       countKey: 'pending',
-  //       permission: 'correspondencia_tramite.pending',
-  //     },
-  //     {
-  //       name: 'Bandeja de Salida',
-  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ATTENDED,
-  //       countKey: 'attended',
-  //       permission: 'correspondencia_tramite.attended',
-  //     },
-  //     {
-  //       name: 'Archivados',
-  //       path: ROUTES.CORRESPONDENCESS.ROUTE_SHEET.ARCHIVED,
-  //       countKey: 'archived',
-  //       permission: 'correspondencia_tramite.archived',
-  //     },
-  //   ],
-  // },
   {
     icon: <FolderIcon />,
     name: 'Trámites',

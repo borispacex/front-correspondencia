@@ -10,8 +10,8 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
-import { RouterRoutes } from '../../components/router/show/RouterRoutes.tsx';
 import MyDocumentInfo from '../../components/documents/my-documents/MyDocumentInfo.tsx';
+import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 
 export default function MyDocumentShowPage() {
   const { id } = useParams();
