@@ -7,11 +7,14 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import { useNavigate } from 'react-router';
 import { OutboxFilter } from '../../components/mailbox/outbox/OutboxFilter.tsx';
 import OutboxTable from '../../components/mailbox/outbox/OutboxTable.tsx';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from '../../hooks/useRouter.ts';
 import { useOutboxFilters } from '../../hooks/filters/useOutboxFilters.ts';
 import { Router } from '../../types/routers/router.type.ts';
 import { STATE } from '../../constants/state-document.constants.ts';
+import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
+import { useDocument } from '../../hooks/useDocument.ts';
+import { Document } from '../../types/documents/document.type.ts';
 
 export default function OutboxPage() {
   const { can } = usePermissions();
@@ -19,6 +22,10 @@ export default function OutboxPage() {
   const navigate = useNavigate();
 
   const { routers, isLoading, getAll } = useRouter();
+  const { getById: getDocumentById, isLoading: isLoadingDocument } = useDocument();
+
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   // ──────────────────────────── filters ─────────────────────────────────
   const { filters, setFilters, sort, setSort, resetFilters, filteredRouters } = useOutboxFilters(routers);
@@ -34,8 +41,10 @@ export default function OutboxPage() {
   }, [getAll]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (router: Router) => {
-    console.log('Rutas:', router);
+  const handleViewRoutes = async (router: Router) => {
+    setOpenRoutesModal(true);
+    const fullDocument = await getDocumentById(router.document_id, { included: ['routers'] });
+    setSelectedDocument(fullDocument);
   };
   const handleView = (router: Router) => {
     console.log('Ver documento', router);
@@ -67,6 +76,14 @@ export default function OutboxPage() {
           onView={handleView}
         />
       </div>
+
+      {/********************************** MODALES ***********************************/}
+      <RouterRoutesModal
+        isLoading={isLoadingDocument}
+        isOpen={openRoutesModal}
+        onClose={() => setOpenRoutesModal(false)}
+        document={selectedDocument}
+      />
     </>
   );
 }

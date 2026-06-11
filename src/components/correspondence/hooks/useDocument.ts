@@ -37,12 +37,12 @@ export function useDocument() {
   // ─────────────────────────────────────────────────────────────
   // Obtener por id
   // ─────────────────────────────────────────────────────────────
-  const getById = useCallback(async (id: number) => {
+  const getById = useCallback(async (id: number, params?: ApiQueryParams) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await getDocumentById(id);
+      const response = await getDocumentById(id, params);
       setDocument(response);
 
       return response;

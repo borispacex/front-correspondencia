@@ -1,6 +1,6 @@
 import { Modal } from '../ui/modal';
 
-interface ModalDeleteProps {
+interface Props {
   isOpen: boolean;
   title?: string;
   message?: string;
@@ -16,7 +16,7 @@ export default function ModalDelete({
   loading = false,
   onClose,
   onConfirm,
-}: ModalDeleteProps) {
+}: Props) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-sm p-6">
       <div className="text-center">

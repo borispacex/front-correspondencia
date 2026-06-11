@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { Document } from '../../types/documents/document.type.ts';
-import { getDocumentById } from '../../services/document.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -12,9 +11,11 @@ import Button from '../../../ui/button/Button.tsx';
 import { PencilIcon, PrinterIcon, SendHorizontalIcon, TrashBinIcon } from '../../../../icons';
 import MyDocumentInfo from '../../components/documents/my-documents/MyDocumentInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
+import { useDocument } from '../../hooks/useDocument.ts';
 
 export default function MyDocumentShowPage() {
   const { id } = useParams();
+  const { getById: getDocumentById } = useDocument();
 
   const [document, setDocument] = useState<Document | null>(null);
 

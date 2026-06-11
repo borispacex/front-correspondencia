@@ -11,7 +11,6 @@ import Button from '../../../ui/button/Button.tsx';
 import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
 import InboxInfo from '../../components/mailbox/inbox/InboxInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
-import { getDocumentById } from '../../services/document.service.ts';
 import { Document } from '../../types/documents/document.type.ts';
 
 export default function InboxShowPage() {

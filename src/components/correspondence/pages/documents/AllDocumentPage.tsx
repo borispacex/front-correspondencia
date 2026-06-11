@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Document } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -11,10 +11,14 @@ import { AllDocumentFilter } from '../../components/documents/all-documents/AllD
 import AllDocumentTable from '../../components/documents/all-documents/AllDocumentTable.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
 import { useAllDocumentFilters } from '../../hooks/filters/useAllDocumentFilters.ts';
+import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 
 export default function AllDocumentPage() {
   const navigate = useNavigate();
   const { documents, isLoading, getAll } = useDocument();
+
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   // ──────────────────────────── filters ─────────────────────────────────
   const { filters, setFilters, sort, setSort, resetFilters, filteredDocuments } = useAllDocumentFilters(documents);
@@ -25,7 +29,8 @@ export default function AllDocumentPage() {
 
   // ─────────────────────────── Handlers ──────────────────────────────────
   const handleViewRoutes = (document: Document) => {
-    console.log('ver ruta:', document);
+    setSelectedDocument(document);
+    setOpenRoutesModal(true);
   };
   const handleView = (document: Document) => {
     console.log('Ver tramite', document);
@@ -57,6 +62,11 @@ export default function AllDocumentPage() {
       </div>
 
       {/********************************** MODALES ***********************************/}
+      <RouterRoutesModal
+        isOpen={openRoutesModal}
+        onClose={() => setOpenRoutesModal(false)}
+        document={selectedDocument}
+      />
     </>
   );
 }

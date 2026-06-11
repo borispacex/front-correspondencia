@@ -34,12 +34,12 @@ export function useRouter() {
   }, []);
 
   // Obtener por id
-  const getById = useCallback(async (id: number) => {
+  const getById = useCallback(async (id: number, params?: ApiQueryParams) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await getRouterById(id);
+      const response = await getRouterById(id, params);
       setRouter(response);
 
       return response;

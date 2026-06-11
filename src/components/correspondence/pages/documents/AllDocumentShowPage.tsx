@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { Document } from '../../types/documents/document.type.ts';
-import { getDocumentById } from '../../services/document.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -12,9 +11,11 @@ import Button from '../../../ui/button/Button.tsx';
 import { RouteIcon } from '../../../../icons';
 import AllDocumentInfo from '../../components/documents/all-documents/AllDocumentInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
+import { useDocument } from '../../hooks/useDocument.ts';
 
 export default function AllDocumentShowPage() {
   const { id } = useParams<{ id: string }>();
+  const { getById: getDocumentByID } = useDocument();
 
   const [document, setDocument] = useState<Document | null>(null);
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
@@ -27,7 +28,7 @@ export default function AllDocumentShowPage() {
     setIsLoadingHistory(true);
 
     try {
-      const response = await getDocumentById(Number(id), { included: ['routers'] });
+      const response = await getDocumentByID(Number(id), { included: ['routers'] });
       setDocument(response);
     } finally {
       setIsLoadingDocument(false);
