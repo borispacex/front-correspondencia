@@ -1,126 +1,72 @@
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { DocumentFilters, Document } from '../../types/documents/document.type.ts';
-import { getDocuments } from '../../services/document.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
-
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
-import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../../constants/routes.constants.ts';
-
-import { PendingFilter, PendingSortConfig } from '../../components/correspondence/pending/PendingFilter.tsx';
+import { useNavigate } from 'react-router';
+import { PendingFilter } from '../../components/correspondence/pending/PendingFilter.tsx';
 import PendingTable from '../../components/correspondence/pending/PendingTable.tsx';
+import { useCallback, useEffect } from 'react';
+import { useRouter } from '../../hooks/useRouter.ts';
+import { usePendingFilters } from '../../hooks/filters/usePendingFilters.ts';
+import { Router } from '../../types/routers/router.type.ts';
+import { STATE } from '../../constants/state-document.constants.ts';
 
 export default function PendingPage() {
   const { can } = usePermissions();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
 
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { routers, isLoading, getAll } = useRouter();
 
-  // ─────────────────────────────────────────────────────────────
-  // filters, sort y status tab
-  // ─────────────────────────────────────────────────────────────
-  const [filters, setFilters] = useState<DocumentFilters>({
-    nro: '',
-    old: '',
-    origin: '',
-    subject: '',
-    priority: '',
-  });
-  const [sort, setSort] = useState<PendingSortConfig>({ field: 'id', dir: 'desc' });
-  // ─────────────────────────────────────────────────────────────
-  // Filtered data
-  // ─────────────────────────────────────────────────────────────
-  const filteredDocuments = useMemo(() => {
-    const filtered = documents.filter((document) => {
-      const nroMatch =
-        !filters.nro ||
-        String(document.doc_contador ?? '')
-          .toLowerCase()
-          .includes(filters.nro.toLowerCase());
-      const oldMatch =
-        !filters.old ||
-        String(document.doc_cite ?? '')
-          .toLowerCase()
-          .includes(filters.old.toLowerCase());
-      const originMatch =
-        !filters.origin ||
-        String(document.doc_dep_name ?? '')
-          .toLowerCase()
-          .includes(filters.origin.toLowerCase());
-      const subjectMatch =
-        !filters.subject ||
-        String(document.doc_referencia ?? '')
-          .toLowerCase()
-          .includes(filters.subject.toLowerCase());
-      const priorityMatch =
-        !filters.priority ||
-        String(document.pri_name ?? '')
-          .toLowerCase()
-          .includes(filters.priority.toLowerCase());
-
-      return nroMatch && oldMatch && originMatch && subjectMatch && priorityMatch;
+  // ──────────────────────────── filters ─────────────────────────────────
+  const { filters, setFilters, sort, setSort, resetFilters, filteredRouters } = usePendingFilters(routers);
+  // ──────────────────────────── Load data ─────────────────────────────────
+  const fetchRouters = useCallback(async () => {
+    await getAll({
+      included: ['document'],
+      filter: { state_document_id: [STATE.ENVIADO, STATE.DERIVADO] },
     });
-
-    return [...filtered].sort((a, b) => {
-      const aVal = String(a[sort.field as keyof Document] ?? '');
-      const bVal = String(b[sort.field as keyof Document] ?? '');
-      const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
-      return sort.dir === 'asc' ? cmp : -cmp;
-    });
-  }, [documents, filters, sort]);
-
-  // ─────────────────────────────────────────────────────────────
-  // Load data
-  // ─────────────────────────────────────────────────────────────
-  const fetchDocuments = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await getDocuments();
-      setDocuments(data);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
+  }, [getAll]);
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+    getAll({ included: ['document'], filter: { state_document_id: [STATE.ENVIADO, STATE.DERIVADO] } });
+  }, [getAll]);
 
-  // ─────────────────────────────────────────────────────────────
-  // Handlers
-  // ─────────────────────────────────────────────────────────────
-  const handleViewRoutes = (document: Document) => console.log('ver ruta:', document);
-  const handleView = (document: Document) => {
-    console.log('Ver tramite', document);
-    navigate(`${ROUTES.CORRESPONDENCE.PENDING.ALL}/${document.id}`);
+  // ── Handlers ────────────────────────────────────────────────
+  const handleViewRoutes = (router: Router) => {
+    console.log('Rutas:', router);
   };
-  // ─────────────────────────────────────────────────────────────
-  // Render
-  // ─────────────────────────────────────────────────────────────
+  const handleView = (router: Router) => {
+    console.log('Ver documento', router);
+    navigate(`${ROUTES.CORRESPONDENCE.PENDING.ALL}/${router.id}`);
+  };
+  // ── Render ───────────────────────────────────────────────────
   return (
     <>
-      <PageMeta title={`Buscar trámite | ${APP_NAME}`} description="Buscador de tramites" />
-      <PageBreadCrumb pageTitle="Buscar trámite" />
+      <PageMeta title={`Sin acción | ${APP_NAME}`} description="Documentos pendientes de atención" />
+      <PageBreadCrumb pageTitle="Sin acción" />
 
       <div className="space-y-5">
+        {/* Filtros */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
-          <PendingFilter filters={filters} sort={sort} onFiltersChange={setFilters} onSortChange={setSort} />
+          <PendingFilter
+            filters={filters}
+            sort={sort}
+            onFiltersChange={setFilters}
+            onSortChange={setSort}
+            onReset={resetFilters}
+          />
         </div>
 
+        {/* Tabla */}
         <PendingTable
-          documents={filteredDocuments}
+          routers={filteredRouters}
           isLoading={isLoading}
           onViewRoutes={handleViewRoutes}
           onView={handleView}
         />
       </div>
-
-      {/********************************** MODALES ***********************************/}
     </>
   );
 }

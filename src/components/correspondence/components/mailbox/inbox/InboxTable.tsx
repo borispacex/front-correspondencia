@@ -172,7 +172,7 @@ export default function InboxTable({
             className={`divide-y divide-gray-100 transition-opacity duration-200 dark:divide-white/[0.05] ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
           >
             {isLoading && routers.length === 0 ? (
-              <TableSkeleton rows={6} cols={4} />
+              <TableSkeleton rows={6} cols={5} />
             ) : paginated.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-5 py-14 text-center text-sm text-gray-400">

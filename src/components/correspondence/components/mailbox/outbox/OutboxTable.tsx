@@ -25,8 +25,8 @@ import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
 interface Props {
   routers: Router[];
   isLoading?: boolean;
-  onViewRoutes?: (document: Document) => void;
-  onView?: (document: Document) => void;
+  onViewRoutes?: (router: Router) => void;
+  onView?: (router: Router) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -149,7 +149,7 @@ export default function OutboxTable({ routers, isLoading, onViewRoutes, onView }
             className={`divide-y divide-gray-100 transition-opacity duration-200 dark:divide-white/[0.05] ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
           >
             {isLoading && routers.length === 0 ? (
-              <TableSkeleton rows={6} cols={4} />
+              <TableSkeleton rows={6} cols={5} />
             ) : paginated.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-5 py-14 text-center text-sm text-gray-400">
@@ -326,7 +326,7 @@ export default function OutboxTable({ routers, isLoading, onViewRoutes, onView }
                           <Button
                             variant="ghost-outline"
                             size="xs"
-                            onClick={() => onView(document)}
+                            onClick={() => onView(router)}
                             startIcon={<EyeIcon className="size-3.5 fill-blue-500 dark:fill-blue-400" />}
                           ></Button>
                         </Tooltip>
@@ -336,7 +336,7 @@ export default function OutboxTable({ routers, isLoading, onViewRoutes, onView }
                           <Button
                             variant="primary-outline"
                             size="xs"
-                            onClick={() => onViewRoutes(document)}
+                            onClick={() => onViewRoutes(router)}
                             startIcon={<RouteIcon className="size-3.5" />}
                           ></Button>
                         </Tooltip>

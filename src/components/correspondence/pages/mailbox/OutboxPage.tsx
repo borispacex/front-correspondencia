@@ -41,9 +41,6 @@ export default function OutboxPage() {
     console.log('Ver documento', router);
     navigate(`${ROUTES.MAILBOX.OUTBOX.ALL}/${router.id}`);
   };
-  const handleReceive = (document_id: number) => {
-    console.log('Recibir', document_id);
-  };
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
@@ -63,7 +60,12 @@ export default function OutboxPage() {
         </div>
 
         {/* Tabla */}
-        <OutboxTable routers={routers} isLoading={isLoading} onViewRoutes={handleViewRoutes} onView={handleView} />
+        <OutboxTable
+          routers={filteredRouters}
+          isLoading={isLoading}
+          onViewRoutes={handleViewRoutes}
+          onView={handleView}
+        />
       </div>
     </>
   );

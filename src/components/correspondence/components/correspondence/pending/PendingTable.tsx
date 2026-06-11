@@ -1,64 +1,41 @@
 import { useMemo, useState } from 'react';
-import { Document } from '../../../types/documents/document.type.ts';
 import { usePermissions } from '../../../../../hooks/usePermissions.ts';
 import {
   AngleDownIcon,
   AngleUpIcon,
-  ArchiveIcon,
-  ArchiveRestoreIcon,
-  BadgeIcon,
-  CalenderIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
   CopyIcon,
   EyeIcon,
-  FileTextIcon,
-  InboxIcon,
-  MailIcon,
-  PencilIcon,
-  PrinterIcon,
   RouteIcon,
-  SendHorizontalIcon,
-  TrashBinIcon,
 } from '../../../../../icons';
 import TableSkeleton from '../../../../animation/TableSkeleton.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
+import { Router } from '../../../types/routers/router.type.ts';
+import { PriorityBadge } from '../../shares/PriorityBadge.tsx';
+import { formatDateBo, getYear } from '../../../../../utils/format.utils.ts';
+import { useTypeDocument } from '../../../hooks/catalog/useTypeDocument.ts';
+import { StateDocumentBadge } from '../../shares/StateDocumentBadge.tsx';
+import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
+import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
 
 interface Props {
-  documents: Document[];
+  routers: Router[];
   isLoading?: boolean;
-  onViewHeader?: (document: Document) => void;
-  onViewRoutes?: (document: Document) => void;
-  onDerive?: (document: Document) => void;
-  onViewSheet?: (document: Document) => void;
-  onView?: (document: Document) => void;
-  onEdit?: (document: Document) => void;
-  onDelete?: (id: number) => void;
-  onArchive?: (id: number) => void;
-  onUnarchive?: (id: number) => void;
-  onReceive?: (id: number) => void;
+  onViewRoutes?: (router: Router) => void;
+  onView?: (router: Router) => void;
 }
 
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
-export default function PendingTable({
-  documents,
-  isLoading,
-  onEdit,
-  onDelete,
-  onDerive,
-  onViewHeader,
-  onViewSheet,
-  onViewRoutes,
-  onView,
-  onArchive,
-  onUnarchive,
-  onReceive,
-}: Props) {
+export default function PendingTable({ routers, isLoading, onViewRoutes, onView }: Props) {
   const { can } = usePermissions();
+  const { getNameById } = useTypeDocument();
+  const { getNameByValue } = useOrigin();
+  const { getNameById: getDeparmentNameById } = useDepartment();
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -66,18 +43,18 @@ export default function PendingTable({
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const sorted = useMemo(() => {
-    if (!sortField) return documents;
-    return [...documents].sort((a, b) => {
-      const aVal = String(a[sortField as keyof Document] ?? '');
-      const bVal = String(b[sortField as keyof Document] ?? '');
+    if (!sortField) return routers;
+    return [...routers].sort((a, b) => {
+      const aVal = String(a[sortField as keyof Router] ?? '');
+      const bVal = String(b[sortField as keyof Router] ?? '');
       const cmp = aVal.localeCompare(bVal, undefined, { numeric: true, sensitivity: 'base' });
       return sortDir === 'asc' ? cmp : -cmp;
     });
-  }, [documents, sortField, sortDir]);
+  }, [routers, sortField, sortDir]);
 
-  const totalPages = Math.max(1, Math.ceil(documents.length / perPage));
+  const totalPages = Math.max(1, Math.ceil(routers.length / perPage));
   const safePage = Math.min(page, totalPages);
-  const total = documents.length;
+  const total = routers.length;
   const from = total === 0 ? 0 : (safePage - 1) * perPage + 1;
   const to = Math.min(safePage * perPage, total);
 
@@ -118,31 +95,13 @@ export default function PendingTable({
     return pages;
   }
 
-  // ── Priority config ────────────────────────────────────────────────────────────
-  const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
-    NORMAL: { label: 'NORMAL', cls: 'bg-blue-100  text-blue-700  dark:bg-blue-900/40  dark:text-blue-300' },
-    URGENTE: { label: 'URGENTE', cls: 'bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300' },
-  };
-
-  function PriorityBadge({ priority }: { priority?: string }) {
-    const cfg = PRIORITY_CONFIG[priority ?? 'NORMAL'] ?? PRIORITY_CONFIG.NORMAL;
-    return (
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${cfg.cls}`}
-      >
-        <BadgeIcon />
-        {cfg.label}
-      </span>
-    );
-  }
-
   // ── Copy ───────────────────────────────────────────────────────────────────
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  async function handleCopy(document: Document) {
+  async function handleCopy(router: Router) {
     try {
-      await navigator.clipboard.writeText(String(document.doc_contador ?? document.id));
-      setCopiedId(document.id);
+      await navigator.clipboard.writeText(`${router.document?.doc_contador}/${getYear(router.document?.created_at)}`);
+      setCopiedId(router.id);
       setTimeout(() => setCopiedId(null), 1800);
     } catch (error) {
       console.error('Error copying', error);
@@ -166,13 +125,22 @@ export default function PendingTable({
                 <span className="flex items-center gap-1"># {renderSortIcon('id')}</span>
               </th>
               <th
-                onClick={() => handleSort('doc_contador')}
+                onClick={() => handleSort('id')}
                 className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <span className="flex items-center gap-1">Trámite {renderSortIcon('doc_contador')}</span>
+                <span className="flex items-center gap-1">Derivación {renderSortIcon('id')}</span>
+              </th>
+              <th
+                onClick={() => handleSort('document_id')}
+                className="cursor-pointer px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <span className="flex items-center gap-1">Trámite {renderSortIcon('document_id')}</span>
               </th>
               <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                Derivado por
+                Tiempo
+              </th>
+              <th className="px-5 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                Estado
               </th>
               <th className="w-40 px-5 py-4 text-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                 Acciones
@@ -183,33 +151,110 @@ export default function PendingTable({
           <tbody
             className={`divide-y divide-gray-100 transition-opacity duration-200 dark:divide-white/[0.05] ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
           >
-            {isLoading && documents.length === 0 ? (
-              <TableSkeleton rows={6} cols={4} />
+            {isLoading && routers.length === 0 ? (
+              <TableSkeleton rows={6} cols={6} />
             ) : paginated.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-5 py-14 text-center text-sm text-gray-400">
-                  No hay documentos pendientes
+                  No hay tramites
                 </td>
               </tr>
             ) : (
-              paginated.map((document) => (
-                <tr key={document.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
-                    {document.id ?? '—'}
-                  </td>
+              paginated.map((router) => (
+                <tr key={router.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{router.id ?? '—'}</td>
 
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
                       <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:text-brand-400 dark:bg-brand-500/10 rounded-full border px-3 py-1 text-xs font-medium">
-                          {document.doc_contador ?? document.id}
+                        <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-400">
+                          {router.document?.doc_contador ?? ''}/{getYear(router.document?.created_at) ?? ''}
                         </span>
-                        <Tooltip content={copiedId === document.id ? 'Copiado' : 'Copiar'}>
+                        <Tooltip content={copiedId === router.id ? 'Copiado' : 'Copiar'}>
                           <button
                             type="button"
-                            onClick={() => handleCopy(document)}
+                            onClick={() => handleCopy(router)}
+                            className={`group relative inline-flex items-center justify-center rounded-md pl-0.5 text-sky-600 transition-colors duration-200 hover:bg-gray-100 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-gray-800 ${
+                              copiedId === router.id
+                                ? 'scale-110 bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400'
+                                : 'scale-100'
+                            }`}
+                          >
+                            <CopyIcon className={`size-4`} />
+                          </button>
+                        </Tooltip>
+                      </div>
+
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {/*{router.priority_id && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="font-semibold text-sky-600 dark:text-sky-400">PRIORIDAD:</span>{' '}*/}
+                        {/*    <PriorityBadge priorityId={router.priority_id} />*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
+                        {/*{router.rout_cite_document && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="font-semibold text-sky-600 dark:text-sky-400">CITE:</span>{' '}*/}
+                        {/*    {router.rout_cite_document}*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
+                        {/*{router.rout_numero_cite && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="font-semibold text-sky-600 dark:text-sky-400">NRO CITE:</span>{' '}*/}
+                        {/*    {router.rout_numero_cite}*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
+                        {router.department_id_origen && (
+                          <p>
+                            <span className="font-semibold text-sky-600 dark:text-sky-400">DE:</span>{' '}
+                            {getDeparmentNameById(router.department_id_origen)}
+                          </p>
+                        )}
+                        {router.department_id_destino && (
+                          <p>
+                            <span className="font-semibold text-sky-600 dark:text-sky-400">PARA:</span>{' '}
+                            {getDeparmentNameById(router.department_id_destino)}
+                          </p>
+                        )}
+                        {router.rout_remite_document && (
+                          <p>
+                            <span className="font-semibold text-sky-600 dark:text-sky-400">REMITE:</span>{' '}
+                            {router.rout_remite_document}
+                          </p>
+                        )}
+                        {router.priority_id && (
+                          <p>
+                            <span className="font-semibold text-sky-600 dark:text-sky-400">PRIORIDAD:</span>{' '}
+                            <PriorityBadge priorityId={router.priority_id} />
+                          </p>
+                        )}
+                        {router.type_document_id && (
+                          <p>
+                            <span className="font-semibold text-sky-600 dark:text-sky-400">TIPO DOCUMENTO:</span>{' '}
+                            {getNameById(router.type_document_id)}
+                          </p>
+                        )}
+                        {/*{router.rout_referencia_document && (*/}
+                        {/*  <p>*/}
+                        {/*    <span className="font-semibold text-sky-600 dark:text-sky-400">OBJETO/REFERENCIA:</span>{' '}*/}
+                        {/*    {router.rout_referencia_document}*/}
+                        {/*  </p>*/}
+                        {/*)}*/}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-5 align-top">
+                    <div className="space-y-3">
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:text-brand-400 dark:bg-brand-500/10 rounded-full border px-3 py-1 text-xs font-medium">
+                          {router.document?.doc_contador ?? ''}/{getYear(router.document?.created_at) ?? ''}
+                        </span>
+                        <Tooltip content={copiedId === router.document_id ? 'Copiado' : 'Copiar'}>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(router.document)}
                             className={`group text-brand-600 hover:text-brand-700 dark:text-brand-400 relative inline-flex items-center justify-center rounded-md pl-0.5 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                              copiedId === document.id
+                              copiedId === router.document_id
                                 ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 scale-110'
                                 : 'scale-100'
                             }`}
@@ -220,71 +265,64 @@ export default function PendingTable({
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {document.priority_id && (
+                        {router.document?.doc_numero_cite && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">
+                              NRO TRAMITE ANTIGUO:
+                            </span>{' '}
+                            {router.document?.id}
+                          </p>
+                        )}
+                        {router.document?.priority_id && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PRIORIDAD:</span>{' '}
-                            <PriorityBadge priority={document.priority_id === 1 ? 'URGENTE' : 'NORMAL'} />
+                            <PriorityBadge priorityId={router.document.priority_id} />
                           </p>
                         )}
-                        {document.doc_cite && (
-                          <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
-                            {document.doc_numero_cite}
-                          </p>
-                        )}
-                        {document.doc_dep_name && (
+                        {router.document?.doc_procedencia && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">PROCEDENCIA:</span>{' '}
-                            {document.doc_dep_name}
+                            {getNameByValue(router.document?.doc_procedencia)}
                           </p>
                         )}
-                        {document.doc_remite && (
+                        {router.document?.doc_remite && (
                           <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITENTE:</span>{' '}
-                            {document.doc_remite}
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">REMITE:</span>{' '}
+                            {router.document?.doc_remite}
                           </p>
                         )}
-                        {document.typ_name && (
+                        {router.document?.doc_cite && (
                           <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">TIPO:</span>{' '}
-                            {document.typ_name}
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">CITE:</span>{' '}
+                            {router.document?.doc_cite}
                           </p>
                         )}
-                        {document.doc_referencia && (
+                        {router.document?.doc_numero_cite && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">NRO CITE:</span>{' '}
+                            {router.document?.doc_numero_cite}
+                          </p>
+                        )}
+                        {router.document?.type_document_id && (
+                          <p>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">TIPO DOCUMENTO:</span>{' '}
+                            {getNameById(router.document?.type_document_id)}
+                          </p>
+                        )}
+                        {router.document?.doc_referencia && (
                           <p>
                             <span className="text-brand-600 dark:text-brand-400 font-semibold">OBJETO/REFERENCIA:</span>{' '}
-                            {document.doc_referencia}
+                            {router.document?.doc_referencia}
                           </p>
                         )}
                       </div>
                     </div>
                   </td>
-
-                  <td className="px-5 py-5 align-top">
-                    <div className="space-y-3">
-                      {document.id % 2 == 0 ? (
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>CRISTIAN MACELO MAMANI VIDES</p>
-                          <p>JEFE DE GESTON Y ASISTENCIA TECNOLOGICA</p>
-                          <p>
-                            <span className="text-brand-600 dark:text-brand-400 font-semibold">Asunto:</span> Para su
-                            atencion
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <CalenderIcon className="text-brand-600 dark:text-brand-400 size-4" />
-                            <span>01/05/2026</span>
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                          <p>Sin derivaciones.</p>
-                          <p className="flex items-center gap-2">
-                            <MailIcon className="text-brand-600 dark:text-brand-400 size-4" />
-                            <span>Tienes 1 documento pendiente.</span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                    <span>{formatDateBo(router.created_at)}</span>
+                  </td>
+                  <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                    <StateDocumentBadge stateDocumentId={router.state_document_id} />
                   </td>
 
                   <td className="px-5 py-5 align-top">
@@ -294,100 +332,18 @@ export default function PendingTable({
                           <Button
                             variant="ghost-outline"
                             size="xs"
-                            onClick={() => onView(document)}
-                            startIcon={<EyeIcon className="size-3.5 fill-blue-500 dark:fill-blue-400" />}
+                            onClick={() => onView(router)}
+                            startIcon={<EyeIcon className="size-3.5 fill-sky-500 dark:fill-sky-400" />}
                           ></Button>
                         </Tooltip>
                       )}
-                      {can('files.edit') && onViewHeader && (
-                        <Tooltip content="Cabecera de ruta">
-                          <Button
-                            variant="secondary-outline"
-                            size="xs"
-                            startIcon={<FileTextIcon className="size-3.5" />}
-                            onClick={() => onViewHeader(document)}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('files.edit') && onViewSheet && (
-                        <Tooltip content="Hoja de ruta">
-                          <Button
-                            variant="secondary-outline"
-                            size="xs"
-                            startIcon={<PrinterIcon className="size-3.5" />}
-                            onClick={() => onViewSheet(document)}
-                          ></Button>
-                        </Tooltip>
-                      )}
-
                       {can('files.routes') && onViewRoutes && (
                         <Tooltip content="Ver rutas">
                           <Button
                             variant="primary-outline"
                             size="xs"
-                            onClick={() => onViewRoutes(document)}
+                            onClick={() => onViewRoutes(router)}
                             startIcon={<RouteIcon className="size-3.5" />}
-                          ></Button>
-                        </Tooltip>
-                      )}
-
-                      {can('files.edit') && onEdit && (
-                        <Tooltip content="Editar">
-                          <Button
-                            variant="action-outline"
-                            size="xs"
-                            onClick={() => onEdit(document)}
-                            startIcon={<PencilIcon className="size-3.5" />}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('files.derive') && onDerive && (
-                        <Tooltip content="Derivar">
-                          <Button
-                            variant="success-outline"
-                            size="xs"
-                            startIcon={<SendHorizontalIcon className="size-3.5" />}
-                            onClick={() => onDerive(document)}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('files.delete') && onDelete && (
-                        <Tooltip content="Eliminar">
-                          <Button
-                            variant="danger-outline"
-                            size="xs"
-                            startIcon={<TrashBinIcon className="size-3.5" />}
-                            onClick={() => onDelete(document.id)}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('files.archive') && onArchive && (
-                        <Tooltip content="Archivar">
-                          <Button
-                            variant="info-outline"
-                            size="xs"
-                            startIcon={<ArchiveIcon className="size-3.5" />}
-                            onClick={() => onArchive(document.id)}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('files.unarchive') && onUnarchive && (
-                        <Tooltip content="Desarchivar">
-                          <Button
-                            variant="info-outline"
-                            size="xs"
-                            startIcon={<ArchiveRestoreIcon className="size-3.5" />}
-                            onClick={() => onUnarchive(document.id)}
-                          ></Button>
-                        </Tooltip>
-                      )}
-                      {can('files.receive') && onReceive && (
-                        <Tooltip content="Recibir">
-                          <Button
-                            variant="info-outline"
-                            size="xs"
-                            startIcon={<InboxIcon className="size-3.5" />}
-                            onClick={() => onReceive(document.id)}
                           ></Button>
                         </Tooltip>
                       )}

@@ -5,28 +5,17 @@ import InputField from '../../../../form/input/InputField.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { BrushCleaningIcon } from '../../../../../icons';
+import { ArchivedFilters, ArchivedSortConfig } from '../../../hooks/filters/useArchivedFilters.ts';
 
-export interface ArchivedFilters {
-  nro: string;
-  origin: string;
-  subject: string;
-  priority: string;
-  sender: string;
-}
-
-export interface ArchivedSortConfig {
-  field: string;
-  dir: 'asc' | 'desc';
-}
-
-interface ArchivedFilterProps {
+interface Props {
   filters: ArchivedFilters;
   sort: ArchivedSortConfig;
   onFiltersChange: (filters: ArchivedFilters) => void;
   onSortChange: (sort: ArchivedSortConfig) => void;
+  onReset: () => void;
 }
 
-export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange }: ArchivedFilterProps) => {
+export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange, onReset }: Props) => {
   const handleInputChange =
     (field: keyof ArchivedFilters) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onFiltersChange({ ...filters, [field]: e.target.value });
@@ -41,16 +30,42 @@ export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange }:
     onSortChange({ field, dir: dir as 'asc' | 'desc' });
   };
 
-  const clearFilters = () => {
-    onFiltersChange({ nro: '', origin: '', subject: '', priority: '', sender: '' });
-    onSortChange({ field: 'id', dir: 'desc' });
-  };
-
   const PRIORITY_OPTIONS: Option[] = [
     { value: '', label: 'Todas' },
-    { value: 'NORMAL', label: 'Normal' },
-    { value: 'URGENTE', label: 'Urgente' },
-    { value: 'ALTA', label: 'Alta' },
+    { value: '2', label: 'Normal' },
+    { value: '1', label: 'Urgente' },
+  ];
+
+  const TYPE_DOCUMENT_OPTIONS: Option[] = [
+    { value: '', label: 'Todas' },
+    { value: '1', label: 'Oficio' },
+    { value: '2', label: 'Nota de servicio' },
+    { value: '3', label: 'Pedido' },
+    { value: '4', label: 'Radiograma' },
+    { value: '5', label: 'Correo electronico' },
+    { value: '6', label: 'Memorandum' },
+    { value: '7', label: 'Parte' },
+    { value: '8', label: 'Papeleta' },
+    { value: '9', label: 'Orden del dia' },
+    { value: '10', label: 'Directica' },
+    { value: '11', label: 'Resolución' },
+    { value: '12', label: 'Acta' },
+    { value: '13', label: 'Nota de entrega' },
+    { value: '14', label: 'Solicitud' },
+    { value: '15', label: 'Informe' },
+    { value: '16', label: 'Certificacion' },
+    { value: '17', label: 'Ejecución' },
+    { value: '18', label: 'Notificación' },
+    { value: '19', label: 'Instructivo' },
+    { value: '20', label: 'Certificado' },
+    { value: '21', label: 'Orden de servicio' },
+    { value: '22', label: 'Plan de actividades' },
+    { value: '23', label: 'Titulos de posgrado' },
+    { value: '24', label: 'Otros' },
+    { value: '25', label: 'Telefonema' },
+    { value: '26', label: 'Memorial' },
+    { value: '27', label: 'Carta' },
+    { value: '28', label: 'Orden de servicio' },
   ];
 
   const SORT_OPTIONS: Option[] = [
@@ -74,12 +89,12 @@ export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange }:
       {/* Procedencia */}
       <div className="flex min-w-[160px] flex-1 flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
-          Procedencia
+          Cite
         </Label>
         <InputField
           size="xs"
-          value={filters.origin}
-          onChange={handleInputChange('origin')}
+          value={filters.nroCite}
+          onChange={handleInputChange('nroCite')}
           placeholder="Buscar procedencia…"
         />
       </div>
@@ -124,6 +139,20 @@ export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange }:
         />
       </div>
 
+      {/* Nro cite */}
+      <div className="flex min-w-[110px] flex-col gap-1">
+        <Label size="xs" className="tracking-wide uppercase">
+          Tipo documento
+        </Label>
+        <Select
+          size="xs"
+          options={TYPE_DOCUMENT_OPTIONS}
+          defaultValue={filters.typeDocument}
+          onChange={handleSelectChange('typeDocument')}
+          placeholder="Todas"
+        />
+      </div>
+
       {/* Ordenar */}
       <div className="flex min-w-[150px] flex-col gap-1">
         <Label size="xs" className="tracking-wide uppercase">
@@ -140,7 +169,7 @@ export const ArchivedFilter = ({ filters, sort, onFiltersChange, onSortChange }:
 
       {/* Limpiar */}
       <Tooltip content="Limpiar">
-        <Button size="xs" variant="outline" onClick={clearFilters} className="h-[38px]">
+        <Button size="xs" variant="outline" onClick={onReset} className="h-[38px]">
           <BrushCleaningIcon width="20" height="20" />
         </Button>
       </Tooltip>
