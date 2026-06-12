@@ -233,8 +233,10 @@ export default function AllDocumentTable({ documents, isLoading, onViewRoutes, o
                         {document.routers?.length ? (
                           <div>
                             <p>
-                              <span className="font-semibold text-sky-600 dark:text-sky-400">DERIVACIONES:</span>{' '}
-                              {document.routers.length}
+                              <span className="font-semibold text-sky-600 dark:text-sky-400">Recorrido</span>
+                              {' · '}
+                              {document.routers.length} derivación
+                              {document.routers.length !== 1 ? 'es' : ''}
                             </p>{' '}
                             {document.routers.map((router, i) => (
                               <div key={router.id} className="flex flex-col border-gray-100 dark:border-white/[0.05]">
