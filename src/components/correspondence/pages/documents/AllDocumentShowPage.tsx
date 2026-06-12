@@ -12,6 +12,7 @@ import { RouteIcon } from '../../../../icons';
 import AllDocumentInfo from '../../components/documents/all-documents/AllDocumentInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
+import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 
 export default function AllDocumentShowPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,9 @@ export default function AllDocumentShowPage() {
   const [document, setDocument] = useState<Document | null>(null);
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   const fetchDocument = useCallback(async () => {
     if (!id) return;
@@ -42,7 +46,8 @@ export default function AllDocumentShowPage() {
 
   // ── Handlers ────────────────────────────────────────────────
   const handleViewRoutes = (doc: Document) => {
-    console.log('Ver rutas', doc);
+    setSelectedDocument(document);
+    setOpenRoutesModal(true);
   };
 
   // const handleDerive = (doc: Document) => {
@@ -86,6 +91,13 @@ export default function AllDocumentShowPage() {
           <RouterRoutes document={document} isLoading={isLoadingHistory} />
         </div>
       </div>
+
+      {/********************************** MODALES ***********************************/}
+      <RouterRoutesModal
+        isOpen={openRoutesModal}
+        onClose={() => setOpenRoutesModal(false)}
+        document={selectedDocument}
+      />
     </>
   );
 }

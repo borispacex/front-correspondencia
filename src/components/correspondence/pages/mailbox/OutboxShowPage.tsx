@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { Router } from '../../types/routers/router.type.ts';
 import { getRouterById } from '../../services/router.service.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
@@ -9,35 +9,36 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { ForwardIcon, PrinterIcon, RouteIcon } from '../../../../icons';
-import { Document } from '../../types/documents/document.type.ts';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import OutboxInfo from '../../components/mailbox/outbox/OutboxInfo.tsx';
+import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
+import ConfirmModal from '../../../modal/ModalConfirm.tsx';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
 
 export default function OutboxShowPage() {
   const { id } = useParams();
 
+  const { can } = usePermissions();
+  const navigate = useNavigate();
+  const { addNotification } = useNotifications();
+
   const [router, setRouter] = useState<Router | null>(null);
-  const [document, setDocument] = useState<Document | null>(null);
   const [isLoadingRouter, setIsLoadingRouter] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [openForwardModal, setOpenForwardModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
-
     setIsLoadingRouter(true);
-    setIsLoadingHistory(true);
-
     try {
       const response = await getRouterById(Number(id), {
         included: ['document.routers'],
       });
-
       setRouter(response);
-      // El documento con sus routers viene dentro del router
-      setDocument(response.document ?? null);
     } finally {
       setIsLoadingRouter(false);
-      setIsLoadingHistory(false);
     }
   }, [id]);
 
@@ -46,27 +47,43 @@ export default function OutboxShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleForward = (router_id: number) => {
-    console.log('Reenviar:', router_id);
+  const handleForward = () => {
+    setOpenForwardModal(true);
   };
 
-  const handleBackup = (router_id: number) => {
-    console.log('Respaldo:', router_id);
+  const handleBackup = () => {
+    console.log('Respaldo:', router?.id);
   };
 
-  const handleViewRoutes = (router: Router) => {
-    console.log('Ver rutas:', router);
+  const handleViewRoutes = () => {
+    setOpenRoutesModal(true);
   };
+
+  async function handleConfirmForward() {
+    if (router === null) return;
+    try {
+      // await forwardRoute(route.id)
+      addNotification({
+        type: 'success',
+        title: 'Reenvio exitoso',
+        message: 'El reenvió fue enviado correctamente.',
+      });
+      navigate(`${ROUTES.MAILBOX.OUTBOX.ALL}}`);
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al realizar reenvio',
+      });
+    }
+  }
 
   return (
     <>
-      <PageMeta
-        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
-        description="Información detallada del trámite"
-      />
+      <PageMeta title={`Tramite (Derivación) #${id} | ${APP_NAME}`} description="Información detallada del trámite" />
 
       <PageBreadCrumb
-        pageTitle={`Tramite (Derivación) #${router?.id}`}
+        pageTitle={`Tramite (Derivación) #${id}`}
         items={[
           {
             label: 'Bandeja de Salida',
@@ -86,7 +103,7 @@ export default function OutboxShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(router)}
+              onClick={() => handleViewRoutes()}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -98,7 +115,7 @@ export default function OutboxShowPage() {
               variant="secondary"
               size="sm"
               startIcon={<PrinterIcon className="size-3.5" />}
-              onClick={() => handleBackup(router.id)}
+              onClick={() => handleBackup()}
             >
               Respaldo
             </Button>
@@ -108,7 +125,7 @@ export default function OutboxShowPage() {
               variant="info"
               size="sm"
               startIcon={<ForwardIcon className="size-3.5" />}
-              onClick={() => handleForward(router.id)}
+              onClick={() => handleForward()}
             >
               Reenviar
             </Button>
@@ -122,9 +139,27 @@ export default function OutboxShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={document} isLoading={isLoadingHistory} />
+          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
         </div>
       </div>
+
+      {/********************************** MODALES ***********************************/}
+      <RouterRoutesModal
+        isOpen={openRoutesModal}
+        isLoading={isLoadingRouter}
+        onClose={() => setOpenRoutesModal(false)}
+        document={router?.document}
+      />
+      <ConfirmModal
+        isOpen={openForwardModal}
+        variant="success"
+        title="¿Confirmar reenvio?"
+        message="Se realizará el reenvio de la derivación."
+        confirmText="Reenviar"
+        loadingText="Reenviando"
+        onClose={() => setOpenForwardModal(false)}
+        onConfirm={handleConfirmForward}
+      />
     </>
   );
 }

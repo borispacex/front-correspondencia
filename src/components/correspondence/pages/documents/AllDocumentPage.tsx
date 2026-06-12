@@ -33,7 +33,6 @@ export default function AllDocumentPage() {
     setOpenRoutesModal(true);
   };
   const handleView = (document: Document) => {
-    console.log('Ver tramite', document);
     navigate(`${ROUTES.DOCUMENTS.ALL_DOCUMENTS.ALL}/${document.id}`);
   };
   // ─────────────────────────── Render ──────────────────────────────────

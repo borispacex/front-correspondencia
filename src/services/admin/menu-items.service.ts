@@ -5,7 +5,12 @@ import type {
   CreateMenuItemRequest,
   UpdateMenuItemRequest,
 } from '../../types/admin/menu-items/menu-item.types.ts';
-import type { ApiResponse, ApiQueryParams } from '../../types/common/api.types.ts';
+import type {
+  ApiResponse,
+  ApiQueryParams,
+  Pagination,
+  LaravelResourcePagination,
+} from '../../types/common/api.types.ts';
 import { buildQueryParams } from '../../utils/query.utils.ts';
 
 export async function getMenuItems(params?: ApiQueryParams): Promise<MenuItem[]> {
@@ -13,6 +18,19 @@ export async function getMenuItems(params?: ApiQueryParams): Promise<MenuItem[]>
     params: params ? buildQueryParams(params) : undefined,
   });
   return data.data;
+}
+
+export async function getMenuItemsPaginated(params: ApiQueryParams): Promise<Pagination<MenuItem>> {
+  const { data } = await http.get<LaravelResourcePagination<MenuItem>>(API_ENDPOINTS.MENU_ITEMS.BASE, {
+    params: buildQueryParams({ ...params }),
+  });
+  return {
+    data: data.data,
+    current_page: data.meta.current_page,
+    last_page: data.meta.last_page,
+    per_page: data.meta.per_page,
+    total: data.meta.total,
+  };
 }
 
 export async function getMenuItemById(id: number, params?: ApiQueryParams): Promise<MenuItem> {

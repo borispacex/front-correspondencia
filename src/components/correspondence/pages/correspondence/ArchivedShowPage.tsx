@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { Router } from '../../types/routers/router.type.ts';
 import { getRouterById } from '../../services/router.service.ts';
@@ -12,32 +12,34 @@ import Button from '../../../ui/button/Button.tsx';
 import { ArchiveRestoreIcon, RouteIcon } from '../../../../icons';
 import ArchivedInfo from '../../components/correspondence/archived/ArchivedInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
-import { Document } from '../../types/documents/document.type.ts';
+import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
+import ConfirmModal from '../../../modal/ModalConfirm.tsx';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
 
 export default function ArchivedShowPage() {
   const { id } = useParams();
 
+  const { can } = usePermissions();
+  const navigate = useNavigate();
+  const { addNotification } = useNotifications();
+
   const [router, setRouter] = useState<Router | null>(null);
-  const [document, setDocument] = useState<Document | null>(null);
   const [isLoadingRouter, setIsLoadingRouter] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [openUnarchiveModal, setOpenUnarchiveModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
-
     setIsLoadingRouter(true);
-    setIsLoadingHistory(true);
-
     try {
       const response = await getRouterById(Number(id), {
         included: ['document.routers'],
       });
-
       setRouter(response);
-      setDocument(response.document ?? null);
     } finally {
       setIsLoadingRouter(false);
-      setIsLoadingHistory(false);
     }
   }, [id]);
 
@@ -46,22 +48,41 @@ export default function ArchivedShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (router: Router) => {
-    console.log('Rutas:', router);
+  const handleViewRoutes = () => {
+    setOpenRoutesModal(true);
   };
 
-  const handleUnarchive = (router_id: number) => {
-    console.log('Desarchivar:', router_id);
+  const handleUnarchive = () => {
+    setOpenUnarchiveModal(true);
   };
+
+  async function handleConfirmUnarchive() {
+    if (router === null) return;
+    try {
+      // await unarchiveRoute(route.id)
+      addNotification({
+        type: 'success',
+        title: 'Dearchivado exitosa',
+        message: 'La desarchivado fue exitoso correctamente.',
+      });
+      navigate(`${ROUTES.CORRESPONDENCE.ARCHIVED.ALL}}`);
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al realizar desarchivación',
+      });
+    }
+  }
 
   return (
     <>
       <PageMeta
-        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
+        title={`Tramite (Derivación) #${id} | ${APP_NAME}`}
         description="Información detallada del tramite archivado"
       />
       <PageBreadCrumb
-        pageTitle={`Tramite (Derivación) #${router?.id}`}
+        pageTitle={`Tramite (Derivación) #${id}`}
         items={[
           {
             label: 'Archivados',
@@ -81,7 +102,7 @@ export default function ArchivedShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(router)}
+              onClick={() => handleViewRoutes()}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -92,7 +113,7 @@ export default function ArchivedShowPage() {
               variant="info"
               size="sm"
               startIcon={<ArchiveRestoreIcon className="size-3.5" />}
-              onClick={() => handleUnarchive(router.id)}
+              onClick={() => handleUnarchive()}
             >
               Desarchivar
             </Button>
@@ -106,9 +127,27 @@ export default function ArchivedShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={document} isLoading={isLoadingHistory} />
+          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
         </div>
       </div>
+
+      {/********************************** MODALES ***********************************/}
+      <RouterRoutesModal
+        isOpen={openRoutesModal}
+        isLoading={isLoadingRouter}
+        onClose={() => setOpenRoutesModal(false)}
+        document={router?.document}
+      />
+      <ConfirmModal
+        isOpen={openUnarchiveModal}
+        variant="success"
+        title="¿Confirmar desarchivar?"
+        message="Se realizará desarchivar de la derivación."
+        confirmText="Desarchivar"
+        loadingText="Desarchivando"
+        onClose={() => setOpenUnarchiveModal(false)}
+        onConfirm={handleConfirmUnarchive}
+      />
     </>
   );
 }

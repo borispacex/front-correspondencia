@@ -3,15 +3,12 @@ import { usePermissions } from '../../../../../hooks/usePermissions.ts';
 import {
   AngleDownIcon,
   AngleUpIcon,
-  BadgeIcon,
-  CalenderIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
   CopyIcon,
   EyeIcon,
-  MailIcon,
   RouteIcon,
 } from '../../../../../icons';
 import TableSkeleton from '../../../../animation/TableSkeleton.tsx';

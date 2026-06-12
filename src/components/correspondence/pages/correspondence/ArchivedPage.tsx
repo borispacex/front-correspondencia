@@ -15,6 +15,7 @@ import { STATE } from '../../constants/state-document.constants.ts';
 import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
 import { Document } from '../../types/documents/document.type.ts';
+import ConfirmModal from '../../../modal/ModalConfirm.tsx';
 
 export default function ArchivedPage() {
   const { can } = usePermissions();
@@ -24,8 +25,11 @@ export default function ArchivedPage() {
   const { routers, isLoading, getAll } = useRouter();
   const { getById: getDocumentById, isLoading: isLoadingDocument } = useDocument();
 
-  const [openRoutesModal, setOpenRoutesModal] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedIdRoute, setSelectedIdRoute] = useState<number | null>(null);
+
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [openUnarchiveModal, setOpenUnarchiveModal] = useState(false);
 
   // ──────────────────────────── filters ─────────────────────────────────
   const { filters, setFilters, sort, setSort, resetFilters, filteredRouters } = useArchivedFilters(routers);
@@ -53,8 +57,27 @@ export default function ArchivedPage() {
     navigate(`${ROUTES.CORRESPONDENCE.ARCHIVED.ALL}/${router.id}`);
   };
   const handleUnarchive = (router_id: number) => {
-    console.log('Recibir', router_id);
+    setSelectedIdRoute(router_id);
+    setOpenUnarchiveModal(true);
   };
+  async function handleConfirmUnarchive() {
+    if (selectedIdRoute === null) return;
+    try {
+      // await unarchiveRoute(selectedIdRoute)
+      addNotification({
+        type: 'success',
+        title: 'Dearchivado exitosa',
+        message: 'La desarchivado fue exitoso correctamente.',
+      });
+      navigate(`${ROUTES.CORRESPONDENCE.ARCHIVED.ALL}}`);
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al realizar desarchivación',
+      });
+    }
+  }
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
@@ -89,6 +112,16 @@ export default function ArchivedPage() {
         isOpen={openRoutesModal}
         onClose={() => setOpenRoutesModal(false)}
         document={selectedDocument}
+      />
+      <ConfirmModal
+        isOpen={openUnarchiveModal}
+        variant="success"
+        title="¿Confirmar desarchivar?"
+        message="Se realizará desarchivar de la derivación."
+        confirmText="Desarchivar"
+        loadingText="Desarchivando"
+        onClose={() => setOpenUnarchiveModal(false)}
+        onConfirm={handleConfirmUnarchive}
       />
     </>
   );

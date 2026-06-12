@@ -15,6 +15,7 @@ import { STATE } from '../../constants/state-document.constants.ts';
 import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 import { Document } from '../../types/documents/document.type.ts';
 import { useDocument } from '../../hooks/useDocument.ts';
+import ConfirmModal from '../../../modal/ModalConfirm.tsx';
 
 export default function InboxPage() {
   const { can } = usePermissions();
@@ -24,8 +25,10 @@ export default function InboxPage() {
   const { routers, isLoading, getAll } = useRouter();
   const { getById: getDocumentById, isLoading: isLoadingDocument } = useDocument();
 
-  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [selectedIdRoute, setSelectedIdRoute] = useState<number | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
 
   // ──────────────────────────── filters ─────────────────────────────────
   const { filters, setFilters, sort, setSort, resetFilters, filteredRouters } = useInboxFilters(routers);
@@ -53,8 +56,26 @@ export default function InboxPage() {
     navigate(`${ROUTES.MAILBOX.INBOX.ALL}/${router.id}`);
   };
   const handleReceive = (router_id: number) => {
-    console.log('Recibir', router_id);
+    setSelectedIdRoute(router_id);
+    setOpenReceiveModal(true);
   };
+  async function handleConfirmReceive() {
+    if (selectedIdRoute === null) return;
+    try {
+      // await deriveRoute(route.id)
+      addNotification({
+        type: 'success',
+        title: 'Derivación exitosa',
+        message: 'La derivación fue enviada correctamente.',
+      });
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al realizar derivación',
+      });
+    }
+  }
   // ── Render ───────────────────────────────────────────────────
   return (
     <>
@@ -89,6 +110,16 @@ export default function InboxPage() {
         isOpen={openRoutesModal}
         onClose={() => setOpenRoutesModal(false)}
         document={selectedDocument}
+      />
+      <ConfirmModal
+        isOpen={openReceiveModal}
+        variant="success"
+        title="¿Confirmar recepción?"
+        message="Se realizará la recepción del tramite."
+        confirmText="Recibir"
+        loadingText="Registrando"
+        onClose={() => setOpenReceiveModal(false)}
+        onConfirm={handleConfirmReceive}
       />
     </>
   );

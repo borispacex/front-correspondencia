@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { Router } from '../../types/routers/router.type.ts';
 import { getRouterById } from '../../services/router.service.ts';
@@ -12,31 +12,36 @@ import Button from '../../../ui/button/Button.tsx';
 import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
 import PendingInfo from '../../components/correspondence/pending/PendingInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
+import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
+import ConfirmModal from '../../../modal/ModalConfirm.tsx';
+import ModalDelete from '../../../modal/ModalDelete.tsx';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
 
 export default function PendingShowPage() {
   const { id } = useParams();
 
+  const { can } = usePermissions();
+  const navigate = useNavigate();
+  const { addNotification } = useNotifications();
+
   const [router, setRouter] = useState<Router | null>(null);
-  const [document, setDocument] = useState<Document | null>(null);
   const [isLoadingRouter, setIsLoadingRouter] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openRoutesModal, setOpenRoutesModal] = useState(false);
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
-
     setIsLoadingRouter(true);
-    setIsLoadingHistory(true);
-
     try {
       const response = await getRouterById(Number(id), {
         included: ['document.routers'],
       });
-
       setRouter(response);
-      setDocument(response.document ?? null);
     } finally {
       setIsLoadingRouter(false);
-      setIsLoadingHistory(false);
     }
   }, [id]);
 
@@ -45,26 +50,64 @@ export default function PendingShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (router: Router) => {
-    console.log('Rutas:', router);
+  const handleReceive = () => {
+    setOpenReceiveModal(true);
   };
 
-  const handleReceive = (router_id: number) => {
-    console.log('Recibir:', router_id);
+  const handleViewRoutes = () => {
+    setOpenRoutesModal(true);
   };
 
-  const handleDelete = (router_id: number) => {
-    console.log('Eliminar:', router_id);
+  const handleDelete = () => {
+    setOpenDeleteModal(true);
   };
+
+  async function handleConfirmDelete() {
+    if (router === null) return;
+    try {
+      // await deleteRoute(route.id)
+      addNotification({
+        type: 'success',
+        title: 'Derivación eliminada',
+        message: 'La derivación fue eliminada correctamente.',
+      });
+      navigate(`${ROUTES.CORRESPONDENCE.PENDING.ALL}}`);
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al eliminar derivación',
+      });
+    }
+  }
+
+  async function handleConfirmReceive() {
+    if (router === null) return;
+    try {
+      // await deriveRoute(route.id)
+      addNotification({
+        type: 'success',
+        title: 'Derivación exitosa',
+        message: 'La derivación fue enviada correctamente.',
+      });
+      navigate(`${ROUTES.CORRESPONDENCE.PENDING.ALL}}`);
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al realizar derivación',
+      });
+    }
+  }
 
   return (
     <>
       <PageMeta
-        title={`Tramite (Derivación) #${router?.id} | ${APP_NAME}`}
+        title={`Tramite (Derivación) #${id} | ${APP_NAME}`}
         description="Información detallada del tramite sin acción"
       />
       <PageBreadCrumb
-        pageTitle={`Tramite (Derivación) #${router?.id}`}
+        pageTitle={`Tramite (Derivación) #${id}`}
         items={[
           {
             label: 'Sin acción',
@@ -84,7 +127,7 @@ export default function PendingShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes(router)}
+              onClick={() => handleViewRoutes()}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -96,7 +139,7 @@ export default function PendingShowPage() {
               variant="info"
               size="sm"
               startIcon={<InboxIcon className="size-3.5" />}
-              onClick={() => handleReceive(router.id)}
+              onClick={() => handleReceive()}
             >
               Recibir
             </Button>
@@ -106,7 +149,7 @@ export default function PendingShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => handleDelete(router.id)}
+              onClick={() => handleDelete()}
             >
               Eliminar
             </Button>
@@ -120,9 +163,35 @@ export default function PendingShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={document} isLoading={isLoadingHistory} />
+          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
         </div>
       </div>
+
+      {/********************************** MODALES ***********************************/}
+      <RouterRoutesModal
+        isOpen={openRoutesModal}
+        isLoading={isLoadingRouter}
+        onClose={() => setOpenRoutesModal(false)}
+        document={router?.document}
+      />
+      <ConfirmModal
+        isOpen={openReceiveModal}
+        variant="success"
+        title="¿Confirmar recepción?"
+        message="Se realizará la recepción de la derivación."
+        confirmText="Recibir"
+        loadingText="Recibiendo"
+        onClose={() => setOpenReceiveModal(false)}
+        onConfirm={handleConfirmReceive}
+      />
+
+      <ModalDelete
+        isOpen={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar este derivación?"
+        message="Esta acción no se puede deshacer."
+      />
     </>
   );
 }

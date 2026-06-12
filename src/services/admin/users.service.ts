@@ -1,7 +1,12 @@
 import http from '../http.service.ts';
 import { API_ENDPOINTS } from '../../constants/api.constants.ts';
 import type { User, CreateUserRequest, UpdateUserRequest } from '../../types/admin/users/user.types.ts';
-import type { ApiResponse, ApiQueryParams } from '../../types/common/api.types.ts';
+import type {
+  ApiResponse,
+  ApiQueryParams,
+  Pagination,
+  LaravelResourcePagination,
+} from '../../types/common/api.types.ts';
 import { buildQueryParams } from '../../utils/query.utils.ts';
 
 export async function getUsers(params?: ApiQueryParams): Promise<User[]> {
@@ -9,6 +14,19 @@ export async function getUsers(params?: ApiQueryParams): Promise<User[]> {
     params: params ? buildQueryParams(params) : undefined,
   });
   return data.data;
+}
+
+export async function getUsersPaginated(params: ApiQueryParams): Promise<Pagination<User>> {
+  const { data } = await http.get<LaravelResourcePagination<User>>(API_ENDPOINTS.USERS.BASE, {
+    params: buildQueryParams({ ...params }),
+  });
+  return {
+    data: data.data,
+    current_page: data.meta.current_page,
+    last_page: data.meta.last_page,
+    per_page: data.meta.per_page,
+    total: data.meta.total,
+  };
 }
 
 export async function getUsersByDepartment(deparment_id?: number): Promise<User[]> {

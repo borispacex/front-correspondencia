@@ -2,18 +2,12 @@ import { FileInputIcon, RouteIcon } from '../../../../icons';
 import { Router } from '../../types/routers/router.type.ts';
 import { Document } from '../../types/documents/document.type.ts';
 
-// ─────────────────────────────────────────────────────────────
-// Props
-// ─────────────────────────────────────────────────────────────
 interface Props {
   document?: Document | null;
   isLoading?: boolean;
   isSelected?: boolean;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────
 function getInitials(name?: string): string {
   if (!name) return '?';
   const clean = name.replace(/^(CRNL\.|ING\.|DAEN\.|CNL\.|DR\.|LIC\.)\s*/gi, '').trim();
@@ -45,9 +39,6 @@ function stripHtml(value?: string): string {
   return value.replace(/<[^>]+>/g, '').trim();
 }
 
-// ─────────────────────────────────────────────────────────────
-// Estado badge
-// ─────────────────────────────────────────────────────────────
 const PENDING_STATE_IDS = [1, 2];
 const ATTENDED_STATE_IDS = [3, 4, 5];
 
@@ -59,9 +50,6 @@ function getStateCls(stateId: number): string {
   return 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/[0.05] dark:text-gray-400 dark:border-white/[0.08]';
 }
 
-// ─────────────────────────────────────────────────────────────
-// Skeleton
-// ─────────────────────────────────────────────────────────────
 function SkeletonLine({ className }: { className?: string }) {
   return <div className={`h-4 animate-pulse rounded bg-gray-200 dark:bg-white/[0.08] ${className ?? ''}`} />;
 }
@@ -90,9 +78,6 @@ function DocumentHistorySkeleton() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// Empty states
-// ─────────────────────────────────────────────────────────────
 function EmptyHistoryState() {
   return (
     <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 dark:border-white/[0.08] dark:bg-white/[0.03]">
@@ -113,7 +98,7 @@ function EmptyRoutersState() {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-8 text-center dark:border-white/[0.08]">
       <RouteIcon className="mb-2 h-8 w-8 text-gray-300 dark:text-gray-600" />
-      <p className="text-xs text-gray-500 dark:text-gray-400">Este documento aún no tiene derivaciones registradas.</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">Este tramite aún no tiene derivaciones registradas.</p>
     </div>
   );
 }
@@ -298,9 +283,6 @@ function RouterStep({ router, variant }: { router: Router; variant: StepVariant 
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// RouterTimeline
-// ─────────────────────────────────────────────────────────────
 function RouterTimeline({ routers }: { routers: Router[] }) {
   return (
     <div className="mt-1">
@@ -319,9 +301,6 @@ function RouterTimeline({ routers }: { routers: Router[] }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// Export principal
-// ─────────────────────────────────────────────────────────────
 export const RouterRoutes = ({ document, isLoading, isSelected = false }: Props) => {
   if (isLoading) return <DocumentHistorySkeleton />;
   if (!document) return <EmptyHistoryState />;
