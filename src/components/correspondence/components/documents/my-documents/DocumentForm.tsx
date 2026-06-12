@@ -4,12 +4,6 @@ import { useFormValidation } from '../../../../../hooks/useFormValidation.ts';
 import { CreateRouterRequest } from '../../../types/routers/router.type.ts';
 import Select, { Option } from '../../../../form/Select.tsx';
 import { useNotifications } from '../../../../../hooks/useNotification.tsx';
-import { getDepartments } from '../../../services/catalog/department.service.ts';
-import { getTypeDocuments } from '../../../services/catalog/type-document.service.ts';
-import { getPriorities } from '../../../services/catalog/priority.service.ts';
-import { getProcedures } from '../../../services/catalog/procedure.service.ts';
-import { getStateDocuments } from '../../../services/catalog/state-document.service.ts';
-import { getProvides } from '../../../services/catalog/provided.service.ts';
 import { getUsersByDepartment } from '../../../../../services/admin/users.service.ts';
 import Label from '../../../../form/Label.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
@@ -22,6 +16,7 @@ import Checkbox from '../../../../form/input/Checkbox.tsx';
 import RichTextEditor from '../../../../form/RichTextEditor.tsx';
 import DropZonePdf from '../../../../form/form-elements/DropZonePdf.tsx';
 import Button from '../../../../ui/button/Button.tsx';
+import { useCatalog } from '../../../context/CatalogContext.tsx';
 
 interface Props {
   document: Document;
@@ -39,17 +34,17 @@ function mapToOptions<T>(items: T[], valueKey: keyof T, labelKey: keyof T): Opti
 export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
   const { values, errors, setValue, setMultipleErrors } = useFormValidation({
     selectedDepartmentOrigen: '',
-    selectedProcedureType: String(document.procedure_id ?? ''),
-    selectedPriority: String(document.priority_id ?? ''),
-    selectedDepartment: String(document.department_id ?? ''),
-    selectedTypeDocument: String(document.type_document_id ?? ''),
-    docFechaOrigen: document.doc_fecha_origen ?? '',
-    docCite: document.doc_cite ?? '',
-    docNumeroCite: document.doc_numero_cite ?? '',
-    docRemite: document.doc_remite ?? '',
-    docReferencia: document.doc_referencia ?? '',
-    docAnexos: document.doc_anexos ?? '',
-    docFojas: document.doc_fojas?.toString() ?? '',
+    selectedProcedureType: String(document?.procedure_id ?? ''),
+    selectedPriority: String(document?.priority_id ?? ''),
+    selectedDepartment: String(document?.department_id ?? ''),
+    selectedTypeDocument: String(document?.type_document_id ?? ''),
+    docFechaOrigen: document?.doc_fecha_origen ?? '',
+    docCite: document?.doc_cite ?? '',
+    docNumeroCite: document?.doc_numero_cite ?? '',
+    docRemite: document?.doc_remite ?? '',
+    docReferencia: document?.doc_referencia ?? '',
+    docAnexos: document?.doc_anexos ?? '',
+    docFojas: document?.doc_fojas?.toString() ?? '',
 
     selectedDepartmentDestino: '',
     selectedUserDestino: '',
@@ -78,20 +73,19 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
   const [loadingCatalogs, setLoadingCatalogs] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {
+    departments: departmentsData,
+    typeDocuments: typeDocumentsData,
+    priorities: prioritiesData,
+    procedures: proceduresData,
+    stateDocuments: statesData,
+    provides: providesData,
+  } = useCatalog();
+
   useEffect(() => {
     async function loadCatalogs() {
       try {
         setLoadingCatalogs(true);
-        const [departmentsData, typeDocumentsData, prioritiesData, proceduresData, statesData, providesData] =
-          await Promise.all([
-            getDepartments(),
-            getTypeDocuments(),
-            getPriorities(),
-            getProcedures(),
-            getStateDocuments(),
-            getProvides(),
-          ]);
-
         setDepartments(mapToOptions(departmentsData, 'id', 'dep_name'));
         setTypeDocuments(mapToOptions(typeDocumentsData, 'id', 'typ_name'));
         setPriorities(
@@ -103,9 +97,7 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           })),
         );
         setProcedures(mapToOptions(proceduresData, 'id', 'proc_name'));
-
         setStateDocuments(mapToOptions(statesData, 'id', 'sdoc_name'));
-
         setProvides(mapToOptions(providesData, 'id', 'prov_name'));
       } catch {
         addNotification({
@@ -217,7 +209,7 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
         </Label>
         <Select
           options={departments}
-          value={values.selectedDepartmentOrigen}
+          defaultValue={values.selectedDepartmentOrigen}
           loading={loadingCatalogs}
           onChange={(value) => {
             setValue('selectedDepartmentOrigen', value);
@@ -235,7 +227,7 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           </Label>
           <Select
             options={procedures}
-            value={values.selectedProcedureType}
+            defaultValue={values.selectedProcedureType}
             loading={loadingCatalogs}
             onChange={(value) => setValue('selectedProcedureType', value)}
             placeholder="Seleccione un trámite"
@@ -249,7 +241,7 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           </Label>
           <Select
             options={stateDocuments}
-            value={values.selectedStateDocument}
+            defaultValue={values.selectedStateDocument}
             loading={loadingCatalogs}
             onChange={(value) => setValue('selectedStateDocument', value)}
             placeholder="Seleccione un estado"
@@ -491,7 +483,6 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           </Tooltip>
         </Label>
         <RichTextEditor
-          label="Aclaración del Proveído"
           name="routAclaracionProveido"
           value={values.routAclaracionProveido}
           // onChange={(html) => setFormData(p => ({ ...p, routAclaracionProveido: html }))}

@@ -4,10 +4,6 @@ import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../../..
 import { useNotifications } from '../../../../../hooks/useNotification.tsx';
 import Select, { Option } from '../../../../form/Select.tsx';
 import { useFormValidation } from '../../../../../hooks/useFormValidation.ts';
-import { getDepartments } from '../../../services/catalog/department.service.ts';
-import { getTypeDocuments } from '../../../services/catalog/type-document.service.ts';
-import { getPriorities } from '../../../services/catalog/priority.service.ts';
-import { getProcedures } from '../../../services/catalog/procedure.service.ts';
 import Label from '../../../../form/Label.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import { InfoIcon } from '../../../../../icons';
@@ -17,6 +13,7 @@ import InputField from '../../../../form/input/InputField.tsx';
 import TextArea from '../../../../form/input/TextArea.tsx';
 import DropZonePdf from '../../../../form/form-elements/DropZonePdf.tsx';
 import Button from '../../../../ui/button/Button.tsx';
+import { useCatalog } from '../../../context/CatalogContext.tsx';
 
 interface Props {
   document?: Document | null;
@@ -60,6 +57,13 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {
+    departments: departmentsData,
+    typeDocuments: typeDocumentsData,
+    priorities: prioritiesData,
+    procedures: proceduresData,
+  } = useCatalog();
+
   function resetForm() {
     setDocProcedencia('I');
     setValue('selectedProcedureType', '');
@@ -81,12 +85,6 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
     async function loadCatalogs() {
       try {
         setLoadingCatalogs(true);
-        const [departmentsData, typeDocumentsData, prioritiesData, proceduresData] = await Promise.all([
-          getDepartments(),
-          getTypeDocuments(),
-          getPriorities(),
-          getProcedures(),
-        ]);
         setDepartments(mapToOptions(departmentsData, 'id', 'dep_name'));
         setTypeDocuments(mapToOptions(typeDocumentsData, 'id', 'typ_name'));
         setPriorities(

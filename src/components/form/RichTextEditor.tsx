@@ -1,8 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface RichTextEditorProps {
-  label?: string;
+interface Props {
   value?: string;
   onChange?: (html: string) => void;
   placeholder?: string;
@@ -322,13 +321,12 @@ const ToolbarRow = ({ children }: { children: React.ReactNode }) => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function RichTextEditor({
-  label = 'Aclaración del Proveído',
   value = '',
   onChange,
   placeholder = 'Escriba el contenido aquí...',
   minHeight = 160,
   name = 'richTextEditor',
-}: RichTextEditorProps) {
+}: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [html, setHtml] = useState(value);
   const [showSource, setShowSource] = useState(false);
@@ -417,9 +415,6 @@ export default function RichTextEditor({
 
   return (
     <div className="w-full">
-      {/* Label */}
-      {label && <p className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">{label}:</p>}
-
       {/* Editor shell */}
       <div className="overflow-hidden rounded border border-gray-400 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800">
         {/* ── Row 1 toolbar ───────────────────────────────────────────── */}

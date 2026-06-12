@@ -1,31 +1,22 @@
 import { useEffect, useState } from 'react';
-
 import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../../types/documents/document.type.ts';
-
 import Label from '../../../form/Label.tsx';
 import InputField from '../../../form/input/InputField.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import Radio from '../../../form/input/Radio.tsx';
 import DatePicker from '../../../form/date-picker.tsx';
-
 import Select, { Option } from '../../../form/Select.tsx';
-
-import { getDepartments } from '../../services/catalog/department.service.ts';
-import { getTypeDocuments } from '../../services/catalog/type-document.service.ts';
-import { getPriorities } from '../../services/catalog/priority.service.ts';
-import { getProcedures } from '../../services/catalog/procedure.service.ts';
 import DropZonePdf from '../../../form/form-elements/DropZonePdf.tsx';
 import { InfoIcon } from '../../../../icons';
 import Tooltip from '../../../form/Tooltip.tsx';
 import TextArea from '../../../form/input/TextArea.tsx';
 import { useFormValidation } from '../../../../hooks/useFormValidation.ts';
 import { useNotifications } from '../../../../hooks/useNotification.tsx';
+import { useCatalog } from '../../context/CatalogContext.tsx';
 
 interface DocumentFormProps {
   document?: Document | null;
-
   onSubmit: (data: CreateDocumentRequest | UpdateDocumentRequest) => Promise<void>;
-
   onCancel: () => void;
 }
 
@@ -65,6 +56,13 @@ export default function FileForm({ document, onSubmit, onCancel }: DocumentFormP
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {
+    departments: departmentsData,
+    typeDocuments: typeDocumentsData,
+    priorities: prioritiesData,
+    procedures: proceduresData,
+  } = useCatalog();
+
   function resetForm() {
     setDocProcedencia('I');
     setValue('selectedProcedureType', '');
@@ -86,12 +84,6 @@ export default function FileForm({ document, onSubmit, onCancel }: DocumentFormP
     async function loadCatalogs() {
       try {
         setLoadingCatalogs(true);
-        const [departmentsData, typeDocumentsData, prioritiesData, proceduresData] = await Promise.all([
-          getDepartments(),
-          getTypeDocuments(),
-          getPriorities(),
-          getProcedures(),
-        ]);
         setDepartments(mapToOptions(departmentsData, 'id', 'dep_name'));
         setTypeDocuments(mapToOptions(typeDocumentsData, 'id', 'typ_name'));
         setPriorities(
