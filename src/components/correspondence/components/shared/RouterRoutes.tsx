@@ -272,21 +272,19 @@ function RouterStep({ router, variant }: { router: Router; variant: StepVariant 
         </div>
 
         {/* Estado de la derivación */}
-        <div className="mt-2.5 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+        <div className="mt-2 grid gap-3 md:grid-cols-[auto_1fr_auto] md:items-center">
           <div>{router.state_document_id && <StateDocumentBadge stateDocumentId={router.state_document_id} />}</div>
-          <div className="flex items-center justify-center gap-1 text-center">
-            <span className="text-[11px] text-gray-600 dark:text-gray-400">
+          <div className="flex flex-col gap-1 text-center text-[11px] text-gray-600 md:flex-row md:items-center md:justify-center md:gap-1 dark:text-gray-400">
+            <span>
               {`${getNameById(getUnitIdById(router.department_id_origen))} · ${getNameByIdDepartment(router.department_id_origen)}`}
             </span>
-            <ArrowRightIcon className="h-3 w-3 text-gray-400" />
-            <span className="text-[11px] text-gray-600 dark:text-gray-400">
+            <ArrowRightIcon className="hidden h-3 w-3 text-gray-400 md:block" />
+            <span>
               {`${getNameById(getUnitIdById(router.department_id_destino))} · ${getNameByIdDepartment(router.department_id_destino)}`}
             </span>
           </div>
-          <div>
-            {router.created_at && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">{formatDateBo(router.created_at)}</span>
-            )}
+          <div className="text-xs text-gray-500 md:text-right dark:text-gray-400">
+            {router.created_at && formatDateBo(router.created_at)}
           </div>
         </div>
       </div>

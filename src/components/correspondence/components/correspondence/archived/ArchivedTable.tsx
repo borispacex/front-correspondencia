@@ -329,6 +329,17 @@ export default function ArchivedTable({ routers, isLoading, onViewRoutes, onView
                   </td>
                   <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
                     <StateDocumentBadge stateDocumentId={router.state_document_id} />
+                    <br />
+                    <br />
+                    <span
+                      className={`inline-flex w-fit rounded-full border px-1.5 py-1 text-xs font-medium ${
+                        router.rout_recibe
+                          ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'
+                          : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400'
+                      }`}
+                    >
+                      {router.rout_recibe ? 'RECIBIDO' : 'SIN RECIBIR'}
+                    </span>
                   </td>
 
                   <td className="px-5 py-5 align-top">
