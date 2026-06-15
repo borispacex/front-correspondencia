@@ -20,10 +20,18 @@ export function useDepartment() {
     [findById],
   );
 
+  const getUnitIdById = useCallback(
+    (id?: number | string) => {
+      return findById(id)?.unit_id ?? '';
+    },
+    [findById],
+  );
+
   return {
     departments,
 
     findById,
     getNameById,
+    getUnitIdById,
   };
 }

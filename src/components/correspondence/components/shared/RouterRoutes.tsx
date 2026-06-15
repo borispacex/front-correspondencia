@@ -1,6 +1,16 @@
-import { FileInputIcon, RouteIcon } from '../../../../icons';
+import { ArrowRightIcon, FileInputIcon, RouteIcon } from '../../../../icons';
 import { Router } from '../../types/routers/router.type.ts';
 import { Document } from '../../types/documents/document.type.ts';
+import { StateDocumentBadge } from './StateDocumentBadge.tsx';
+import { PriorityBadge } from './PriorityBadge.tsx';
+import { formatDateBo, getYear } from '../../../../utils/format.utils.ts';
+import { useDepartment } from '../../hooks/catalog/useDepartment.ts';
+import { useProcedure } from '../../hooks/catalog/useProcedure.ts';
+import { useOrigin } from '../../hooks/catalog/useOrigin.ts';
+import { useTypeDocument } from '../../hooks/catalog/useTypeDocument.ts';
+import Badge from '../../../ui/badge/Badge.tsx';
+import { useUnit } from '../../hooks/catalog/useUnit.ts';
+import { ProvidedBadge } from './ProvidedBadge.tsx';
 
 interface Props {
   document?: Document | null;
@@ -15,39 +25,9 @@ function getInitials(name?: string): string {
   return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase();
 }
 
-function formatDateTime(iso?: string): string {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return (
-    d.toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
-    ' ' +
-    d.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })
-  );
-}
-
-function formatDate(iso?: string): string {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('es-BO', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-}
-
 function stripHtml(value?: string): string {
   if (!value) return '';
   return value.replace(/<[^>]+>/g, '').trim();
-}
-
-const PENDING_STATE_IDS = [1, 2];
-const ATTENDED_STATE_IDS = [3, 4, 5];
-
-function getStateCls(stateId: number): string {
-  if (PENDING_STATE_IDS.includes(stateId))
-    return 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-300 dark:border-yellow-500/20';
-  if (ATTENDED_STATE_IDS.includes(stateId))
-    return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/20';
-  return 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/[0.05] dark:text-gray-400 dark:border-white/[0.08]';
 }
 
 function SkeletonLine({ className }: { className?: string }) {
@@ -107,60 +87,87 @@ function EmptyRoutersState() {
 // DocumentHeader
 // ─────────────────────────────────────────────────────────────
 function DocumentHeader({ document: doc }: { document: Document }) {
-  const isUrgent = doc.priority_id === 1 || stripHtml(doc.pri_name).toUpperCase().includes('URGENTE');
+  const { getNameByValue } = useOrigin();
+  const { getNameById: getNameByIdProcedure } = useProcedure();
+  const { getNameById: getNameByIdTypeDocument } = useTypeDocument();
 
   return (
     <div className="mb-5 rounded-xl border border-gray-100 bg-gray-50/60 p-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
       {/* Cites + estado */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5">
           {/* Cite principal */}
-          <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
-            {doc.doc_numero_cite ?? doc.doc_cite ?? `DOC-${doc.id}`}
+          <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300 text-md inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium">
+            {doc.doc_contador ?? ''}/{getYear(doc.created_at) ?? ''}
           </span>
-          {/* Hoja de ruta */}
-          {doc.doc_contador && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-gray-300">
-              <RouteIcon className="h-3 w-3" />
-              {doc.doc_contador}
-            </span>
-          )}
+          <div>
+            {/* Hoja de ruta */}
+            {doc.id && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-gray-300">
+                <RouteIcon className="h-3 w-3" />
+                {doc.id}
+              </span>
+            )}
+            {doc.doc_cite && <p className="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{doc.doc_cite}</p>}
+          </div>
         </div>
 
-        {/* Prioridad + estado */}
-        <div className="flex items-center gap-2">
-          {isUrgent && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-red-700 uppercase dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-              Urgente
-            </span>
+        <div className="flex flex-col items-end gap-0.5">
+          <div className="flex items-center gap-2">
+            {doc.priority_id && <PriorityBadge priorityId={doc.priority_id} />}
+            <StateDocumentBadge stateDocumentId={doc.state_document_id} />
+          </div>
+          {doc.doc_numero_cite && (
+            <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">{doc.doc_numero_cite}</span>
           )}
-          <span
-            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${getStateCls(doc.state_document_id)}`}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-current" />
-            {doc.sdoc_name ?? 'Sin estado'}
-          </span>
         </div>
       </div>
 
-      {/* Referencia / asunto */}
-      {doc.doc_referencia && (
-        <p className="mb-3 text-sm leading-relaxed text-gray-700 dark:text-gray-300">{doc.doc_referencia}</p>
-      )}
-
-      {/* Meta */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1">
-        {doc.doc_remite && (
-          <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-            <span className="font-medium text-gray-700 dark:text-gray-300">{doc.doc_remite}</span>
+      {/* Procedencia */}
+      {doc.doc_procedencia && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-gray-500 dark:text-gray-400">Procedencia:</span>
+          <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300">
+            {getNameByValue(doc.doc_procedencia)}
           </span>
+        </div>
+      )}
+      {/* Tipo tramite */}
+      {doc.doc_procedencia && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-gray-500 dark:text-gray-400">Tipo de trámite:</span>
+          <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300">
+            {getNameByIdProcedure(doc.procedure_id)}
+          </span>
+        </div>
+      )}
+      {/* Tipo de documento */}
+      {doc.doc_procedencia && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-gray-500 dark:text-gray-400">Tipo de documento:</span>
+          <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300">
+            {getNameByIdTypeDocument(doc.type_document_id)}
+          </span>
+        </div>
+      )}
+      {/* Referencia / asunto */}
+      {doc.doc_remite && (
+        <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-[12px] text-gray-500 dark:text-gray-400">Remite:</span>
+          <span className="text-[12px] font-medium text-gray-700 dark:text-gray-300">{doc.doc_remite}</span>
+        </span>
+      )}
+      {/* Meta */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {doc.doc_referencia && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Referencia:</span>
+            <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">{doc.doc_referencia}</p>
+          </div>
         )}
-        {doc.doc_dep_name && <span className="text-xs text-gray-500 dark:text-gray-400">{doc.doc_dep_name}</span>}
-        {doc.typ_name && <span className="text-xs text-gray-500 dark:text-gray-400">{doc.typ_name}</span>}
         {(doc.doc_fecha_origen ?? doc.created_at) && (
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {formatDate(doc.doc_fecha_origen ?? doc.created_at)}
+            {formatDateBo(doc.doc_fecha_origen ?? doc.created_at)}
           </span>
         )}
       </div>
@@ -198,6 +205,10 @@ function RouterStep({ router, variant }: { router: Router; variant: StepVariant 
         ? 'border-green-200 dark:border-green-500/30'
         : 'border-gray-100 dark:border-white/[0.05]';
 
+  // Catalog
+  const { getNameById: getNameByIdDepartment, getUnitIdById } = useDepartment();
+  const { getNameById } = useUnit();
+
   return (
     <div className="relative flex gap-3">
       {/* Dot + línea vertical */}
@@ -233,7 +244,11 @@ function RouterStep({ router, variant }: { router: Router; variant: StepVariant 
           </div>
 
           <div className="flex flex-col items-end gap-0.5">
-            <span className="text-[11px] text-gray-400 dark:text-gray-500">{formatDateTime(router.created_at)}</span>
+            <span className="text-[11px] text-gray-400 dark:text-gray-500">
+              <Badge variant="light" size="sm" color={router.rout_recibe ? 'success' : 'warning'}>
+                Recibido: {router.rout_recibe ? formatDateBo(router.rout_recibe) : 'Sin fecha'}
+              </Badge>
+            </span>
             {router.rout_numero_cite && (
               <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
                 {router.rout_numero_cite}
@@ -241,43 +256,39 @@ function RouterStep({ router, variant }: { router: Router; variant: StepVariant 
             )}
           </div>
         </div>
-
-        {/* Destinatario */}
-        {router.rout_recibe && (
-          <div className="mt-2.5 flex items-center gap-1.5">
-            <span className="text-[11px] text-gray-500 dark:text-gray-400">Para:</span>
-            <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300">{router.rout_recibe}</span>
-          </div>
-        )}
-
         {/* Referencia */}
         {router.rout_referencia_document && (
-          <p className="mt-2 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
-            {router.rout_referencia_document}
-          </p>
-        )}
-
-        {/* Observación */}
-        {router.rout_observacion && (
-          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg border border-gray-100 bg-gray-50 px-2.5 py-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
-            <span className="mt-px text-[10px] font-semibold tracking-wide text-gray-400 uppercase dark:text-gray-500">
-              Obs.
+          <div className="my-2.5 flex items-center gap-1.5">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Referencia:</span>
+            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              {router.rout_referencia_document}{' '}
             </span>
-            <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-400">{router.rout_observacion}</p>
           </div>
         )}
+        {/* Provided */}
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <span></span>
+          <ProvidedBadge size="xs" providedIds={router.provided_id} />
+        </div>
 
         {/* Estado de la derivación */}
-        {router.stateDocument?.sdoc_name && (
-          <div className="mt-2.5">
-            <span
-              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${getStateCls(router.state_document_id)}`}
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-current" />
-              {router.stateDocument.sdoc_name}
+        <div className="mt-2.5 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+          <div>{router.state_document_id && <StateDocumentBadge stateDocumentId={router.state_document_id} />}</div>
+          <div className="flex items-center justify-center gap-1 text-center">
+            <span className="text-[11px] text-gray-600 dark:text-gray-400">
+              {`${getNameById(getUnitIdById(router.department_id_origen))} · ${getNameByIdDepartment(router.department_id_origen)}`}
+            </span>
+            <ArrowRightIcon className="h-3 w-3 text-gray-400" />
+            <span className="text-[11px] text-gray-600 dark:text-gray-400">
+              {`${getNameById(getUnitIdById(router.department_id_destino))} · ${getNameByIdDepartment(router.department_id_destino)}`}
             </span>
           </div>
-        )}
+          <div>
+            {router.created_at && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">{formatDateBo(router.created_at)}</span>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

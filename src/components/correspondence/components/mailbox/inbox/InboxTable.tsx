@@ -22,11 +22,12 @@ import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Router } from '../../../types/routers/router.type.ts';
 import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
-import { getYear } from '../../../../../utils/format.utils.ts';
+import { formatDateBo, getYear } from '../../../../../utils/format.utils.ts';
 import { useTypeDocument } from '../../../hooks/catalog/useTypeDocument.ts';
 import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
 import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
+import { ProvidedBadge } from '../../shared/ProvidedBadge.tsx';
 
 interface Props {
   routers: Router[];
@@ -186,23 +187,28 @@ export default function InboxTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-400">
-                          {router.document?.doc_contador ?? ''}/{getYear(router.document?.created_at) ?? ''}
+                      <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-400">
+                            {router.document?.doc_contador ?? ''}/{getYear(router.document?.created_at) ?? ''}
+                          </span>
+                          <Tooltip content={copiedId === router.id ? 'Copiado' : 'Copiar'}>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(router)}
+                              className={`group relative inline-flex items-center justify-center rounded-md pl-0.5 text-sky-600 transition-colors duration-200 hover:bg-gray-100 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-gray-800 ${
+                                copiedId === router.id
+                                  ? 'scale-110 bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400'
+                                  : 'scale-100'
+                              }`}
+                            >
+                              <CopyIcon className={`size-4`} />
+                            </button>
+                          </Tooltip>
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatDateBo(router.created_at)}
                         </span>
-                        <Tooltip content={copiedId === router.id ? 'Copiado' : 'Copiar'}>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(router)}
-                            className={`group relative inline-flex items-center justify-center rounded-md pl-0.5 text-sky-600 transition-colors duration-200 hover:bg-gray-100 hover:text-sky-700 dark:text-sky-400 dark:hover:bg-gray-800 ${
-                              copiedId === router.id
-                                ? 'scale-110 bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400'
-                                : 'scale-100'
-                            }`}
-                          >
-                            <CopyIcon className={`size-4`} />
-                          </button>
-                        </Tooltip>
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
@@ -249,7 +255,7 @@ export default function InboxTable({
                           </p>
                         )}
                         {router.type_document_id && (
-                          <p>
+                          <p className="mb-2">
                             <span className="font-semibold text-sky-600 dark:text-sky-400">TIPO DOCUMENTO:</span>{' '}
                             {getNameById(router.type_document_id)}
                           </p>
@@ -260,6 +266,10 @@ export default function InboxTable({
                         {/*    {router.rout_referencia_document}*/}
                         {/*  </p>*/}
                         {/*)}*/}
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <span></span>
+                          <ProvidedBadge size="xs" providedIds={router.provided_id} />
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -340,6 +350,17 @@ export default function InboxTable({
                   </td>
                   <td className="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
                     <StateDocumentBadge stateDocumentId={router.state_document_id} />
+                    <br />
+                    <br />
+                    <span
+                      className={`inline-flex w-fit rounded-full border px-1.5 py-1 text-xs font-medium ${
+                        router.rout_recibe
+                          ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'
+                          : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400'
+                      }`}
+                    >
+                      {router.rout_recibe ? 'RECIBIDO' : 'SIN RECIBIR'}
+                    </span>
                   </td>
 
                   <td className="px-5 py-5 align-top">

@@ -22,7 +22,7 @@ import Tooltip from '../../../../form/Tooltip.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { Document } from '../../../types/documents/document.type.ts';
 import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
-import { getYear } from '../../../../../utils/format.utils.ts';
+import { formatDateBo, getYear } from '../../../../../utils/format.utils.ts';
 import { useOrigin } from '../../../hooks/catalog/useOrigin.ts';
 import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { useTypeDocument } from '../../../hooks/catalog/useTypeDocument.ts';
@@ -179,23 +179,28 @@ export default function MyDocumentTable({
 
                   <td className="px-5 py-5 align-top">
                     <div className="space-y-3">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:text-brand-400 dark:bg-brand-500/10 rounded-full border px-3 py-1 text-xs font-medium">
-                          {document.doc_contador ?? ''}/{getYear(document.created_at) ?? ''}
+                      <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/20 dark:text-brand-400 dark:bg-brand-500/10 rounded-full border px-3 py-1 text-xs font-medium">
+                            {document.doc_contador ?? ''}/{getYear(document.created_at) ?? ''}
+                          </span>
+                          <Tooltip content={copiedId === document.id ? 'Copiado' : 'Copiar'}>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(document)}
+                              className={`group text-brand-600 hover:text-brand-700 dark:text-brand-400 relative inline-flex items-center justify-center rounded-md pl-0.5 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                                copiedId === document.id
+                                  ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 scale-110'
+                                  : 'scale-100'
+                              }`}
+                            >
+                              <CopyIcon className={`size-4`} />
+                            </button>
+                          </Tooltip>
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatDateBo(document.created_at)}
                         </span>
-                        <Tooltip content={copiedId === document.id ? 'Copiado' : 'Copiar'}>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(document)}
-                            className={`group text-brand-600 hover:text-brand-700 dark:text-brand-400 relative inline-flex items-center justify-center rounded-md pl-0.5 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                              copiedId === document.id
-                                ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 scale-110'
-                                : 'scale-100'
-                            }`}
-                          >
-                            <CopyIcon className={`size-4`} />
-                          </button>
-                        </Tooltip>
                       </div>
 
                       <div className="text-sm text-gray-700 dark:text-gray-300">
