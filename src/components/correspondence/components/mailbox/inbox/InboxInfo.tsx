@@ -6,6 +6,8 @@ import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
 import { Router } from '../../../types/routers/router.type.ts';
 import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
+import { ProvidedBadge } from '../../shared/ProvidedBadge.tsx';
+import { CalendarIcon, FileTextIcon } from '../../../../../icons';
 
 interface Props {
   router?: Router | null;
@@ -52,8 +54,6 @@ export default function InboxInfo({ router, isLoading }: Props) {
     ['Aclaración proveido', router.rout_aclaracion_proveido],
     ['Anexos', router.rout_anexos_document],
     ['Fojas', router.rout_fojas_document],
-    ['Recibido por', ''],
-    ['Archivo', ''],
   ];
 
   return (
@@ -84,6 +84,44 @@ export default function InboxInfo({ router, isLoading }: Props) {
             </span>
           </div>
         ))}
+        <div className="border-b border-gray-100 py-3 dark:border-white/[0.05]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:gap-4">
+            <span className="shrink-0 text-sm text-gray-400">Recibidos por:</span>
+
+            <div className="space-y-1 text-sm font-medium text-gray-800 sm:text-right dark:text-gray-200">
+              <div className="flex items-center gap-1 sm:justify-end">
+                <span>Boris Vargas Paucara</span>
+                <span>·</span>
+                <CalendarIcon className="h-4 w-4 shrink-0" />
+                <span>{formatDateBo(router.created_at)}</span>
+              </div>
+
+              <div className="flex items-center gap-1 sm:justify-end">
+                <span>LIZET FLORES SILVA</span>
+                <span>·</span>
+                <CalendarIcon className="h-4 w-4 shrink-0" />
+                <span>{formatDateBo(router.created_at)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-baseline justify-between gap-4 border-b border-gray-100 py-3 last:border-none dark:border-white/[0.05]">
+          <span className="shrink-0 text-sm text-gray-400">Archivo:</span>
+
+          <a
+            href="https://correspondencia.emi.edu.bo/Documentos/ea472882ce397116fef7f581bd4e906a.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-600 hover:border-brand-300 hover:bg-brand-50 dark:text-brand-400 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/10 inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium transition-all dark:border-gray-700 dark:bg-transparent"
+          >
+            <FileTextIcon className="h-4 w-4" />
+            <span>Ver archivo PDF</span>
+          </a>
+        </div>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-2">
+          <span></span>
+          <ProvidedBadge size="xs" providedIds={router.provided_id} />
+        </div>
       </div>
 
       {/* Estado */}

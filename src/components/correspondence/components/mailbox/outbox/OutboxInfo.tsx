@@ -6,6 +6,8 @@ import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
 import { Router } from '../../../types/routers/router.type.ts';
 import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
+import { ProvidedBadge } from '../../shared/ProvidedBadge.tsx';
+import { CalendarIcon } from '../../../../../icons';
 
 interface Props {
   router?: Router | null;
@@ -52,8 +54,6 @@ export default function OutboxInfo({ router, isLoading }: Props) {
     ['Aclaración proveido', router.rout_aclaracion_proveido],
     ['Anexos', router.rout_anexos_document],
     ['Fojas', router.rout_fojas_document],
-    ['Recibido por', ''],
-    ['Archivo', ''],
   ];
 
   return (
@@ -84,6 +84,32 @@ export default function OutboxInfo({ router, isLoading }: Props) {
             </span>
           </div>
         ))}
+        <div className="border-b border-gray-100 py-3 dark:border-white/[0.05]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:gap-4">
+            <span className="shrink-0 text-sm text-gray-400">Recibidos por:</span>
+
+            <div className="space-y-1 text-sm font-medium text-gray-800 sm:text-right dark:text-gray-200">
+              <div className="flex items-center gap-1 sm:justify-end">
+                <span>Boris Vargas Paucara</span>
+                <span>·</span>
+                <CalendarIcon className="h-4 w-4 shrink-0" />
+                <span>{formatDateBo(router.created_at)}</span>
+              </div>
+
+              <div className="flex items-center gap-1 sm:justify-end">
+                <span>LIZET FLORES SILVA</span>
+                <span>·</span>
+                <CalendarIcon className="h-4 w-4 shrink-0" />
+                <span>{formatDateBo(router.created_at)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-2">
+          <span></span>
+          <ProvidedBadge size="xs" providedIds={router.provided_id} />
+        </div>
       </div>
 
       {/* Estado */}

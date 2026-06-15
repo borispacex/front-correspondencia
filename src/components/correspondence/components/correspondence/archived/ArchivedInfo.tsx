@@ -6,6 +6,7 @@ import { StateDocumentBadge } from '../../shared/StateDocumentBadge.tsx';
 import { PriorityBadge } from '../../shared/PriorityBadge.tsx';
 import { Router } from '../../../types/routers/router.type.ts';
 import { useDepartment } from '../../../hooks/catalog/useDepartment.ts';
+import { ProvidedBadge } from '../../shared/ProvidedBadge.tsx';
 
 interface Props {
   router?: Router | null;
@@ -52,8 +53,6 @@ export default function ArchivedInfo({ router, isLoading }: Props) {
     ['Aclaración proveido', router.rout_aclaracion_proveido],
     ['Anexos', router.rout_anexos_document],
     ['Fojas', router.rout_fojas_document],
-    ['Recibido por', ''],
-    ['Archivo', ''],
   ];
 
   return (
@@ -84,6 +83,21 @@ export default function ArchivedInfo({ router, isLoading }: Props) {
             </span>
           </div>
         ))}
+        <div className="flex items-baseline justify-between gap-4 border-b border-gray-100 py-3 last:border-none dark:border-white/[0.05]">
+          <span className="shrink-0 text-sm text-gray-400">Recibidos por:</span>
+          <span className="text-right text-sm font-medium text-gray-800 dark:text-gray-200">
+            <p>Boris Vargas Paucara</p>
+            <p>MARIA ISABEL BALDELLON AVENDAÑO</p>
+            <p>Magali Larrea Riveros</p>
+            <p>Norma Lopez Aguilar</p>
+            <p>SUSAN GRACIELA MAMANI CAHUAYA</p>
+            <p>TELMO DURAN MOLLINEDO</p>
+          </span>
+        </div>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-2">
+          <span></span>
+          <ProvidedBadge size="xs" providedIds={router.provided_id} />
+        </div>
       </div>
 
       {/* Estado */}
