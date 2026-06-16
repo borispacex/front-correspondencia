@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
-import { Document } from '../../types/documents/document.type.ts';
+import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../../types/documents/document.type.ts';
 import PageMeta from '../../../common/PageMeta.tsx';
 import { APP_NAME } from '../../constants/correspondence.constants.ts';
 import PageBreadCrumb from '../../../common/PageBreadCrumb.tsx';
@@ -12,32 +12,37 @@ import { PencilIcon, PrinterIcon, SendHorizontalIcon, TrashBinIcon } from '../..
 import MyDocumentInfo from '../../components/documents/my-documents/MyDocumentInfo.tsx';
 import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
+import { Modal } from '../../../ui/modal';
+import DocumentForm from '../../components/documents/my-documents/DocumentForm.tsx';
+import RouterForm from '../../components/documents/my-documents/RouterForm.tsx';
+import ModalDelete from '../../../modal/ModalDelete.tsx';
+import { usePermissions } from '../../../../hooks/usePermissions.ts';
+import { useNotifications } from '../../../../hooks/useNotification.tsx';
 
 export default function MyDocumentShowPage() {
   const { id } = useParams();
+  const { can } = usePermissions();
+  const { addNotification } = useNotifications();
+  const navigate = useNavigate();
+
   const { getById: getDocumentById } = useDocument();
 
   const [document, setDocument] = useState<Document | null>(null);
 
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRouterModalOpen, setIsRouterModalOpen] = useState(false);
+  const [confirmId, setConfirmId] = useState<number | null>(null);
 
   const fetchDocument = useCallback(async () => {
     if (!id) return;
-
     setIsLoadingDocument(true);
-    setIsLoadingHistory(true);
-
     try {
       const response = await getDocumentById(Number(id), { included: ['routers'] });
-
       setDocument(response);
-
-      // TODO:
-      // cargar historial/rutas
     } finally {
       setIsLoadingDocument(false);
-      setIsLoadingHistory(false);
     }
   }, [id]);
 
@@ -46,18 +51,50 @@ export default function MyDocumentShowPage() {
   }, [fetchDocument]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleDerive = (document: Document) => {
-    console.log('Derivar', document);
-  };
-  const handleEdit = (document: Document) => {
-    console.log('Editar', document);
-  };
-  const handleViewSheet = (document: Document) => {
+  const handleViewSheet = () => {
     console.log('Hoja de ruta', document);
   };
-  const handleDelete = (document_id: number) => {
-    console.log('Eliminar', document_id);
-  };
+  async function handleConfirmDelete() {
+    if (confirmId === null) return;
+    try {
+      addNotification({
+        type: 'success',
+        title: 'Documento eliminado',
+        message: 'El documento fue eliminado correctamente.',
+      });
+      setConfirmId(null);
+      await fetchDocument();
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al eliminar el documento',
+      });
+    }
+  }
+
+  async function handleSubmit(data: CreateDocumentRequest | UpdateDocumentRequest) {
+    try {
+      addNotification({
+        type: 'info',
+        title: 'Documento actualizado',
+        message: `El documento "${data.doc_numero_cite}" fue actualizado correctamente.`,
+      });
+
+      setIsModalOpen(false);
+      await fetchDocument();
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: err?.response?.data?.message ?? 'Error al guardar el usuario',
+      });
+    }
+  }
+
+  async function handleSubmitRouter(data: any) {
+    console.log('derive', data);
+  }
 
   return (
     <>
@@ -85,7 +122,7 @@ export default function MyDocumentShowPage() {
               variant="secondary"
               size="sm"
               startIcon={<PrinterIcon className="size-3.5" />}
-              onClick={() => handleViewSheet(document)}
+              onClick={() => handleViewSheet()}
             >
               Hoja de ruta
             </Button>
@@ -95,7 +132,7 @@ export default function MyDocumentShowPage() {
               className="mr-3"
               variant="action"
               size="sm"
-              onClick={() => handleEdit(document)}
+              onClick={() => setIsModalOpen(true)}
               startIcon={<PencilIcon className="size-3.5" />}
             >
               Editar
@@ -107,7 +144,7 @@ export default function MyDocumentShowPage() {
               variant="success"
               size="sm"
               startIcon={<SendHorizontalIcon className="size-3.5" />}
-              onClick={() => handleDerive(document)}
+              onClick={() => setIsRouterModalOpen(true)}
             >
               Derivar
             </Button>
@@ -117,7 +154,7 @@ export default function MyDocumentShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => handleDelete(document.id)}
+              onClick={() => setConfirmId(document?.id)}
             >
               Eliminar
             </Button>
@@ -131,9 +168,44 @@ export default function MyDocumentShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={document} isLoading={isLoadingHistory} />
+          <RouterRoutes document={document} isLoading={isLoadingDocument} />
         </div>
       </div>
+
+      {/********************************** MODALES ***********************************/}
+      <Modal
+        isOpen={isModalOpen}
+        size="lg"
+        onClose={() => setIsModalOpen(false)}
+        className="w-full max-w-6xl p-6 sm:p-8"
+      >
+        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">Editar Documento</h3>
+        <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
+          Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+        </p>
+        <DocumentForm document={document} onSubmit={handleSubmit} onCancel={() => setIsModalOpen(false)} />
+      </Modal>
+
+      <Modal
+        isOpen={isRouterModalOpen}
+        size="lg"
+        onClose={() => setIsRouterModalOpen(false)}
+        className="w-full max-w-6xl p-6 sm:p-8"
+      >
+        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">Derivar documento</h3>
+        <p className="mb-5 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
+          Los campos marcados con <span className="text-error-500"> * </span> son obligatorios
+        </p>
+        <RouterForm document={document} onSubmit={handleSubmitRouter} onCancel={() => setIsRouterModalOpen(false)} />
+      </Modal>
+
+      <ModalDelete
+        isOpen={confirmId !== null}
+        onClose={() => setConfirmId(null)}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar este Documento?"
+        message="Esta acción no se puede deshacer."
+      />
     </>
   );
 }
