@@ -124,6 +124,8 @@ export default function DatePicker({
           instance.altInput.placeholder = placeholder || '';
           if (readOnly) {
             instance.altInput.readOnly = true;
+            instance.altInput.tabIndex = -1;
+            instance.altInput.style.cursor = 'default';
           }
         }
 

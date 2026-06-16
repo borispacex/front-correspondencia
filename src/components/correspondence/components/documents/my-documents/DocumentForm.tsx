@@ -297,7 +297,7 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
               <InfoIcon className="size-4 cursor-pointer text-gray-400" />
             </Tooltip>
           </Label>
-          <DatePicker id="createdDate" value={createdDate} disabled required={false} />
+          <DatePicker id="createdDate" value={createdDate} disabled required={true} readOnly={true} />
         </div>
       </div>
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
