@@ -1,26 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Document } from '../../../types/documents/document.type.ts';
-import { useFormValidation } from '../../../../../hooks/useFormValidation.ts';
-import { CreateRouterRequest } from '../../../types/routers/router.type.ts';
-import Select, { Option } from '../../../../form/Select.tsx';
+
+import { CreateDocumentRequest, Document, UpdateDocumentRequest } from '../../../types/documents/document.type.ts';
 import { useNotifications } from '../../../../../hooks/useNotification.tsx';
-import { getUsersByDepartment } from '../../../../../services/admin/users.service.ts';
+import Select, { Option } from '../../../../form/Select.tsx';
+import { useFormValidation } from '../../../../../hooks/useFormValidation.ts';
 import Label from '../../../../form/Label.tsx';
 import Tooltip from '../../../../form/Tooltip.tsx';
 import { InfoIcon } from '../../../../../icons';
+import Radio from '../../../../form/input/Radio.tsx';
+import DatePicker from '../../../../form/date-picker.tsx';
 import InputField from '../../../../form/input/InputField.tsx';
 import TextArea from '../../../../form/input/TextArea.tsx';
-import MultiSelect from '../../../../form/MultiSelect.tsx';
-import CheckboxSkeleton from '../../../../animation/CheckboxSkeleton.tsx';
-import Checkbox from '../../../../form/input/Checkbox.tsx';
-import RichTextEditor from '../../../../form/RichTextEditor.tsx';
 import DropZonePdf from '../../../../form/form-elements/DropZonePdf.tsx';
 import Button from '../../../../ui/button/Button.tsx';
 import { useCatalog } from '../../../context/CatalogContext.tsx';
 
 interface Props {
-  document: Document;
-  onSubmit: (data: CreateRouterRequest) => Promise<void>;
+  document?: Document | null;
+  onSubmit: (data: CreateDocumentRequest | UpdateDocumentRequest) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -33,44 +30,31 @@ function mapToOptions<T>(items: T[], valueKey: keyof T, labelKey: keyof T): Opti
 
 export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
   const { values, errors, setValue, setMultipleErrors } = useFormValidation({
-    selectedDepartmentOrigen: '',
-    selectedProcedureType: String(document?.procedure_id ?? ''),
-    selectedPriority: String(document?.priority_id ?? ''),
-    selectedDepartment: String(document?.department_id ?? ''),
-    selectedTypeDocument: String(document?.type_document_id ?? ''),
-    docFechaOrigen: document?.doc_fecha_origen ?? '',
-    docCite: document?.doc_cite ?? '',
-    docNumeroCite: document?.doc_numero_cite ?? '',
-    docRemite: document?.doc_remite ?? '',
-    docReferencia: document?.doc_referencia ?? '',
-    docAnexos: document?.doc_anexos ?? '',
-    docFojas: document?.doc_fojas?.toString() ?? '',
-
-    selectedDepartmentDestino: '',
-    selectedUserDestino: '',
-    selectedStateDocument: '',
-
-    routAclaracionProveido: '',
-    routObservacion: '',
-
-    providedIds: [] as string[],
-
+    selectedProcedureType: '',
+    docFechaOrigen: '',
+    selectedDepartment: '',
+    selectedTypeDocument: '',
+    selectedPriority: '',
+    docCite: '',
+    docNumeroCite: '',
+    docRemite: '',
+    docReferencia: '',
+    docAnexos: '',
+    docFojas: '',
     file: null as File | null,
   });
 
   const { addNotification } = useNotifications();
 
-  const [departments, setDepartments] = useState<Option[]>([]);
-  const [users, setUsers] = useState<Option[]>([]);
   const [procedures, setProcedures] = useState<Option[]>([]);
-  const [stateDocuments, setStateDocuments] = useState<Option[]>([]);
-  const [typeDocuments, setTypeDocuments] = useState<Option[]>([]);
   const [priorities, setPriorities] = useState<Option[]>([]);
-
-  const [provides, setProvides] = useState<Option[]>([]);
-  const [selectedProvideIds, setSelectedProvideIds] = useState<string[]>([]);
-  const [selectedDepartmentsIds, setSelectedDepartmentsIds] = useState<string[]>([]);
+  const [typeDocuments, setTypeDocuments] = useState<Option[]>([]);
+  const [departments, setDepartments] = useState<Option[]>([]);
   const [loadingCatalogs, setLoadingCatalogs] = useState(false);
+
+  const [docProcedencia, setDocProcedencia] = useState<'I' | 'E'>('I');
+  const [createdDate, setCreatedDate] = useState('');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -78,9 +62,24 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
     typeDocuments: typeDocumentsData,
     priorities: prioritiesData,
     procedures: proceduresData,
-    stateDocuments: statesData,
-    provides: providesData,
   } = useCatalog();
+
+  function resetForm() {
+    setDocProcedencia('I');
+    setValue('selectedProcedureType', '');
+    setValue('selectedPriority', '');
+    setValue('selectedDepartment', '');
+    setValue('selectedTypeDocument', '');
+    setValue('docFechaOrigen', '');
+    setCreatedDate(new Date().toISOString());
+    setValue('docCite', '');
+    setValue('docNumeroCite', '');
+    setValue('docRemite', '');
+    setValue('docReferencia', '');
+    setValue('docAnexos', '');
+    setValue('docFojas', '');
+    setValue('file', null);
+  }
 
   useEffect(() => {
     async function loadCatalogs() {
@@ -97,54 +96,53 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           })),
         );
         setProcedures(mapToOptions(proceduresData, 'id', 'proc_name'));
-        setStateDocuments(mapToOptions(statesData, 'id', 'sdoc_name'));
-        setProvides(mapToOptions(providesData, 'id', 'prov_name'));
-      } catch {
+      } catch (err) {
         addNotification({
           type: 'error',
           title: 'Error',
-          message: 'No se pudieron cargar los catálogos',
+          message: err ? 'No se pudieron cargar los catálogos' : '',
         });
       } finally {
         setLoadingCatalogs(false);
       }
     }
-
     loadCatalogs();
   }, []);
 
   useEffect(() => {
-    async function loadUsers() {
-      if (!values.selectedDepartmentDestino) {
-        setUsers([]);
-        return;
-      }
-
-      try {
-        const usersData = await getUsersByDepartment(Number(values.selectedDepartmentDestino));
-        setUsers(mapToOptions(usersData, 'id', 'name'));
-      } catch {
-        addNotification({
-          type: 'error',
-          title: 'Error',
-          message: 'No se pudieron cargar los usuarios',
-        });
-      }
+    if (!document) {
+      resetForm();
+      return;
     }
-
-    loadUsers();
-  }, [values.selectedDepartmentDestino]);
+    setDocProcedencia(document.doc_procedencia ?? 'I');
+    setValue('docFechaOrigen', document.doc_fecha_origen ?? '');
+    setCreatedDate(document.created_at ?? '');
+    setValue('docCite', document.doc_cite ?? '');
+    setValue('docNumeroCite', document.doc_numero_cite ?? '');
+    setValue('docRemite', document.doc_remite ?? '');
+    setValue('docReferencia', document.doc_referencia ?? '');
+    setValue('docAnexos', document.doc_anexos ?? '');
+    setValue('docFojas', document.doc_fojas?.toString() ?? '');
+    setValue('selectedProcedureType', String(document.procedure_id ?? ''));
+    setValue('selectedPriority', String(document.priority_id ?? ''));
+    setValue('selectedDepartment', String(document.department_id ?? ''));
+    setValue('selectedTypeDocument', String(document.type_document_id ?? ''));
+  }, [document]);
 
   function validate(): boolean {
     const newErrors: any = {};
-    if (!values.selectedDepartmentOrigen)
-      newErrors.selectedDepartmentOrigen = 'Debe seleccionar un departamento origen';
-    if (!values.selectedDepartmentDestino)
-      newErrors.selectedDepartmentDestino = 'Debe seleccionar un departamento destino';
-    if (!values.selectedUserDestino) newErrors.selectedUserDestino = 'Debe seleccionar un usuario destino';
-    if (!values.selectedStateDocument) newErrors.selectedStateDocument = 'Debe seleccionar un estado';
-    if (!values.selectedProcedureType) newErrors.selectedProcedureType = 'Debe seleccionar un trámite';
-    if (values.providedIds.length === 0) newErrors.providedIds = 'Debe seleccionar al menos un proveído';
+    if (!values.docFechaOrigen) newErrors.docFechaOrigen = 'La fecha del documento es requerida';
+    if (!values.selectedDepartment) newErrors.selectedDepartment = 'Debe seleccionar un departamento';
+    if (!values.selectedTypeDocument) newErrors.selectedTypeDocument = 'Debe seleccionar un tipo de documento';
+    if (!values.docRemite.trim()) newErrors.docRemite = 'El remitente es requerido';
+    if (!values.docReferencia.trim()) newErrors.docReferencia = 'El objeto / referencia es requerido';
+    if (values.docFojas && isNaN(Number(values.docFojas))) newErrors.docFojas = 'Las fojas deben ser numéricas';
+    if (!values.docCite.trim()) newErrors.docCite = 'El cite es requerido';
+    if (!values.docAnexos.trim()) newErrors.docAnexos = 'Los anexos son requeridos';
+    if (!values.docFojas.trim()) newErrors.docFojas = 'El número de fojas es requerido';
+    if (!values.docNumeroCite.trim()) newErrors.docNumeroCite = 'El número de cite es requerido';
+    if (!values.selectedPriority) newErrors.selectedPriority = 'Debe seleccionar una prioridad';
+    if (!values.selectedProcedureType) newErrors.selectedProcedureType = 'Debe seleccionar un tipo de trámite';
     if (!values.file) newErrors.file = 'El archivo es requerido';
 
     setMultipleErrors(newErrors);
@@ -154,21 +152,36 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (!validate()) return;
+
     setIsSubmitting(true);
 
     try {
-      const payload: CreateRouterRequest = {
-        document_id: document.id,
-        department_id_destino: Number(values.selectedDepartmentDestino),
-        user_id_destino: values.selectedUserDestino ? Number(values.selectedUserDestino) : undefined,
-        procedure_id: values.selectedProcedureType ? Number(values.selectedProcedureType) : undefined,
-        state_document_id: Number(values.selectedStateDocument),
-        provided_ids: values.providedIds,
-        rout_aclaracion_proveido: values.routAclaracionProveido.trim(),
-        rout_observacion: values.routObservacion.trim(),
+      const payload = {
+        doc_procedencia: docProcedencia,
+        procedure_id: values.selectedProcedureType ? Number(values.selectedProcedureType) : null,
+        department_id: values.selectedDepartment ? Number(values.selectedDepartment) : null,
+        type_document_id: values.selectedTypeDocument ? Number(values.selectedTypeDocument) : null,
+        priority_id: values.selectedPriority ? Number(values.selectedPriority) : null,
+        doc_fecha_origen: values.docFechaOrigen,
+        doc_cite: values.docCite.trim(),
+        doc_numero_cite: values.docNumeroCite.trim(),
+        doc_remite: values.docRemite.trim(),
+        doc_referencia: values.docReferencia.trim(),
+        doc_anexos: values.docAnexos.trim(),
+        doc_fojas: values.docFojas ? Number(values.docFojas) : undefined,
+        file: values.file,
       };
-      await onSubmit(payload);
+
+      if (document) {
+        await onSubmit({
+          id: document.id,
+          ...payload,
+        } as UpdateDocumentRequest);
+      } else {
+        await onSubmit(payload as CreateDocumentRequest);
+      }
     } catch (err: unknown) {
       const axiosErr = err as {
         response?: {
@@ -180,73 +193,136 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
       addNotification({
         type: 'error',
         title: 'Error',
-        message: axiosErr?.response?.data?.message ?? 'Error al derivar documento',
+        message: axiosErr?.response?.data?.message ?? 'Error al guardar el documento',
       });
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  function toggleProvide(id: string) {
-    setSelectedProvideIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <div>
         <Label>
-          Departamento origen<span className="text-error-500">*</span>{' '}
+          Origen Documento{' '}
           <Tooltip
+            position="bottom"
             content={
               <div>
-                <p className="mb-2 font-bold">Departamento origen:</p>
-                <p className="mb-2 font-medium">Se debera seleccionar el area funcional a la que pertenece.</p>
+                <p className="mb-2 font-bold">Origen Documento:</p>
+                <p className="mb-2 font-medium">
+                  Esta opción determinara si el documento que se adjunta a la hoja de trámite es de procedencia interna
+                  cuando es de la misma institución o externa si viene de otra institución o persona.
+                </p>
               </div>
             }
           >
             <InfoIcon className="size-4 cursor-pointer text-gray-400" />
           </Tooltip>
         </Label>
+        <div className="flex items-center gap-6 pt-2">
+          <Radio
+            id="internal"
+            name="docProcedencia"
+            value="I"
+            checked={docProcedencia === 'I'}
+            onChange={(value) => setDocProcedencia(value as 'I' | 'E')}
+            label="Interno"
+          />
+          <Radio
+            id="external"
+            name="docProcedencia"
+            value="E"
+            checked={docProcedencia === 'E'}
+            onChange={(value) => setDocProcedencia(value as 'I' | 'E')}
+            label="Externo"
+          />
+        </div>
+      </div>
+      <div>
+        <Label>
+          Tipo de Trámite<span className="text-error-500">*</span>
+        </Label>
         <Select
-          options={departments}
-          defaultValue={values.selectedDepartmentOrigen}
+          options={procedures}
+          defaultValue={values.selectedProcedureType}
           loading={loadingCatalogs}
-          onChange={(value) => {
-            setValue('selectedDepartmentOrigen', value);
-          }}
-          placeholder="Seleccione departamento"
-          error={!!errors.selectedDepartmentOrigen}
-          hint={errors.selectedDepartmentOrigen}
+          onChange={(value) => setValue('selectedProcedureType', value)}
+          placeholder="Seleccione un trámite"
+          error={!!errors.selectedProcedureType}
+          hint={errors.selectedProcedureType}
         />
       </div>
-
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
         <div>
           <Label>
-            Tipo de Trámite<span className="text-error-500">*</span>
+            Fecha Documento
+            <span className="text-error-500">*</span>{' '}
+            <Tooltip
+              content={
+                <div>
+                  <p className="mb-2 font-bold">Fecha Documento:</p>
+                  <p className="mb-2 font-medium">
+                    Se debe colocar la fecha del documento que se adjuntara a la hoja de trámite.
+                  </p>
+                </div>
+              }
+            >
+              <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+            </Tooltip>
           </Label>
-          <Select
-            options={procedures}
-            defaultValue={values.selectedProcedureType}
-            loading={loadingCatalogs}
-            onChange={(value) => setValue('selectedProcedureType', value)}
-            placeholder="Seleccione un trámite"
-            error={!!errors.selectedProcedureType}
-            hint={errors.selectedProcedureType}
+          <DatePicker
+            id="docFechaOrigen"
+            picker="date"
+            value={values.docFechaOrigen}
+            onChange={(value) => setValue('docFechaOrigen', value)}
+            placeholder="Seleccione una fecha"
+            error={!!errors.docFechaOrigen}
+            hint={errors.docFechaOrigen}
           />
         </div>
         <div>
           <Label>
-            Estado del documento<span className="text-error-500">*</span>
+            {'Fecha Creación '}
+            <Tooltip
+              content={
+                <div>
+                  <p className="mb-2 font-bold">Fecha Creación:</p>
+                  <p className="mb-2 font-medium">
+                    La fecha de creación no es editable, pero indica la fecha de creación de la hoja de trámite.
+                  </p>
+                </div>
+              }
+            >
+              <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+            </Tooltip>
+          </Label>
+          <DatePicker id="createdDate" value={createdDate} disabled required={false} />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+        <div>
+          <Label>
+            Dpto. / Unidad Origen<span className="text-error-500">*</span>{' '}
+            <Tooltip
+              content={
+                <div>
+                  <p className="mb-2 font-bold">Departamento Origen:</p>
+                  <p className="mb-2 font-medium">Se deberá seleccionar el área funcional a la que pertenece.</p>
+                </div>
+              }
+            >
+              <InfoIcon className="size-4 cursor-pointer text-gray-400" />
+            </Tooltip>
           </Label>
           <Select
-            options={stateDocuments}
-            defaultValue={values.selectedStateDocument}
+            options={departments}
+            defaultValue={values.selectedDepartment}
             loading={loadingCatalogs}
-            onChange={(value) => setValue('selectedStateDocument', value)}
-            placeholder="Seleccione un estado"
-            error={!!errors.selectedStateDocument}
-            hint={errors.selectedStateDocument}
+            onChange={(value) => setValue('selectedDepartment', value)}
+            placeholder="Seleccione un área"
+            error={!!errors.selectedDepartment}
+            hint={errors.selectedDepartment}
           />
         </div>
         <div>
@@ -275,7 +351,8 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
             hint={errors.selectedTypeDocument}
           />
         </div>
-
+      </div>
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
         <div>
           <Label>
             Prioridad<span className="text-error-500">*</span>{' '}
@@ -302,8 +379,6 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
             hint={errors.selectedPriority}
           />
         </div>
-      </div>
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div>
           <Label>
             Cite<span className="text-error-500">*</span>{' '}
@@ -312,7 +387,7 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
                 <div>
                   <p className="mb-2 font-bold">Cite:</p>
                   <p className="mb-2 font-medium">
-                    Es la coficacion que genra la reparticion, division, areas funcionales, etc. para su control.
+                    Es la codificación que genera la repartición, división, áreas funcionales, etc. para su control.
                   </p>
                 </div>
               }
@@ -326,9 +401,10 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Cite"
             error={!!errors.docCite}
             hint={errors.docCite}
-            disabled
           />
         </div>
+      </div>
+      <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
         <div>
           <Label>
             Nro. Cite<span className="text-error-500">*</span>
@@ -339,17 +415,16 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Nro. Cite"
             error={!!errors.docNumeroCite}
             hint={errors.docNumeroCite}
-            disabled
           />
         </div>
         <div>
           <Label>
-            Remite
+            Remitente
             <span className="text-error-500">*</span>{' '}
             <Tooltip
               content={
                 <div>
-                  <p className="mb-2 font-bold">Remite:</p>
+                  <p className="mb-2 font-bold">Remitente:</p>
                   <p className="mb-2 font-medium">
                     La persona encargada del área funcional quien está enviando la hoja de trámite.
                   </p>
@@ -365,11 +440,9 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Remitente"
             error={!!errors.docRemite}
             hint={errors.docRemite}
-            disabled
           />
         </div>
       </div>
-
       <div>
         <Label>
           Objeto / Referencia
@@ -396,101 +469,6 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           hint={errors.docReferencia}
         />
       </div>
-      <div>
-        <Label>
-          Departamentos
-          <span className="text-error-500">*</span>{' '}
-          <Tooltip
-            content={
-              <div>
-                <p className="mb-2 font-bold">Departamentos:</p>
-                <p className="mb-2 font-medium">
-                  Se debe seleccionar una o mas departamentos a los que se derivara la hoja de trámite.
-                </p>
-              </div>
-            }
-          >
-            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
-          </Tooltip>
-        </Label>
-        <div>
-          <MultiSelect
-            required
-            selectAll
-            searchable
-            value={selectedDepartmentsIds}
-            loading={loadingCatalogs}
-            rules={[
-              { type: 'required', message: 'Selecciona al menos una opción.' },
-              { type: 'min', value: 2, message: 'Mínimo 2 opciones.' },
-            ]}
-            options={departments}
-            onChange={(vals) => setSelectedDepartmentsIds(vals)}
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>
-          Proveidos
-          <span className="text-error-500">*</span>{' '}
-          <Tooltip
-            content={
-              <div>
-                <p className="mb-2 font-bold">Proveidos:</p>
-                <p className="mb-2 font-medium">Se debe seleccionar uno o mas proveidos a la hoja de trámite.</p>
-              </div>
-            }
-          >
-            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
-          </Tooltip>
-        </Label>
-        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
-          {loadingCatalogs ? (
-            <CheckboxSkeleton items={4} />
-          ) : provides.length === 0 ? (
-            <div className="px-5 py-10 text-center text-sm text-gray-400">No hay proveidos registrados</div>
-          ) : (
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
-              {provides.map((provide) => (
-                <Checkbox
-                  key={provide.value}
-                  label={provide.label}
-                  checked={selectedProvideIds.includes(provide.value)}
-                  onChange={() => toggleProvide(provide.value)}
-                  size="md"
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <div>
-        <Label>
-          Aclaracion del proveido
-          <span className="text-error-500">*</span>{' '}
-          <Tooltip
-            content={
-              <div>
-                <p className="mb-2 font-bold">Aclaracion del proveido:</p>
-                <p className="mb-2 font-medium">
-                  Se debera colocar una aclaracion al o los provedios que se marquen para su mejor comprension.
-                </p>
-              </div>
-            }
-          >
-            <InfoIcon className="size-4 cursor-pointer text-gray-400" />
-          </Tooltip>
-        </Label>
-        <RichTextEditor
-          name="routAclaracionProveido"
-          value={values.routAclaracionProveido}
-          // onChange={(html) => setFormData(p => ({ ...p, routAclaracionProveido: html }))}
-          onChange={(html) => setValue('routAclaracionProveido', html)}
-          minHeight={160}
-        />
-      </div>
-
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
         <div>
           <Label>
@@ -521,7 +499,6 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           />
         </div>
       </div>
-
       <div>
         <Label>
           Archivo
@@ -556,14 +533,12 @@ export default function DocumentForm({ document, onSubmit, onCancel }: Props) {
           </p>
         )}
       </div>
-
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-3 pt-2">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           Cancelar
         </Button>
-
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Derivando...' : 'Derivar'}
+          {isSubmitting ? 'Guardando...' : document ? 'Actualizar' : 'Guardar'}
         </Button>
       </div>
     </form>
