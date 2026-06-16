@@ -33,22 +33,24 @@ function mapToOptions<T>(items: T[], valueKey: keyof T, labelKey: keyof T): Opti
 
 export default function RouterForm({ document, onSubmit, onCancel }: Props) {
   const { values, errors, setValue, setMultipleErrors } = useFormValidation({
-    selectedDepartmentOrigen: '',
+    selectedDepartmentOrigen: String(document.department_id ?? ''),
     selectedProcedureType: String(document?.procedure_id ?? ''),
-    selectedPriority: String(document?.priority_id ?? ''),
-    selectedDepartment: String(document?.department_id ?? ''),
+    selectedStateDocument: document.state_document_id ?? '',
     selectedTypeDocument: String(document?.type_document_id ?? ''),
-    docFechaOrigen: document?.doc_fecha_origen ?? '',
+    selectedPriority: String(document?.priority_id ?? ''),
     docCite: document?.doc_cite ?? '',
     docNumeroCite: document?.doc_numero_cite ?? '',
     docRemite: document?.doc_remite ?? '',
     docReferencia: document?.doc_referencia ?? '',
+
+    selectedDepartment: String(document?.department_id ?? ''),
+    docFechaOrigen: document?.doc_fecha_origen ?? '',
+
     docAnexos: document?.doc_anexos ?? '',
     docFojas: document?.doc_fojas?.toString() ?? '',
 
     selectedDepartmentDestino: '',
     selectedUserDestino: '',
-    selectedStateDocument: '',
 
     routAclaracionProveido: '',
     routObservacion: '',
@@ -217,6 +219,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
           placeholder="Seleccione departamento"
           error={!!errors.selectedDepartmentOrigen}
           hint={errors.selectedDepartmentOrigen}
+          disabled
         />
       </div>
 
@@ -233,6 +236,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Seleccione un trámite"
             error={!!errors.selectedProcedureType}
             hint={errors.selectedProcedureType}
+            disabled
           />
         </div>
         <div>
@@ -247,6 +251,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Seleccione un estado"
             error={!!errors.selectedStateDocument}
             hint={errors.selectedStateDocument}
+            disabled
           />
         </div>
         <div>
@@ -273,6 +278,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Seleccione un documento"
             error={!!errors.selectedTypeDocument}
             hint={errors.selectedTypeDocument}
+            disabled
           />
         </div>
 
@@ -300,6 +306,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Seleccione prioridad"
             error={!!errors.selectedPriority}
             hint={errors.selectedPriority}
+            disabled
           />
         </div>
       </div>
@@ -394,6 +401,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
           placeholder="Referencia"
           error={!!errors.docReferencia}
           hint={errors.docReferencia}
+          disabled
         />
       </div>
       <div>
@@ -503,6 +511,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
             placeholder="Anexos"
             error={!!errors.docAnexos}
             hint={errors.docAnexos}
+            disabled
           />
         </div>
         <div>
@@ -518,6 +527,7 @@ export default function RouterForm({ document, onSubmit, onCancel }: Props) {
             min="0"
             error={!!errors.docFojas}
             hint={errors.docFojas}
+            disabled
           />
         </div>
       </div>
