@@ -10,7 +10,6 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { PencilIcon, PrinterIcon, SendHorizontalIcon, TrashBinIcon } from '../../../../icons';
 import MyDocumentInfo from '../../components/documents/my-documents/MyDocumentInfo.tsx';
-import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
 import { Modal } from '../../../ui/modal';
 import DocumentForm from '../../components/documents/my-documents/DocumentForm.tsx';
@@ -33,7 +32,7 @@ export default function MyDocumentShowPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRouterModalOpen, setIsRouterModalOpen] = useState(false);
-  const [confirmId, setConfirmId] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const fetchDocument = useCallback(async () => {
     if (!id) return;
@@ -55,14 +54,14 @@ export default function MyDocumentShowPage() {
     console.log('Hoja de ruta', document);
   };
   async function handleConfirmDelete() {
-    if (confirmId === null) return;
+    if (isDeleteModalOpen) return;
     try {
       addNotification({
         type: 'success',
         title: 'Documento eliminado',
         message: 'El documento fue eliminado correctamente.',
       });
-      setConfirmId(null);
+      setIsDeleteModalOpen(false);
       await fetchDocument();
     } catch (err: any) {
       addNotification({
@@ -154,7 +153,7 @@ export default function MyDocumentShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => setConfirmId(document?.id)}
+              onClick={() => setIsDeleteModalOpen(true)}
             >
               Eliminar
             </Button>
@@ -168,7 +167,15 @@ export default function MyDocumentShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={document} isLoading={isLoadingDocument} />
+          {/*<RouterRoutes document={document} isLoading={isLoadingDocument} />*/}
+          <div className="rounded-2xl border border-gray-200 bg-white p-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <iframe
+              src="https://drive.google.com/file/d/1HlKslqmKv3p4PE8ajFx9sZ43_FbH6szT/preview"
+              className="h-[80vh] w-full rounded-xl"
+              allow="autoplay"
+              title="Documento"
+            />
+          </div>
         </div>
       </div>
 
@@ -200,8 +207,8 @@ export default function MyDocumentShowPage() {
       </Modal>
 
       <ModalDelete
-        isOpen={confirmId !== null}
-        onClose={() => setConfirmId(null)}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         title="¿Eliminar este Documento?"
         message="Esta acción no se puede deshacer."

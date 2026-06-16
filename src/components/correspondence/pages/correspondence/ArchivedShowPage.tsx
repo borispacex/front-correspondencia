@@ -11,7 +11,6 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { ArchiveRestoreIcon, RouteIcon } from '../../../../icons';
 import ArchivedInfo from '../../components/correspondence/archived/ArchivedInfo.tsx';
-import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 import ConfirmModal from '../../../modal/ModalConfirm.tsx';
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
@@ -48,14 +47,6 @@ export default function ArchivedShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = () => {
-    setOpenRoutesModal(true);
-  };
-
-  const handleUnarchive = () => {
-    setOpenUnarchiveModal(true);
-  };
-
   async function handleConfirmUnarchive() {
     if (router === null) return;
     try {
@@ -102,7 +93,7 @@ export default function ArchivedShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes()}
+              onClick={() => setOpenRoutesModal(true)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -113,7 +104,7 @@ export default function ArchivedShowPage() {
               variant="info"
               size="sm"
               startIcon={<ArchiveRestoreIcon className="size-3.5" />}
-              onClick={() => handleUnarchive()}
+              onClick={() => setOpenUnarchiveModal(true)}
             >
               Desarchivar
             </Button>
@@ -127,7 +118,15 @@ export default function ArchivedShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
+          {/*<RouterRoutes document={router?.document} isLoading={isLoadingRouter} />*/}
+          <div className="rounded-2xl border border-gray-200 bg-white p-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <iframe
+              src="https://drive.google.com/file/d/1HlKslqmKv3p4PE8ajFx9sZ43_FbH6szT/preview"
+              className="h-[80vh] w-full rounded-xl"
+              allow="autoplay"
+              title="Documento"
+            />
+          </div>
         </div>
       </div>
 

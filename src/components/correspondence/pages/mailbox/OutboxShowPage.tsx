@@ -9,7 +9,6 @@ import { ROUTES } from '../../../../constants/routes.constants.ts';
 import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { ForwardIcon, PrinterIcon, RouteIcon } from '../../../../icons';
-import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import OutboxInfo from '../../components/mailbox/outbox/OutboxInfo.tsx';
 import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 import ConfirmModal from '../../../modal/ModalConfirm.tsx';
@@ -47,16 +46,8 @@ export default function OutboxShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleForward = () => {
-    setOpenForwardModal(true);
-  };
-
   const handleBackup = () => {
     console.log('Respaldo:', router?.id);
-  };
-
-  const handleViewRoutes = () => {
-    setOpenRoutesModal(true);
   };
 
   async function handleConfirmForward() {
@@ -103,7 +94,7 @@ export default function OutboxShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes()}
+              onClick={() => setOpenRoutesModal(true)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -125,7 +116,7 @@ export default function OutboxShowPage() {
               variant="info"
               size="sm"
               startIcon={<ForwardIcon className="size-3.5" />}
-              onClick={() => handleForward()}
+              onClick={() => setOpenForwardModal(true)}
             >
               Reenviar
             </Button>
@@ -139,7 +130,15 @@ export default function OutboxShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
+          {/*<RouterRoutes document={router?.document} isLoading={isLoadingRouter} />*/}
+          <div className="rounded-2xl border border-gray-200 bg-white p-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <iframe
+              src="https://drive.google.com/file/d/1HlKslqmKv3p4PE8ajFx9sZ43_FbH6szT/preview"
+              className="h-[80vh] w-full rounded-xl"
+              allow="autoplay"
+              title="Documento"
+            />
+          </div>
         </div>
       </div>
 

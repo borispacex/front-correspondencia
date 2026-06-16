@@ -10,7 +10,6 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { InboxIcon, RouteIcon, TrashBinIcon } from '../../../../icons';
 import InboxInfo from '../../components/mailbox/inbox/InboxInfo.tsx';
-import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 import ConfirmModal from '../../../modal/ModalConfirm.tsx';
 import { usePermissions } from '../../../../hooks/usePermissions.ts';
@@ -49,18 +48,6 @@ export default function InboxShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleReceive = () => {
-    setOpenReceiveModal(true);
-  };
-
-  const handleViewRoutes = () => {
-    setOpenRoutesModal(true);
-  };
-
-  const handleDelete = () => {
-    setOpenDeleteModal(true);
-  };
-
   async function handleConfirmDelete() {
     if (router === null) return;
     try {
@@ -127,7 +114,7 @@ export default function InboxShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes()}
+              onClick={() => setOpenRoutesModal(true)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -139,7 +126,7 @@ export default function InboxShowPage() {
               variant="info"
               size="sm"
               startIcon={<InboxIcon className="size-3.5" />}
-              onClick={() => handleReceive()}
+              onClick={() => setOpenReceiveModal(true)}
             >
               Recibir
             </Button>
@@ -149,7 +136,7 @@ export default function InboxShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => handleDelete()}
+              onClick={() => setOpenDeleteModal(true)}
             >
               Eliminar
             </Button>
@@ -163,7 +150,15 @@ export default function InboxShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
+          {/*<RouterRoutes document={router?.document} isLoading={isLoadingRouter} />*/}
+          <div className="rounded-2xl border border-gray-200 bg-white p-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <iframe
+              src="https://drive.google.com/file/d/1HlKslqmKv3p4PE8ajFx9sZ43_FbH6szT/preview"
+              className="h-[80vh] w-full rounded-xl"
+              allow="autoplay"
+              title="Documento"
+            />
+          </div>
         </div>
       </div>
 

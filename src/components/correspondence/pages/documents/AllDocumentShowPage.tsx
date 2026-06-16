@@ -10,7 +10,6 @@ import Tooltip from '../../../form/Tooltip.tsx';
 import Button from '../../../ui/button/Button.tsx';
 import { RouteIcon } from '../../../../icons';
 import AllDocumentInfo from '../../components/documents/all-documents/AllDocumentInfo.tsx';
-import { RouterRoutes } from '../../components/shared/RouterRoutes.tsx';
 import { useDocument } from '../../hooks/useDocument.ts';
 import RouterRoutesModal from '../../components/shared/RouterRoutesModal.tsx';
 
@@ -20,23 +19,17 @@ export default function AllDocumentShowPage() {
 
   const [document, setDocument] = useState<Document | null>(null);
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const [openRoutesModal, setOpenRoutesModal] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   const fetchDocument = useCallback(async () => {
     if (!id) return;
-
     setIsLoadingDocument(true);
-    setIsLoadingHistory(true);
-
     try {
       const response = await getDocumentByID(Number(id), { included: ['routers'] });
       setDocument(response);
     } finally {
       setIsLoadingDocument(false);
-      setIsLoadingHistory(false);
     }
   }, [id]);
 
@@ -45,14 +38,7 @@ export default function AllDocumentShowPage() {
   }, [fetchDocument]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleViewRoutes = (doc: Document) => {
-    setSelectedDocument(document);
-    setOpenRoutesModal(true);
-  };
-
-  // const handleDerive = (doc: Document) => {
-  //   console.log('Derivar', doc);
-  // };
+  // Vacio
 
   return (
     <>
@@ -72,7 +58,7 @@ export default function AllDocumentShowPage() {
               variant="primary"
               size="sm"
               disabled={!document}
-              onClick={() => document && handleViewRoutes(document)}
+              onClick={() => document && setOpenRoutesModal(true)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -88,16 +74,19 @@ export default function AllDocumentShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={document} isLoading={isLoadingHistory} />
+          <div className="rounded-2xl border border-gray-200 bg-white p-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <iframe
+              src="https://drive.google.com/file/d/1HlKslqmKv3p4PE8ajFx9sZ43_FbH6szT/preview"
+              className="h-[80vh] w-full rounded-xl"
+              allow="autoplay"
+              title="Documento"
+            />
+          </div>
         </div>
       </div>
 
       {/********************************** MODALES ***********************************/}
-      <RouterRoutesModal
-        isOpen={openRoutesModal}
-        onClose={() => setOpenRoutesModal(false)}
-        document={selectedDocument}
-      />
+      <RouterRoutesModal isOpen={openRoutesModal} onClose={() => setOpenRoutesModal(false)} document={document} />
     </>
   );
 }

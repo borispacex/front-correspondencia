@@ -50,18 +50,6 @@ export default function PendingShowPage() {
   }, [fetchData]);
 
   // ── Handlers ────────────────────────────────────────────────
-  const handleReceive = () => {
-    setOpenReceiveModal(true);
-  };
-
-  const handleViewRoutes = () => {
-    setOpenRoutesModal(true);
-  };
-
-  const handleDelete = () => {
-    setOpenDeleteModal(true);
-  };
-
   async function handleConfirmDelete() {
     if (router === null) return;
     try {
@@ -127,7 +115,7 @@ export default function PendingShowPage() {
               className="mr-3"
               variant="primary"
               size="sm"
-              onClick={() => handleViewRoutes()}
+              onClick={() => setOpenRoutesModal(true)}
               startIcon={<RouteIcon className="size-3.5" />}
             >
               Ver rutas
@@ -139,7 +127,7 @@ export default function PendingShowPage() {
               variant="info"
               size="sm"
               startIcon={<InboxIcon className="size-3.5" />}
-              onClick={() => handleReceive()}
+              onClick={() => setOpenReceiveModal(true)}
             >
               Recibir
             </Button>
@@ -149,7 +137,7 @@ export default function PendingShowPage() {
               variant="danger"
               size="sm"
               startIcon={<TrashBinIcon className="size-3.5" />}
-              onClick={() => handleDelete()}
+              onClick={() => setOpenDeleteModal(true)}
             >
               Eliminar
             </Button>
@@ -163,7 +151,15 @@ export default function PendingShowPage() {
         </div>
 
         <div className="xl:col-span-2">
-          <RouterRoutes document={router?.document} isLoading={isLoadingRouter} />
+          {/*<RouterRoutes document={router?.document} isLoading={isLoadingRouter} />*/}
+          <div className="rounded-2xl border border-gray-200 bg-white p-2 dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <iframe
+              src="https://drive.google.com/file/d/1HlKslqmKv3p4PE8ajFx9sZ43_FbH6szT/preview"
+              className="h-[80vh] w-full rounded-xl"
+              allow="autoplay"
+              title="Documento"
+            />
+          </div>
         </div>
       </div>
 
